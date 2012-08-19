@@ -13,7 +13,7 @@ object Util {
    * @param op the file writing code
    */
   def writerTo(filename: String)(op: PrintWriter => Unit) {
-    resource(new PrintWriter(new BufferedWriter(new FileWriter(filename))))(op)
+    using(new PrintWriter(new BufferedWriter(new FileWriter(filename))))(op)
   }
 
   /**

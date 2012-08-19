@@ -1,0 +1,1 @@
+echo Uninstall script for Windows
