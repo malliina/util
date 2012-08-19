@@ -1,4 +1,5 @@
 import sbt._
+
 package
 
 /**
@@ -6,5 +7,6 @@ package
  */
 
 object GitBuild extends Build {
-  lazy val test = Project("test", file("test"))
+  lazy val util = Project("common-util", file("common-util"))
+  lazy val test = Project("test", file("test")).dependsOn(util)
 }
