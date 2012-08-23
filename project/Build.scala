@@ -18,7 +18,7 @@ object GitBuild extends Build {
     rpm.Keys.rpmRelease := "Release 0.1 for RPM",
     rpm.Keys.rpmVendor := "King Michael",
     windows.Keys.wixFile := new File("doesnotexist"),
-    linux.Keys.linuxPackageMappings <+= (baseDirectory) map {
+    linux.Keys.linuxPackageMappings <+= baseDirectory map {
       bd => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
     }
   )
