@@ -12,9 +12,9 @@ object GitBuild extends Build {
   lazy val util = Project("common-util", file("common-util"), settings = mySettings)
   lazy val test = Project("test", file("test"), settings = mySettings ++ PackagerPlugin.packagerSettings).dependsOn(util).settings(
     // http://lintian.debian.org/tags/maintainer-address-missing.html
-    linux.Keys.maintainer := "Michael Skogberg <malliina123@ǧmail.com>",
-    linux.Keys.packageSummary := "Test package summary",
-    linux.Keys.packageDescription := "This is the description of the test package",
+    linux.Keys.maintainer := "Michael Skogberg <malliina123@gmail.com>",
+    linux.Keys.packageSummary := "This is a summary of package test",
+    linux.Keys.packageDescription := "This is the description of package test.",
     name := "test",
     debian.Keys.version := "0.1",
     // Tag takes single token only
@@ -22,12 +22,16 @@ object GitBuild extends Build {
     rpm.Keys.rpmVendor := "kingmichael",
     rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
     windows.Keys.wixFile := new File("doesnotexist"),
-    linux.Keys.linuxPackageMappings <+= baseDirectory map {
+    linux.Keys.linuxPackageMappings <+= (baseDirectory) map {
       bd => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
     },
-    debian.Keys.linuxPackageMappings <+= (baseDirectory, name) map {
+    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map {
       // http://lintian.debian.org/tags/no-copyright-file.html
       (bd, pkgName) => (packageMapping((bd / "dist" / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")) withUser "root" withPerms "0644")
+    },
+    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map {
+      // http://lintian.debian.org/tags/changelog-file-missing-in-native-package.html
+      (bd, pkgName) => (packageMapping((bd / "dist" / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz")) withUser "root" withPerms "0644" gzipped) asDocs()
     },
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
   )
