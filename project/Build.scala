@@ -20,6 +20,7 @@ object GitBuild extends Build {
     // Tag takes single token only
     rpm.Keys.rpmRelease := "0.1",
     rpm.Keys.rpmVendor := "kingmichael",
+    rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
     windows.Keys.wixFile := new File("doesnotexist"),
     linux.Keys.linuxPackageMappings <+= baseDirectory map {
       bd => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
