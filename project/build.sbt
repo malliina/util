@@ -1,10 +1,9 @@
-scalaVersion := "2.9.1"
+scalaVersion := "2.9.2"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 resolvers ++= Seq(
     "sbt-idea-repo" at "http://mpeltonen.github.com/maven/",
-    "wiquery-maven-repo" at "http://wiquery.googlecode.com/svn/repo/",
     "Twitter Repository" at "http://maven.twttr.com/",
     Classpaths.typesafeResolver,
     Resolver.url(
@@ -13,13 +12,16 @@ resolvers ++= Seq(
     )(Resolver.ivyStylePatterns)
 )
 
-libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % (v+"-0.2.11"))
+libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % (v+"-0.2.11.1"))
 
-addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.0.0")
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.1.0")
 
-addSbtPlugin("com.twitter" % "sbt-package-dist" % "1.0.5")
+//addSbtPlugin("com.twitter" % "sbt-package-dist" % "1.0.5")
 
-addSbtPlugin("org.clapper" % "sbt-izpack" % "0.3.2")
+//addSbtPlugin("org.clapper" % "sbt-izpack" % "0.3.2")
+
+addSbtPlugin("com.typesafe" % "sbt-native-packager" % "0.4.4")
+
 
 
 
