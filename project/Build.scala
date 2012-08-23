@@ -17,7 +17,8 @@ object GitBuild extends Build {
     linux.Keys.packageDescription := "This is the description of the test package",
     name := "test",
     debian.Keys.version := "0.1",
-    rpm.Keys.rpmRelease := "Release 0.1 for RPM",
+    // Tag takes single token only
+    rpm.Keys.rpmRelease := "0.1",
     rpm.Keys.rpmVendor := "kingmichael",
     windows.Keys.wixFile := new File("doesnotexist"),
     linux.Keys.linuxPackageMappings <+= baseDirectory map {
