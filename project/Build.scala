@@ -1,5 +1,6 @@
 import sbt._
 import sbt.Keys._
+import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager.{PackagerPlugin, linux, rpm, windows}
 
 /**
@@ -16,7 +17,10 @@ object GitBuild extends Build {
     name := "test",
     rpm.Keys.rpmRelease := "Release 0.1 for RPM",
     rpm.Keys.rpmVendor := "King Michael",
-    windows.Keys.wixFile := new File("doesnotexist")
+    windows.Keys.wixFile := new File("doesnotexist"),
+    linux.Keys.linuxPackageMappings <+= (baseDirectory) map {
+      bd => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
+    }
   )
 
   def mySettings = commonSettings
