@@ -2,15 +2,26 @@ import sbt._
 import sbt.Keys._
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager.{PackagerPlugin, linux, debian, rpm, windows}
+import Dependencies._
 
 /**
  * @author Mle
  */
 
 object GitBuild extends Build {
+  val commonSettings = Defaults.defaultSettings ++ Seq(
+    scalaVersion := "2.9.2",
+    version := "0.1-SNAPSHOT",
+    //      resolvers := additionalRepos,
+    exportJars := true,
+    retrieveManaged := true,
+    publishTo := Some(Resolver.url("sbt-plugin-releases", new URL("http://xxx/artifactory/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)),
+    publishMavenStyle := false,
+    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt")
+  )
   lazy val parent = Project("parent", file("."))
-  lazy val util = Project("common-util", file("common-util"), settings = mySettings)
-  lazy val test = Project("test", file("test"), settings = mySettings ++ PackagerPlugin.packagerSettings).dependsOn(util).settings(
+  lazy val util = Project("common-util", file("common-util"), settings = mySettings(loggingDeps))
+  lazy val test = Project("test", file("test"), settings = mySettings() ++ PackagerPlugin.packagerSettings).dependsOn(util).settings(
     // http://lintian.debian.org/tags/maintainer-address-missing.html
     linux.Keys.maintainer := "Michael Skogberg <malliina123@gmail.com>",
     linux.Keys.packageSummary := "This is a summary of package test",
@@ -23,7 +34,7 @@ object GitBuild extends Build {
     rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
     windows.Keys.wixFile := new File("doesnotexist"),
     linux.Keys.linuxPackageMappings <+= (baseDirectory) map {
-      bd => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
+      (bd) => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
     },
     debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map {
       // http://lintian.debian.org/tags/no-copyright-file.html
@@ -36,15 +47,8 @@ object GitBuild extends Build {
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
   )
 
-  def mySettings = commonSettings
+  def mySettings(deps: Seq[ModuleID] = Seq.empty) = commonSettings ++ Seq(libraryDependencies ++= deps)
 
-  val commonSettings = Defaults.defaultSettings ++ Seq(
-    scalaVersion := "2.9.2",
-    version := "0.1-SNAPSHOT",
-    //      resolvers := additionalRepos,
-    exportJars := true,
-    retrieveManaged := true
-  )
   //  IzPack.variables in IzPack.Config <+= name {
   //    name => ("projectName", "My test project")
   //  }
