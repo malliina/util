@@ -9,7 +9,6 @@ import Dependencies._
  */
 
 object GitBuild extends Build {
-  val tmp = com.github.siasia.WarPlugin
   val commonSettings = Defaults.defaultSettings ++ Seq(
     scalaVersion := "2.9.2",
     version := "0.1-SNAPSHOT",
@@ -34,17 +33,17 @@ object GitBuild extends Build {
     rpm.Keys.rpmVendor := "kingmichael",
     rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
     windows.Keys.wixFile := new File("doesnotexist"),
-    linux.Keys.linuxPackageMappings <+= (baseDirectory) map {
-      (bd) => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
-    },
-    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map {
+    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map (
       // http://lintian.debian.org/tags/no-copyright-file.html
       (bd, pkgName) => (packageMapping((bd / "dist" / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")) withUser "root" withPerms "0644")
-    },
-    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map {
+      ),
+    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map (
       // http://lintian.debian.org/tags/changelog-file-missing-in-native-package.html
       (bd, pkgName) => (packageMapping((bd / "dist" / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz")) withUser "root" withPerms "0644" gzipped) asDocs()
-    },
+      ),
+    linux.Keys.linuxPackageMappings <+= (baseDirectory) map (
+      (bd: File) => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
+      ),
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
   )
 
