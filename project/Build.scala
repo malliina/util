@@ -9,6 +9,7 @@ import Dependencies._
  */
 
 object GitBuild extends Build {
+  val tmp = com.github.siasia.WarPlugin
   val commonSettings = Defaults.defaultSettings ++ Seq(
     scalaVersion := "2.9.2",
     version := "0.1-SNAPSHOT",
