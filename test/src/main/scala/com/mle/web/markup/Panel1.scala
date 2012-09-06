@@ -9,6 +9,8 @@ import com.mle.web.component.SAjaxLink
  */
 
 class Panel1(id: String) extends Panel(id) with Log {
-  val link = SAjaxLink("link")(target => log info "Pressed link; target: " + target)
+  val link = SAjaxLink("link")(target => {
+    log info "Pressed link; target: " + target
+  })
   add(link)
 }

@@ -13,7 +13,7 @@ object JettyUtil extends Log {
   def start(port: Int = 8080) {
     val server = new Server(port)
     val contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS)
-    contextHandler addServlet(newWicketServlet(classOf[TestApplication]), "/*")
+    contextHandler addServlet(newWicketServlet(classOf[TestWebApplication]), "/*")
     server setHandler contextHandler
     server.start()
     log info "Started web server on port: " + port

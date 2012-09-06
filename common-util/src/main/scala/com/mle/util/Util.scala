@@ -39,4 +39,16 @@ object Util {
   } finally {
     resource.close()
   }
+
+  /**
+   * Attempts to compute <code>attempt</code>, suppressing any exceptions
+   * @param attempt
+   * @return attempt wrapped in an [[scala.Option]], or [[scala.None]] if any exception is thrown
+   */
+  def optionally[T](attempt: => T): Option[T] =
+    try {
+      Some(attempt)
+    } catch {
+      case e: Exception => None
+    }
 }

@@ -7,7 +7,7 @@ import org.apache.wicket.markup.html.WebPage
 /**
  * @author Mle
  */
-class TestApplication extends WebApplication {
+class TestWebApplication extends WebApplication {
   def getHomePage = classOf[Home]
 
   override def init() {
