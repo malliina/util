@@ -14,7 +14,7 @@ import com.mle.web.behavior.SortableListBehavior
  * @author Mle
  */
 
-class Panel2(id: String) extends Panel(id) with Log {
+class SortPanel(id: String) extends Panel(id) with Log {
   val items = new JArrayList(Seq("aaa", "bbb", "ccc", "ddd"))
   val form = new Form("form") {
     override def onSubmit() {

@@ -15,14 +15,12 @@ object Dependencies {
   val loggingDeps = Seq(slf4j, logBackClassic, logBackCore)
   val wicket = "org.apache.wicket" % "wicket" % wicketVersion
   val wicketExt = "org.apache.wicket" % "wicket-extensions" % wicketVersion
+  val wicketWebSockets = "org.apache.wicket" % "wicket-native-websocket-jetty" % "0.2"
   val jettyServer = "org.eclipse.jetty" % "jetty-server" % jettyVersion
   val jettyServlet = "org.eclipse.jetty" % "jetty-servlet" % jettyVersion
-  val webDeps = Seq(wicket, wicketExt, jettyServer, jettyServlet)
+  val jettyWebSocket = "org.eclipse.jetty" % "jetty-websocket" % jettyVersion
+  val webDeps = Seq(wicket, wicketExt, wicketWebSockets, jettyServer, jettyServlet, jettyWebSocket)
   val wiQueryCore = "org.odlabs.wiquery" % "wiquery-core" % "6.0.0"
   val wiQueryUi = "org.odlabs.wiquery" % "wiquery-jquery-ui" % "6.0.0"
   val wiQuery = Seq(wiQueryCore, wiQueryUi)
-}
-
-object Resolvers {
-//  val jqWicketRepo = "JQWicket repo" at "http://jqwicket.googlecode.com/svn/m2-repo/releases/"
 }

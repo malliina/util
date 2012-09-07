@@ -17,8 +17,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters
 class Home(params: PageParameters) extends WebPage(params) with Log {
   val tab = params get "tab"
 //  log info "Tab: " + tab
-  val tab1 = new STab("Tab 1", new Panel1(_))
-  val tab2 = new STab("Tab 2", new Panel2(_))
+  val tab1 = new STab("Tab 1", new WebSocketsPanel(_))
+  val tab2 = new STab("Tab 2", new SortPanel(_))
   val tabs = new AjaxTabbedPanel("tabs", Seq(tab1, tab2))
   add(tabs)
   optionally(tab.toInt).foreach(tabNr => if (tabNr >= 0 && tabNr < tabs.size) tabs setSelectedTab tabNr)
