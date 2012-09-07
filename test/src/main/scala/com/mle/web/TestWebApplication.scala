@@ -3,7 +3,6 @@ package com.mle.web
 import markup.Home
 import org.apache.wicket.protocol.http.WebApplication
 import org.apache.wicket.markup.html.WebPage
-import com.google.code.jqwicket.JQComponentOnBeforeRenderListener
 
 /**
  * JQWicket doesn't work with Wicket 6.0.0: NoClassDefFoundError: org/apache/wicket/markup/html/IHeaderResponse.

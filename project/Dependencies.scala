@@ -21,9 +21,8 @@ object Dependencies {
   val wiQueryCore = "org.odlabs.wiquery" % "wiquery-core" % "6.0.0"
   val wiQueryUi = "org.odlabs.wiquery" % "wiquery-jquery-ui" % "6.0.0"
   val wiQuery = Seq(wiQueryCore, wiQueryUi)
-  val jqWicket = "com.google.code.jqwicket" % "jqwicket" % "0.8"
 }
 
 object Resolvers {
-  val jqWicketRepo = "JQWicket repo" at "http://jqwicket.googlecode.com/svn/m2-repo/releases/"
+//  val jqWicketRepo = "JQWicket repo" at "http://jqwicket.googlecode.com/svn/m2-repo/releases/"
 }
