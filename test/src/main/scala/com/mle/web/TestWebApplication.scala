@@ -3,12 +3,19 @@ package com.mle.web
 import markup.Home
 import org.apache.wicket.protocol.http.WebApplication
 import org.apache.wicket.markup.html.WebPage
+import com.google.code.jqwicket.JQComponentOnBeforeRenderListener
 
 /**
+ * JQWicket doesn't work with Wicket 6.0.0: NoClassDefFoundError: org/apache/wicket/markup/html/IHeaderResponse.
+ * <br>
+ * WiQuery is not preferred.
+ * <br>
+ * wicket-jquery-ui is not available for 6.0.0 asof now and has no sortable behavior
+ *
  * @author Mle
  */
 class TestWebApplication extends WebApplication {
-  def getHomePage = classOf[Home]
+  val getHomePage = classOf[Home]
 
   override def init() {
     super.init()

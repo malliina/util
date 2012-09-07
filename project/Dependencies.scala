@@ -18,4 +18,12 @@ object Dependencies {
   val jettyServer = "org.eclipse.jetty" % "jetty-server" % jettyVersion
   val jettyServlet = "org.eclipse.jetty" % "jetty-servlet" % jettyVersion
   val webDeps = Seq(wicket, wicketExt, jettyServer, jettyServlet)
+  val wiQueryCore = "org.odlabs.wiquery" % "wiquery-core" % "6.0.0"
+  val wiQueryUi = "org.odlabs.wiquery" % "wiquery-jquery-ui" % "6.0.0"
+  val wiQuery = Seq(wiQueryCore, wiQueryUi)
+  val jqWicket = "com.google.code.jqwicket" % "jqwicket" % "0.8"
+}
+
+object Resolvers {
+  val jqWicketRepo = "JQWicket repo" at "http://jqwicket.googlecode.com/svn/m2-repo/releases/"
 }
