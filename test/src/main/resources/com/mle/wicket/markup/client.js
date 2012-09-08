@@ -24,8 +24,12 @@ jQuery(function($) {
 		$('#sentMessages').show();
 	});
 
-	Wicket.Event.subscribe("/websocket/message", function(jqEvent, message) {
-		$('#messages').prepend('<span>' + message + '</span><br/>');
+//	Wicket.Event.subscribe("/websocket/message", function(jqEvent, message) {
+//		$('#messages').prepend('<span>' + message + '</span><br/>');
+//	});
+    Wicket.Event.subscribe("/websocket/message", function(jqEvent, message) {
+        var record=jQuery.parseJSON(message);
+		$('#messages').prepend('<span>' + record.message + '</span><br/>');
 	});
 
 	var close = function(jqEvent) {

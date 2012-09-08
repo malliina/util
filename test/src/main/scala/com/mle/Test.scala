@@ -1,7 +1,8 @@
 package com.mle
 
-import util.Log
-import web.JettyUtil
+import ch.qos.logback.classic.Level
+import util.{AppUtils, Log}
+import wicket.JettyUtil
 
 /**
  * @author Mle
@@ -9,6 +10,7 @@ import web.JettyUtil
 
 object Test extends Log {
   def main(args: Array[String]) {
-    JettyUtil.start()
+    AppUtils.setLogLevel(Level.INFO)
+    JettyUtil.startAtmosphere()
   }
 }

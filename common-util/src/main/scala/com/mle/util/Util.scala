@@ -25,20 +25,22 @@ object Util {
    * @tparam U result of the operation
    * @return the result of the operation
    */
-  def resource[T <: {def close()}, U](resource: T)(op: T => U): U = try {
-    op(resource)
-  } finally {
-    resource.close()
-  }
+  def resource[T <: {def close()}, U](resource: T)(op: T => U): U =
+    try {
+      op(resource)
+    } finally {
+      resource.close()
+    }
 
   /**
    * @see [[com.mle.util.Util]]#resource
    */
-  def using[T <: Closeable, U](resource: T)(op: T => U): U = try {
-    op(resource)
-  } finally {
-    resource.close()
-  }
+  def using[T <: Closeable, U](resource: T)(op: T => U): U =
+    try {
+      op(resource)
+    } finally {
+      resource.close()
+    }
 
   /**
    * Attempts to compute <code>attempt</code>, suppressing any exceptions

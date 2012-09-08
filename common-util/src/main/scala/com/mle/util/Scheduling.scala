@@ -1,12 +1,12 @@
 package com.mle.util
 
-import java.util.concurrent.{Executors, TimeUnit}
+import java.util.concurrent.{Callable, Executors, TimeUnit}
 
 /**
  * @author Mle
  */
 
-object Scheduling {
+object Scheduling extends Log {
   private val service = Executors.newSingleThreadScheduledExecutor()
   val every = (schedule(_: Int, _: TimeUnit) _).tupled
 
@@ -16,7 +16,19 @@ object Scheduling {
 
   def runnable(code: => Unit) = new Runnable {
     def run() {
-      code
+      logAnyError(code)
     }
+  }
+
+  def callable[T](code: => T) = new Callable[T] {
+    def call(): T = logAnyError(code)
+  }
+
+  def logAnyError[T](code: => T) = try {
+    code
+  } catch {
+    case e: Exception =>
+      log warn("Execution failed", e)
+      throw e
   }
 }

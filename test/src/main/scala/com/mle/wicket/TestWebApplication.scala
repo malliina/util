@@ -1,4 +1,4 @@
-package com.mle.web
+package com.mle.wicket
 
 import markup.Home
 import org.apache.wicket.protocol.http.WebApplication

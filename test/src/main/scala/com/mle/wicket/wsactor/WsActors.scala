@@ -1,20 +1,25 @@
-package com.mle.web.wsactor
+package com.mle.wicket.wsactor
 
 import com.mle.util.Implicits._
 import com.mle.util.Log
 import com.mle.util.Scheduling._
+import com.mle.util.Util._
 
 /**
  * @author Mle
  */
 
 object WsActors extends Log {
+  log info "Initializing Web Services actors"
+  val JSON_FORMAT = """{"message": "%s", "version": %d}"""
   val king = KingActor.build()
   private var i = 0
-
-  every(3.seconds) {
+  addShutdownHook(king ! Stop)
+  every(1.milliseconds) {
     i += 1
-    king ! Broadcast(i.toString)
+    val msg = String.format(JSON_FORMAT, "Message nr: " + i, new Integer(4))
+    log debug "Broadcasting: " + msg
+    king ! Broadcast(msg)
   }
 
   case class Address(appName: String, sessionId: String, pageId: Int)

@@ -1,9 +1,8 @@
-import sbt._
-import sbt.Keys._
+import Dependencies._
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager.{PackagerPlugin, linux, debian, rpm, windows}
-import Dependencies._
-import Resolvers._
+import sbt.Keys._
+import sbt._
 
 /**
  * @author Mle
@@ -23,6 +22,7 @@ object GitBuild extends Build {
   lazy val parent = Project("parent", file("."))
   lazy val util = Project("common-util", file("common-util"), settings = mySettings(loggingDeps))
   lazy val test = Project("test", file("test"), settings = mySettings() ++ PackagerPlugin.packagerSettings).dependsOn(util).settings(
+    classDirectory <<= (baseDirectory)(b => b / "WEB-INF" / "classes"),
     libraryDependencies ++= webDeps ++ wiQuery,
     // http://lintian.debian.org/tags/maintainer-address-missing.html
     linux.Keys.maintainer := "Michael Skogberg <malliina123@gmail.com>",

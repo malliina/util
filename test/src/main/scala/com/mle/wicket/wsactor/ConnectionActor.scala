@@ -1,4 +1,4 @@
-package com.mle.web.wsactor
+package com.mle.wicket.wsactor
 
 import WsActors._
 import actors.Actor
@@ -25,7 +25,7 @@ class ConnectionActor(val address: Address) extends Actor with Log {
           val conn = registry.getConnection(Application.get(appName), session, page)
           conn sendMessage msg
         case Stop =>
-          log info "Exiting: " + id
+          log info "Closing: " + id
           exit()
       }
     }

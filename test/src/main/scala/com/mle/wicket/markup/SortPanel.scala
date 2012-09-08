@@ -1,14 +1,14 @@
-package com.mle.web.markup
+package com.mle.wicket.markup
 
 import org.apache.wicket.markup.html.panel.Panel
 import java.util.{ArrayList => JArrayList}
 import org.apache.wicket.model.Model
 import collection.JavaConversions._
 import org.apache.wicket.markup.html.basic.Label
-import com.mle.web.component.SListView
+import com.mle.wicket.component.SListView
 import org.apache.wicket.markup.html.form.Form
 import com.mle.util.Log
-import com.mle.web.behavior.SortableListBehavior
+import com.mle.wicket.behavior.SortableListBehavior
 
 /**
  * @author Mle

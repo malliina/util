@@ -1,4 +1,4 @@
-package com.mle.web.component
+package com.mle.wicket.component
 
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink
 import org.apache.wicket.ajax.AjaxRequestTarget

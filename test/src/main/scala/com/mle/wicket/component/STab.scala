@@ -1,4 +1,4 @@
-package com.mle.web.component
+package com.mle.wicket.component
 
 import org.apache.wicket.model.{Model, IModel}
 import org.apache.wicket.extensions.markup.html.tabs.AbstractTab

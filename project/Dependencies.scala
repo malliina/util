@@ -16,10 +16,11 @@ object Dependencies {
   val wicket = "org.apache.wicket" % "wicket" % wicketVersion
   val wicketExt = "org.apache.wicket" % "wicket-extensions" % wicketVersion
   val wicketWebSockets = "org.apache.wicket" % "wicket-native-websocket-jetty" % "0.2"
+  val wicketAtmosphere = "org.apache.wicket" % "wicket-atmosphere" % "0.3"
   val jettyServer = "org.eclipse.jetty" % "jetty-server" % jettyVersion
   val jettyServlet = "org.eclipse.jetty" % "jetty-servlet" % jettyVersion
   val jettyWebSocket = "org.eclipse.jetty" % "jetty-websocket" % jettyVersion
-  val webDeps = Seq(wicket, wicketExt, wicketWebSockets, jettyServer, jettyServlet, jettyWebSocket)
+  val webDeps = Seq(wicket, wicketExt, wicketWebSockets, wicketAtmosphere, jettyServer, jettyServlet, jettyWebSocket)
   val wiQueryCore = "org.odlabs.wiquery" % "wiquery-core" % "6.0.0"
   val wiQueryUi = "org.odlabs.wiquery" % "wiquery-jquery-ui" % "6.0.0"
   val wiQuery = Seq(wiQueryCore, wiQueryUi)

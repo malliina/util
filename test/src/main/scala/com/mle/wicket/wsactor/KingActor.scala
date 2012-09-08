@@ -1,4 +1,4 @@
-package com.mle.web.wsactor
+package com.mle.wicket.wsactor
 
 import WsActors._
 import actors.Actor
@@ -21,8 +21,12 @@ class KingActor extends Actor with Log {
             connections -= c
             c ! Stop
           })
+          log info "Client disconnected, " + connections.size + " clients left"
         case Broadcast(msg) =>
           connections.foreach(_ ! Message(msg))
+        case Stop =>
+          connections foreach (_ ! Stop)
+          exit()
       }
     }
   }

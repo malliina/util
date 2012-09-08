@@ -1,4 +1,4 @@
-package com.mle.web.component
+package com.mle.wicket.component
 
 import java.util.{List => JList}
 import org.apache.wicket.model.IModel

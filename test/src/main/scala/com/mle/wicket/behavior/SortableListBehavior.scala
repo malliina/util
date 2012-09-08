@@ -1,4 +1,4 @@
-package com.mle.web.behavior
+package com.mle.wicket.behavior
 
 import org.odlabs.wiquery.ui.sortable.SortableBehavior
 import org.apache.wicket.ajax.AjaxRequestTarget
