@@ -32,7 +32,7 @@ object Util {
   }
 
   /**
-   * @see [[com.mle.util.Util]].resource
+   * @see [[com.mle.util.Util]]#resource
    */
   def using[T <: Closeable, U](resource: T)(op: T => U): U = try {
     op(resource)
@@ -51,4 +51,12 @@ object Util {
     } catch {
       case e: Exception => None
     }
+
+  def addShutdownHook(code: => Unit) {
+    Runtime.getRuntime.addShutdownHook(new Thread {
+      override def run() {
+        code
+      }
+    })
+  }
 }

@@ -3,6 +3,8 @@ package com.mle.web.markup
 import collection.JavaConversions._
 import com.mle.util.Log
 import com.mle.web.component.SAjaxLink
+import com.mle.web.wsactor.WsActors
+import com.mle.web.wsactor.WsActors.Address
 import org.apache.wicket.Component
 import org.apache.wicket.ajax.WebSocketRequestHandler
 import org.apache.wicket.markup.head.{IHeaderResponse, JavaScriptHeaderItem}
@@ -23,21 +25,25 @@ class WebSocketsPanel(id: String) extends Panel(id) with Log {
     val pageId = getPage.getPageId
     val maybeConn = Option(registry.getConnection(getApplication, sessionId, pageId))
     maybeConn.foreach(conn => {
-//      conn sendMessage "Anybody home?"
       val handler = new WebSocketRequestHandler(this, conn)
-      val msg = "This message has been pushed after an ajax request"
+      val msg = "This message has been pushed as a response to an ajax request"
+      //      conn sendMessage msg
       handler push msg
       log info "Server pushed message: " + msg
     })
   })
   add(link)
   add(new WebSocketBehavior {
-    override def onConnect(message: ConnectedMessage) {
-      log info "Client connected, app: " + message.getApplication + ", session: " + message.getSessionId
+    def toAddress(msg: ConnectedMessage) = Address(msg.getApplication.getName, msg.getSessionId, msg.getPageId)
+
+    override def onConnect(msg: ConnectedMessage) {
+      log info "Client connected, app: " + msg.getApplication + ", session: " + msg.getSessionId
+      WsActors.connect(Address(msg.getApplication.getName, msg.getSessionId, msg.getPageId))
     }
 
     override def onClose(message: ClosedMessage) {
       log info "Client connection closed"
+      WsActors.disconnect(Address(message.getApplication.getName, message.getSessionId, message.getPageId))
     }
 
     override def onMessage(handler: WebSocketRequestHandler, message: TextMessage) {
