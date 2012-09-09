@@ -10,7 +10,7 @@ import com.mle.util.FileUtilities
  * however that example depends on Git while this code does not.
  * @author Mle
  */
-object PackageSettings extends Plugin {
+object Packaging extends Plugin {
   // Relative to the project
   val outDir = "distrib"
   val confDir = "conf"
@@ -33,7 +33,8 @@ object PackageSettings extends Plugin {
   val scriptFiles = TaskKey[Set[Path]]("scripts", "Scripts to package with the app")
   val copyConfs = TaskKey[Set[Path]]("copy-confs", "Copies all configuration files to " + confOutDir)
   val copyScripts = TaskKey[Set[Path]]("copy-scripts", "Copies all configuration files to " + scriptOutDir)
-  val libs = TaskKey[Set[Path]]("mle:libs", "All (managed and unmanaged) libs")
+  val printLibs = TaskKey[Unit]("print-libs", "Prints library .jars to stdout")
+  val libs = TaskKey[Set[Path]]("libs", "All (managed and unmanaged) libs")
   val copyLibs = TaskKey[Set[Path]]("copy-libs", "Copies all (managed and unmanaged) libs to " + libOutDir)
   val createJar = TaskKey[Set[Path]]("create-jar", "Copies application .jar to " + outDir)
   val packageApp = TaskKey[Set[Path]]("package-app", "Copies the app (jars, libs, confs) to " + outDir)
@@ -61,10 +62,13 @@ object PackageSettings extends Plugin {
       // Libs, but not my own jars
       cp.files.filter(f => !products.files.contains(f)).map(_.toPath).toSet
     }),
-    copyLibs <<= (
+    printLibs <<= (libs) map ((l) => {
+      l foreach println
+    }),
+    copyLibs <<=(
       libs,
       distribDir
-      ) map ((libJars, dest) => {
+    ) map ((libJars, dest) => {
       val libDestination = dest resolve libDir
       Files.createDirectories(libDestination)
       libJars.map(libJar => Files.copy(libJar, libDestination resolve libJar.getFileName, StandardCopyOption.REPLACE_EXISTING))

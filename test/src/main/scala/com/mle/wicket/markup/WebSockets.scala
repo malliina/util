@@ -1,23 +1,19 @@
 package com.mle.wicket.markup
 
-import collection.JavaConversions._
 import com.mle.util.Log
 import com.mle.wicket.component.SAjaxLink
 import com.mle.wicket.wsactor.WsActors
 import com.mle.wicket.wsactor.WsActors.Address
-import org.apache.wicket.Component
 import org.apache.wicket.ajax.WebSocketRequestHandler
-import org.apache.wicket.markup.head.{IHeaderResponse, JavaScriptHeaderItem}
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.protocol.ws.api.message.{ClosedMessage, ConnectedMessage, TextMessage}
-import org.apache.wicket.protocol.ws.api.{WicketWebSocketJQueryResourceReference, SimpleWebSocketConnectionRegistry, WebSocketBehavior}
-import org.apache.wicket.request.resource.PackageResourceReference
+import org.apache.wicket.protocol.ws.api.{SimpleWebSocketConnectionRegistry, WebSocketBehavior}
 
 /**
  * @author Mle
  */
 
-class WebSocketsPanel(id: String) extends Panel(id) with Log {
+class WebSockets(id: String) extends Panel(id) with Log {
   val link = SAjaxLink("link")(target => {
     log info "Pressed link; pushing data to client..."
     val registry = new SimpleWebSocketConnectionRegistry
@@ -51,15 +47,6 @@ class WebSocketsPanel(id: String) extends Panel(id) with Log {
       val pushMsg = "This is a reply to: " + message.getText
       handler push pushMsg
       log info "Pushed this response: " + pushMsg
-    }
-
-    override def renderHead(component: Component, response: IHeaderResponse) {
-      super.renderHead(component, response)
-      response.render(JavaScriptHeaderItem.forReference(new ClientResourceReference))
-    }
-
-    private class ClientResourceReference extends PackageResourceReference(classOf[WebSocketsPanel], "client.js") {
-      override def getDependencies = Seq(JavaScriptHeaderItem.forReference(WicketWebSocketJQueryResourceReference.get()))
     }
   })
 }

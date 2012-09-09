@@ -1,8 +1,7 @@
 package com.mle.wicket
 
-import markup.Home
+import markup.{Single, Home}
 import org.apache.wicket.protocol.http.WebApplication
-import org.apache.wicket.markup.html.WebPage
 
 /**
  * JQWicket doesn't work with Wicket 6.0.0: NoClassDefFoundError: org/apache/wicket/markup/html/IHeaderResponse.
@@ -13,18 +12,12 @@ import org.apache.wicket.markup.html.WebPage
  *
  * @author Mle
  */
-class TestWebApplication extends WebApplication {
+class TestWebApplication extends WebApplication with PageMounting {
   val getHomePage = classOf[Home]
 
   override def init() {
     super.init()
     mount(classOf[Home])
-  }
-
-  /**
-   * Mounts the page to the path given by the class name
-   */
-  def mount[T <: WebPage](pageClazz: Class[T]) {
-    mountPage("/" + pageClazz.getSimpleName, pageClazz)
+    mount(classOf[Single])
   }
 }

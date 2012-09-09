@@ -1,11 +1,10 @@
 package com.mle.wicket.markup
 
 import com.mle.util.Log
-import com.mle.wicket.AtmosphereApplication
 import com.mle.wicket.component.SAjaxSubmitLink
 import java.util.Date
 import org.apache.wicket.ajax.AjaxRequestTarget
-import org.apache.wicket.atmosphere.Subscribe
+import org.apache.wicket.atmosphere.{Subscribe, EventBus}
 import org.apache.wicket.markup.html.basic.Label
 import org.apache.wicket.markup.html.form.{TextField, Form}
 import org.apache.wicket.markup.html.panel.Panel
@@ -23,7 +22,9 @@ class Atmosphere(id: String) extends Panel(id) with Log {
   add(form)
   val input = new TextField("input", Model.of(""))
   val submitLink = new SAjaxSubmitLink("send")(target => {
-    AtmosphereApplication.get.eventBus.post(input.getModelObject)
+    log info "Sending"
+    EventBus.get.post("Message: " + input.getModelObject)
+    //    AtmosphereApplication.get.eventBus.post(input.getModelObject)
   })
   form add(input, submitLink)
   setVersioned(false)

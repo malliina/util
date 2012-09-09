@@ -15,7 +15,7 @@ object WsActors extends Log {
   val king = KingActor.build()
   private var i = 0
   addShutdownHook(king ! Stop)
-  every(1.milliseconds) {
+  every(1.seconds) {
     i += 1
     val msg = String.format(JSON_FORMAT, "Message nr: " + i, new Integer(4))
     log debug "Broadcasting: " + msg

@@ -1,4 +1,5 @@
 import Dependencies._
+import com.github.siasia.WebPlugin.webSettings
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager.{PackagerPlugin, linux, debian, rpm, windows}
 import sbt.Keys._
@@ -17,11 +18,14 @@ object GitBuild extends Build {
     retrieveManaged := true,
     publishTo := Some(Resolver.url("sbt-plugin-releases", new URL("http://xxx/artifactory/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
-    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt")
+    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt"),
+    classpathTypes += "orbit"
   )
   lazy val parent = Project("parent", file("."))
   lazy val util = Project("common-util", file("common-util"), settings = mySettings(loggingDeps))
-  lazy val test = Project("test", file("test"), settings = mySettings() ++ PackagerPlugin.packagerSettings).dependsOn(util).settings(
+  lazy val test = Project("test", file("test"), settings = mySettings() ++ Packaging.newSettings ++ webSettings ++ PackagerPlugin.packagerSettings)
+    .dependsOn(util)
+    .settings(
     classDirectory <<= (baseDirectory)(b => b / "WEB-INF" / "classes"),
     libraryDependencies ++= webDeps ++ wiQuery,
     // http://lintian.debian.org/tags/maintainer-address-missing.html
