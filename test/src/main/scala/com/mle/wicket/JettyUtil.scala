@@ -3,10 +3,10 @@ package com.mle.wicket
 import com.mle.util.Log
 import java.util.EnumSet
 import javastuff.AtmosphereApplication
-import javax.servlet.DispatcherType
-import javax.servlet.Filter
 import javax.servlet.http.HttpServlet
+import javax.servlet.{DispatcherType, Filter}
 import org.apache.wicket.protocol.http._
+import org.atmosphere.cache.HeaderBroadcasterCache
 import org.atmosphere.cpr.AtmosphereServlet
 import org.atmosphere.handler.ReflectorServletProcessor
 import org.atmosphere.websocket.protocol.EchoProtocol
@@ -20,7 +20,7 @@ import org.eclipse.jetty.servlet._
  */
 
 object JettyUtil extends Log {
-  val ATMO_PATH = "/atmosphere/*"
+  val ATMO_PATH = "/*"
   val WS_PATH = "/ws/*"
 
   /**
@@ -30,7 +30,7 @@ object JettyUtil extends Log {
   def start[S <: WebApplication, T <: Filter](port: Int = 8080,
                                               wicketApp: Class[S],
                                               wicketFilter: Class[T] = classOf[WicketFilter],
-                                              path: String = "/*") {
+                                              path: String = "/*") = {
     startServer(port)(contextHandler => {
       val filter = newWicketFilter(wicketApp, wicketFilter, path)
       contextHandler.addFilter(filter, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
@@ -38,18 +38,18 @@ object JettyUtil extends Log {
     })
   }
 
-  def startAll(port: Int = 8080) {
+  def startAll(port: Int = 8080) = {
     startServer(port)(c => {
       initAtmosphere(context = c)
       initWebSockets(WS_PATH, c)
     })
   }
 
-  def startWebSockets(port: Int = 8080) {
+  def startWebSockets(port: Int = 8080) = {
     startServer(port)(initWebSockets(WS_PATH, _))
   }
 
-  def startAtmosphere[T <: WebApplication](port: Int = 8080, webApp: Class[T] = classOf[AtmosphereApplication]) {
+  def startAtmosphere[T <: WebApplication](port: Int = 8080, webApp: Class[T] = classOf[AtmosphereApplication]) = {
     startServer(port)(initAtmosphere(webApp, _))
   }
 
@@ -62,28 +62,30 @@ object JettyUtil extends Log {
 
   private def initAtmosphere[T <: WebApplication](webApp: Class[T] = classOf[AtmosphereApplication], context: ServletContextHandler) {
     log info "Mapping atmosphere to: " + ATMO_PATH
-    val holder = context addServlet(classOf[MyAtmoServlet], ATMO_PATH)
-    initWicket(holder, webApp, ATMO_PATH) //, ATMO_PATH
-    holder setInitParameter("org.atmosphere.useWebSocket", "true")
-    holder setInitParameter("org.atmosphere.useNative", "true")
-    holder setInitParameter("org.atmosphere.websocket.WebSocketProtocol", classOf[EchoProtocol].getName)
-    holder setInitOrder 1
-
+    val servlet = new AtmosphereServlet(true)
     /**
      * Codified atmosphere.xml.
      * AtmosphereServlet automatically looks for atmosphere.xml or annotated handlers in WEB-INF/classes
      * therefore it only works for .war packages.
      * This workaround sets the AtmosphereHandler programmatically, without annotations and without atmosphere.xml
      */
-    class MyAtmoServlet extends AtmosphereServlet {
-      //      val interceptors = Seq(new AtmosphereResourceLifecycleInterceptor)
-      //      val interceptors = Seq(new SSEAtmosphereInterceptor)
-      //      interceptors foreach (_.configure(framework().getAtmosphereConfig))
-      framework() addAtmosphereHandler(ATMO_PATH, new MyAtmoHandler)
-    }
+    val handler = new ReflectorServletProcessor
+    handler setFilterClassName classOf[WicketFilter].getName
+    handler setServletClassName classOf[AtmosphereServlet].getName
+    servlet.framework().addAtmosphereHandler(ATMO_PATH, handler)
+    val holder = new ServletHolder(servlet)
+    initWicket(holder, webApp, ATMO_PATH)
+    holder setInitParameter("org.atmosphere.useWebSocket", "false")
+    holder setInitParameter("org.atmosphere.useNative", "true")
+    // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
+    holder setInitParameter("org.atmosphere.websocket.WebSocketProtocol", classOf[EchoProtocol].getName)
+    holder setInitParameter("org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults", "true")
+    holder setInitParameter("org.atmosphere.cpr.broadcasterCacheClass", classOf[HeaderBroadcasterCache].getName)
+    holder setInitOrder 1
+    context addServlet(holder, ATMO_PATH)
   }
 
-  def startServer(port: Int = 8080)(contextInit: ServletContextHandler => Unit) {
+  def startServer(port: Int = 8080)(contextInit: ServletContextHandler => Unit): Server = {
     val server = new Server
     val connector = new SelectChannelConnector
     connector setPort port
@@ -92,6 +94,7 @@ object JettyUtil extends Log {
     contextInit(contextHandler)
     server setHandler contextHandler
     server.start()
+    server
   }
 
   /**
@@ -115,14 +118,4 @@ object JettyUtil extends Log {
     holder setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, path)
     holder
   }
-
-
-  //  private class MyAtmoServlet extends AtmosphereServlet {
-  //    val interceptors = Seq(new AtmosphereResourceLifecycleInterceptor)
-  //  }
-
-  private class MyAtmoHandler extends ReflectorServletProcessor {
-    setFilterClassName(classOf[WicketFilter].getName)
-  }
-
 }

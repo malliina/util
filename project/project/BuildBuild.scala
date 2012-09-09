@@ -13,9 +13,10 @@ object BuildBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     scalaVersion := "2.9.2",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
-    libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % (v+"-0.2.11.1")),//(v + "-0.2.11.1")),
+    libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.12.0-0.2.11.1")), //(v + "-0.2.11.1")),
     addSbtPlugin("com.typesafe" % "sbt-native-packager" % "0.4.4"),
-    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.1.0")
+    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.1.0"),
+    classpathTypes += "orbit"
   )
   lazy val root = Project("build", file("."))
 }

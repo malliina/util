@@ -22,9 +22,7 @@ class Atmosphere(id: String) extends Panel(id) with Log {
   add(form)
   val input = new TextField("input", Model.of(""))
   val submitLink = new SAjaxSubmitLink("send")(target => {
-    log info "Sending"
-    EventBus.get.post("Message: " + input.getModelObject)
-    //    AtmosphereApplication.get.eventBus.post(input.getModelObject)
+    EventBus.get.post(input.getModelObject)
   })
   form add(input, submitLink)
   setVersioned(false)

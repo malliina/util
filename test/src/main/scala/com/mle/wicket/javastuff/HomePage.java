@@ -20,6 +20,7 @@ import com.mle.wicket.markup.Home;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
+import org.apache.wicket.atmosphere.EventBus;
 import org.apache.wicket.atmosphere.Subscribe;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -52,8 +53,8 @@ public class HomePage extends WebPage {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                AtmosphereApplication.get().getEventBus().post("Ohoi");
-//                EventBus.get().post("oi: "+input.getModelObject());
+//                EventBus.get().post("Ohoi");
+                EventBus.get().post("oi: "+input.getModelObject());
             }
 
             @Override

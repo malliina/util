@@ -54,7 +54,6 @@ public class AtmosphereApplication extends WebApplication
 	{
 		super.init();
 		eventBus = new EventBus(this);
-
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		final Runnable beeper = new Runnable()
 		{
