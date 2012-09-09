@@ -2,7 +2,6 @@ package com.mle.wicket
 
 import com.mle.util.Log
 import java.util.EnumSet
-import javastuff.AtmosphereApplication
 import javax.servlet.http.HttpServlet
 import javax.servlet.{DispatcherType, Filter}
 import org.apache.wicket.protocol.http._
@@ -49,7 +48,7 @@ object JettyUtil extends Log {
     startServer(port)(initWebSockets(WS_PATH, _))
   }
 
-  def startAtmosphere[T <: WebApplication](port: Int = 8080, webApp: Class[T] = classOf[AtmosphereApplication]) = {
+  def startAtmosphere[T <: WebApplication](port: Int = 8080, webApp: Class[T] = classOf[MyAtmosphereApplication]) = {
     startServer(port)(initAtmosphere(webApp, _))
   }
 
@@ -60,7 +59,7 @@ object JettyUtil extends Log {
     context.addServlet(classOf[DefaultServlet], path)
   }
 
-  private def initAtmosphere[T <: WebApplication](webApp: Class[T] = classOf[AtmosphereApplication], context: ServletContextHandler) {
+  private def initAtmosphere[T <: WebApplication](webApp: Class[T] = classOf[MyAtmosphereApplication], context: ServletContextHandler) {
     log info "Mapping atmosphere to: " + ATMO_PATH
     val servlet = new AtmosphereServlet(true)
     /**
