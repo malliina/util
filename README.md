@@ -1,1 +1,1 @@
-Exploring Scala.
+Exploring Scala. Test code for wicket, atmosphere, web sockets, functional programming.
