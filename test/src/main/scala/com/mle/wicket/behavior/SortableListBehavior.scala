@@ -5,10 +5,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget
 import org.apache.wicket.Component
 import org.apache.wicket.markup.html.list.ListItem
 import com.mle.util.Log
-import collection.mutable
 import org.apache.wicket.model.IModel
-import java.util.{List => JList}
-import collection.JavaConversions._
+import java.util.{List => JList, ArrayList => JArrayList}
 
 /**
  * Sortable jQuery behavior for [[org.apache.wicket.markup.html.list.ListView]]s that updates the backing model of the list as sorting takes place.
@@ -20,15 +18,17 @@ import collection.JavaConversions._
  * @author Mle
  */
 
-class SortableListBehavior[T](model: IModel[_ <: JList[_ <: T]]) extends SortableBehavior with Log {
+class SortableListBehavior[T](model: IModel[JArrayList[T]]) extends SortableBehavior with Log {
   val updateCallback = new SortableBehavior.AjaxUpdateCallback {
     def update(target: AjaxRequestTarget, source: Component, sortIndex: Int, sortItem: Component) {
-      val srcIndex = sortItem.asInstanceOf[ListItem[T]].getIndex
-      val destIndex = sortIndex - 1
-      swap(model.getObject, srcIndex, destIndex)
-      log debug "Moved list item from index: " + srcIndex + " to index: " + destIndex
-      // source is the parent container of the ListView
-      target add source
+      if (sortItem != null) {
+        val srcIndex = sortItem.asInstanceOf[ListItem[T]].getIndex
+        val destIndex = sortIndex
+        model setObject swap(model.getObject, srcIndex, destIndex)
+        log debug "Moved list item from index: " + srcIndex + " to index: " + destIndex
+        // source is the parent container of the ListView
+        target add source
+      }
     }
   }
   setUpdateEvent(updateCallback)
@@ -40,8 +40,9 @@ class SortableListBehavior[T](model: IModel[_ <: JList[_ <: T]]) extends Sortabl
    * @param after the new position of the element
    * @tparam Y type of element
    */
-  def swap[Y](buf: mutable.Buffer[Y], before: Int, after: Int) {
+  def swap[Y](buf: JArrayList[Y], before: Int, after: Int) = {
     if (before != after)
-      buf.insert(after, buf.remove(before))
+      buf.add(after, buf.remove(before))
+    buf
   }
 }

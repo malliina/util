@@ -22,12 +22,13 @@ class SortPanel(id: String) extends Panel(id) with Log {
     }
   }
   add(form)
-  val list = new SListView("list", Model.of[JArrayList[String]](items))(item => {
+  val listModel = Model.of[JArrayList[String]](items)
+  val list = new SListView("list", listModel)(item => {
     item add new Label("item", item.getModel)
     // for sortable to work
     item setOutputMarkupId true
   })
   form add list
-  val sortable = new SortableListBehavior[String](list.getModel)
+  val sortable = new SortableListBehavior[String](listModel)
   form add sortable
 }
