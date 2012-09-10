@@ -3,11 +3,11 @@ package com.mle.wicket
 import com.mle.util.Implicits._
 import com.mle.util.Log
 import com.mle.util.Scheduling._
-import java.util.Date
 import markup.{Single, Home}
 import org.apache.wicket.Application
 import org.apache.wicket.atmosphere.EventBus
 import org.apache.wicket.protocol.http.WebApplication
+import java.util.Date
 
 /**
  * @author Mle
@@ -23,9 +23,11 @@ class MyAtmosphereApplication extends WebApplication with PageMounting with Log 
   override def init() {
     super.init()
     eBus = new EventBus(this)
+    var i = 0
     every(3.seconds) {
-      eBus post new Date()
-      log info "Posted new date"
+      i += 1
+      eBus post new Date
+      log debug "Sent to eventbus"
     }
     mount(classOf[Home])
     mount(classOf[Single])

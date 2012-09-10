@@ -1,12 +1,12 @@
 package com.mle.wicket.behavior
 
-import org.odlabs.wiquery.ui.sortable.SortableBehavior
-import org.apache.wicket.ajax.AjaxRequestTarget
-import org.apache.wicket.Component
-import org.apache.wicket.markup.html.list.ListItem
 import com.mle.util.Log
-import org.apache.wicket.model.IModel
 import java.util.{List => JList, ArrayList => JArrayList}
+import org.apache.wicket.Component
+import org.apache.wicket.ajax.AjaxRequestTarget
+import org.apache.wicket.markup.html.list.ListItem
+import org.apache.wicket.model.IModel
+import org.odlabs.wiquery.ui.sortable.SortableBehavior
 
 /**
  * Sortable jQuery behavior for [[org.apache.wicket.markup.html.list.ListView]]s that updates the backing model of the list as sorting takes place.
@@ -24,6 +24,7 @@ class SortableListBehavior[T](model: IModel[JArrayList[T]]) extends SortableBeha
       if (sortItem != null) {
         val srcIndex = sortItem.asInstanceOf[ListItem[T]].getIndex
         val destIndex = sortIndex
+        log info "Moving element from position: " + srcIndex + " to position: " + destIndex
         model setObject swap(model.getObject, srcIndex, destIndex)
         log debug "Moved list item from index: " + srcIndex + " to index: " + destIndex
         // source is the parent container of the ListView
