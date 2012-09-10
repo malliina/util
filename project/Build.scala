@@ -4,12 +4,16 @@ import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager.{PackagerPlugin, linux, debian, rpm, windows}
 import sbt.Keys._
 import sbt._
+import PlayProject._
 
 /**
  * @author Mle
  */
 
 object GitBuild extends Build {
+
+  override def settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
+
   val commonSettings = Defaults.defaultSettings ++ Seq(
     scalaVersion := "2.9.2",
     version := "0.1-SNAPSHOT",
@@ -18,10 +22,11 @@ object GitBuild extends Build {
     retrieveManaged := true,
     publishTo := Some(Resolver.url("sbt-plugin-releases", new URL("http://xxx/artifactory/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
-    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt"),
-    classpathTypes += "orbit"
+    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt")
   )
+  val playDeps = Nil
   lazy val parent = Project("parent", file("."))
+  lazy val play = PlayProject("playpro", applicationVersion = "0.1", dependencies = playDeps, path = file("playpro"), mainLang = SCALA)
   lazy val util = Project("common-util", file("common-util"), settings = mySettings(loggingDeps))
   lazy val test = Project("test", file("test"), settings = mySettings() ++ Packaging.newSettings ++ webSettings ++ PackagerPlugin.packagerSettings)
     .dependsOn(util)
