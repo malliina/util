@@ -19,9 +19,6 @@ import org.eclipse.jetty.servlet._
  */
 
 object JettyUtil extends Log {
-  val ATMO_PATH = "/*"
-  val WS_PATH = "/ws/*"
-
   /**
    * Valid filters are e.g. [[org.apache.wicket.protocol.http.Jetty7WebSocketFilter]]
    * or [[org.apache.wicket.protocol.http.WicketFilter]]
@@ -37,30 +34,15 @@ object JettyUtil extends Log {
     })
   }
 
-  def startAll(port: Int = 8080) = {
-    startServer(port)(c => {
-      initAtmosphere(context = c)
-      initWebSockets(WS_PATH, c)
-    })
-  }
-
-  def startWebSockets(port: Int = 8080) = {
-    startServer(port)(initWebSockets(WS_PATH, _))
-  }
-
-  def startAtmosphere[T <: WebApplication](port: Int = 8080, webApp: Class[T] = classOf[MyAtmosphereApplication]) = {
-    startServer(port)(initAtmosphere(webApp, _))
-  }
-
-  private def initWebSockets(path: String, context: ServletContextHandler) {
+  def initWebSockets[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
     log info "Mapping native Web Sockets to: " + path
-    val filter = newWicketFilter(classOf[TestWebApplication], classOf[Jetty7WebSocketFilter], path)
-    context.addFilter(filter, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
-    context.addServlet(classOf[DefaultServlet], path)
+    val filter = newWicketFilter(webApp = webApp, filter = classOf[Jetty7WebSocketFilter],path = path)
+    context addFilter(filter, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
+    context addServlet(classOf[DefaultServlet], path)
   }
 
-  private def initAtmosphere[T <: WebApplication](webApp: Class[T] = classOf[MyAtmosphereApplication], context: ServletContextHandler) {
-    log info "Mapping atmosphere to: " + ATMO_PATH
+  def initAtmosphere[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
+    log info "Mapping atmosphere to: " + path
     val servlet = new AtmosphereServlet(true)
     /**
      * Codified atmosphere.xml.
@@ -71,9 +53,9 @@ object JettyUtil extends Log {
     val handler = new ReflectorServletProcessor
     handler setFilterClassName classOf[WicketFilter].getName
     handler setServletClassName classOf[AtmosphereServlet].getName
-    servlet.framework().addAtmosphereHandler(ATMO_PATH, handler)
+    servlet.framework().addAtmosphereHandler(path, handler)
     val holder = new ServletHolder(servlet)
-    initWicket(holder, webApp, ATMO_PATH)
+    initWicket(holder, webApp, path)
     holder setInitParameter("org.atmosphere.useWebSocket", "false")
     holder setInitParameter("org.atmosphere.useNative", "true")
     // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
@@ -81,7 +63,7 @@ object JettyUtil extends Log {
     holder setInitParameter("org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults", "true")
     holder setInitParameter("org.atmosphere.cpr.broadcasterCacheClass", classOf[HeaderBroadcasterCache].getName)
     holder setInitOrder 1
-    context addServlet(holder, ATMO_PATH)
+    context addServlet(holder, path)
   }
 
   def startServer(port: Int = 8080)(contextInit: ServletContextHandler => Unit): Server = {
@@ -96,23 +78,23 @@ object JettyUtil extends Log {
     server
   }
 
-  /**
-   * Alternative to newWicketFilter.
-   * This method creates a required servlet and configures WicketFilter, but doesn't let the user choose the WicketFilter class.
-   */
-  def newWicketServlet[T <: WebApplication, S <: HttpServlet](webApp: Class[T],
-                                                              servlet: Class[S] = classOf[WicketServlet],
-                                                              path: String = "/*") = {
-    initWicket(new ServletHolder(classOf[WicketServlet]), webApp)
-  }
+//  /**
+//   * Alternative to newWicketFilter.
+//   * This method creates a required servlet and configures WicketFilter, but doesn't let the user choose the WicketFilter class.
+//   */
+//  def newWicketServlet[T <: WebApplication, S <: HttpServlet](webApp: Class[T],
+//                                                              servlet: Class[S],
+//                                                              path: String) = {
+//    initWicket(new ServletHolder(classOf[WicketServlet]), webApp, path)
+//  }
 
   def newWicketFilter[T <: WebApplication, U <: Filter](webApp: Class[T],
-                                                        filter: Class[U] = classOf[WicketFilter],
-                                                        path: String = "/*") = {
+                                                        filter: Class[U],
+                                                        path: String) = {
     initWicket(new FilterHolder(filter), webApp, path)
   }
 
-  private def initWicket[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String = "/*"): T = {
+  private def initWicket[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {
     holder setInitParameter(ContextParamWebApplicationFactory.APP_CLASS_PARAM, app.getName)
     holder setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, path)
     holder

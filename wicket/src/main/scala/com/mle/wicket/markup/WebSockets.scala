@@ -44,7 +44,7 @@ class WebSockets(id: String) extends Panel(id) with Log {
 
     override def onMessage(handler: WebSocketRequestHandler, message: TextMessage) {
       log info "Got message: " + message.getText
-      val pushMsg = "This is a reply to: " + message.getText
+      val pushMsg = WsActors.toJson("This is a reply to: " + message.getText)
       handler push pushMsg
       log info "Pushed this response: " + pushMsg
     }

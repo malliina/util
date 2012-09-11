@@ -15,42 +15,42 @@
  * limitations under the License.
  */
 
-jQuery(function($) {
+jQuery(function ($) {
 
-	Wicket.Event.subscribe("/websocket/open", function(jqEvent) {
-		$('#connect').hide();
-		$('#disconnect').show();
+    Wicket.Event.subscribe("/websocket/open", function (jqEvent) {
+        $('#connect').hide();
+        $('#disconnect').show();
         $('#sender').show();
-		$('#sentMessages').show();
-	});
+        $('#sentMessages').show();
+    });
 
-    Wicket.Event.subscribe("/websocket/message", function(jqEvent, message) {
-        var record=jQuery.parseJSON(message);
-		$('#messages').prepend('<span>' + record.message + '</span><br/>');
-	});
+    Wicket.Event.subscribe("/websocket/message", function (jqEvent, message) {
+        var record = jQuery.parseJSON(message);
+        $('#messages').prepend('<span>' + record.message + '</span><br/>');
+    });
 
-	var close = function(jqEvent) {
-		$('#sentMessages').hide();
-		$('#connect').show();
-		$('#disconnect').hide();
+    var close = function (jqEvent) {
+        $('#sentMessages').hide();
+        $('#connect').show();
+        $('#disconnect').hide();
         $('#sender').hide();
-		$('#messages').empty();
-	};
+        $('#messages').empty();
+    };
 
-	Wicket.Event.subscribe("/websocket/closed", close);
-	Wicket.Event.subscribe("/websocket/error", close);
+    Wicket.Event.subscribe("/websocket/closed", close);
+    Wicket.Event.subscribe("/websocket/error", close);
 
-	$('#connect').click(function() {
-		Wicket.WebSocket.createDefaultConnection();
-	});
+    $('#connect').click(function () {
+        Wicket.WebSocket.createDefaultConnection();
+    });
 
-	$('#send').click(function() {
-		Wicket.WebSocket.send($('#message').val());
-		$('#message').val('');
-	});
+    $('#send').click(function () {
+        Wicket.WebSocket.send($('#message').val());
+        $("#message").val('');
+    });
 
-	$('#disconnect').click(function() {
-		Wicket.WebSocket.close();
-	});
+    $('#disconnect').click(function () {
+        Wicket.WebSocket.close();
+    });
 
 });

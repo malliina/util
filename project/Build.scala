@@ -26,7 +26,7 @@ object GitBuild extends Build {
   )
   val playDeps = Nil
   lazy val parent = Project("parent", file("."))
-  lazy val play = PlayProject("play2", applicationVersion = "0.1", dependencies = playDeps, path = file("play2"), mainLang = SCALA)
+  lazy val play = PlayProject("playapp", applicationVersion = "0.1", dependencies = playDeps, path = file("playapp"), mainLang = SCALA)
   lazy val util = Project("common-util", file("common-util"), settings = commonSettings)
     .settings(libraryDependencies ++= loggingDeps)
   lazy val wicket = Project("wicket", file("wicket"), settings = commonSettings ++ Packaging.newSettings ++ webSettings ++ PackagerPlugin.packagerSettings)

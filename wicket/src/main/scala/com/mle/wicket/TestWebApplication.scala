@@ -13,11 +13,11 @@ import org.apache.wicket.protocol.http.WebApplication
  * @author Mle
  */
 class TestWebApplication extends WebApplication with PageMounting {
-  val getHomePage = classOf[Home]
+  def getHomePage = classOf[Home]
 
   override def init() {
     super.init()
-    mount(classOf[Home])
-    mount(classOf[Single])
+//    mount(classOf[Home])
+//    mount(classOf[Single])
   }
 }

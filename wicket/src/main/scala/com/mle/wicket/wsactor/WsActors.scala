@@ -17,10 +17,18 @@ object WsActors extends Log {
   addShutdownHook(king ! Stop)
   every(1.seconds) {
     i += 1
-    val msg = String.format(JSON_FORMAT, "Message nr: " + i, new Integer(4))
+    val msg = toJson("Message nr: " + i)
     log debug "Broadcasting: " + msg
     king ! Broadcast(msg)
   }
+
+  /**
+   * Converts the parameters to a valid JSON string
+   * @param msg the message
+   * @param version a totally arbitrary number just to test json
+   * @return the message in JSON format
+   */
+  def toJson(msg: String, version: java.lang.Integer = new Integer(4)) = String.format(JSON_FORMAT, msg, version)
 
   case class Address(appName: String, sessionId: String, pageId: Int)
 
