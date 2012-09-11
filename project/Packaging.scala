@@ -118,7 +118,11 @@ object Packaging extends Plugin {
     })
   )
 
-  def launcher(appDir: Path, files: Types.Id[Set[Path]], appName: String, extension: String, appFiles: Types.Id[Set[Path]]) = {
+  def launcher(appDir: Path,
+               files: Types.Id[Set[Path]],
+               appName: String,
+               extension: String,
+               appFiles: Types.Id[Set[Path]]) = {
     val launcherFilename = appName.toLowerCase + extension
     val launcherDestination = appDir resolve launcherFilename
     val maybeLauncherFile = files.find(_.getFileName.toString == launcherFilename)
