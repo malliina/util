@@ -26,18 +26,18 @@ object GitBuild extends Build {
   )
   val playDeps = Nil
   lazy val parent = Project("parent", file("."))
-  lazy val play = PlayProject("playpro", applicationVersion = "0.1", dependencies = playDeps, path = file("playpro"), mainLang = SCALA)
-  lazy val util = Project("common-util", file("common-util"), settings = mySettings(loggingDeps))
-  lazy val test = Project("test", file("test"), settings = mySettings() ++ Packaging.newSettings ++ webSettings ++ PackagerPlugin.packagerSettings)
+  lazy val play = PlayProject("play2", applicationVersion = "0.1", dependencies = playDeps, path = file("play2"), mainLang = SCALA)
+  lazy val util = Project("common-util", file("common-util"), settings = commonSettings)
+    .settings(libraryDependencies ++= loggingDeps)
+  lazy val wicket = Project("wicket", file("wicket"), settings = commonSettings ++ Packaging.newSettings ++ webSettings ++ PackagerPlugin.packagerSettings)
     .dependsOn(util)
     .settings(
-    classDirectory <<= (baseDirectory)(b => b / "WEB-INF" / "classes"),
     libraryDependencies ++= webDeps ++ wiQuery,
     // http://lintian.debian.org/tags/maintainer-address-missing.html
     linux.Keys.maintainer := "Michael Skogberg <malliina123@gmail.com>",
-    linux.Keys.packageSummary := "This is a summary of package test",
-    linux.Keys.packageDescription := "This is the description of package test.",
-    name := "test",
+    linux.Keys.packageSummary := "This is a summary of the package",
+    linux.Keys.packageDescription := "This is the description of the package.",
+//    name := "wicket",
     debian.Keys.version := "0.1",
     // Tag takes single token only
     rpm.Keys.rpmRelease := "0.1",
@@ -57,9 +57,6 @@ object GitBuild extends Build {
       ),
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
   )
-
-  def mySettings(deps: Seq[ModuleID] = Seq.empty) = commonSettings ++ Seq(libraryDependencies ++= deps)
-
   //  IzPack.variables in IzPack.Config <+= name {
   //    name => ("projectName", "My test project")
   //  }

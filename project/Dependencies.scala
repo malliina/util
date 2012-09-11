@@ -17,7 +17,7 @@ object Dependencies {
   val wicketExt = "org.apache.wicket" % "wicket-extensions" % wicketVersion
   val wicketWebSockets = "org.apache.wicket" % "wicket-native-websocket-jetty" % "0.2"
   val wicketAtmosphere = "org.apache.wicket" % "wicket-atmosphere" % "0.3"
-  val jettyHack = "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" artifacts Artifact("javax.servlet", "orbit", "jar")
+  val jettyHack = "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" artifacts Artifact("javax.servlet", "jar", "jar")
   val jettyServer = "org.eclipse.jetty" % "jetty-server" % jettyVersion artifacts Artifact("jetty-server", "jar", "jar")
   val jettyServlet = "org.eclipse.jetty" % "jetty-servlet" % jettyVersion artifacts Artifact("jetty-servlet", "jar", "jar")
   val jettyWebSocket = "org.eclipse.jetty" % "jetty-websocket" % jettyVersion artifacts Artifact("jetty-websocket", "jar", "jar")
