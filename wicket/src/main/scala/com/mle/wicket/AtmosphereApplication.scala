@@ -13,7 +13,7 @@ import java.util.Date
  * @author Mle
  */
 
-class MyAtmosphereApplication extends WebApplication with PageMounting with Log {
+class AtmosphereApplication extends WebApplication with PageMounting with Log {
   private var eBus: EventBus = null
 
   val getHomePage = classOf[Home]
@@ -34,6 +34,6 @@ class MyAtmosphereApplication extends WebApplication with PageMounting with Log 
   }
 }
 
-object MyAtmosphereApplication {
-  def get = Application.get.asInstanceOf[MyAtmosphereApplication]
+object AtmosphereApplication {
+  def get = Application.get.asInstanceOf[AtmosphereApplication]
 }

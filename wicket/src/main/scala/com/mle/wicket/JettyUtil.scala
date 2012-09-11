@@ -2,7 +2,6 @@ package com.mle.wicket
 
 import com.mle.util.Log
 import java.util.EnumSet
-import javax.servlet.http.HttpServlet
 import javax.servlet.{DispatcherType, Filter}
 import org.apache.wicket.protocol.http._
 import org.atmosphere.cache.HeaderBroadcasterCache
@@ -19,30 +18,32 @@ import org.eclipse.jetty.servlet._
  */
 
 object JettyUtil extends Log {
+
   /**
    * Valid filters are e.g. [[org.apache.wicket.protocol.http.Jetty7WebSocketFilter]]
    * or [[org.apache.wicket.protocol.http.WicketFilter]]
    */
-  def start[S <: WebApplication, T <: Filter](port: Int = 8080,
-                                              wicketApp: Class[S],
-                                              wicketFilter: Class[T] = classOf[WicketFilter],
-                                              path: String = "/*") = {
-    startServer(port)(contextHandler => {
-      val filter = newWicketFilter(wicketApp, wicketFilter, path)
-      contextHandler.addFilter(filter, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
-      contextHandler.addServlet(classOf[DefaultServlet], path)
-    })
-  }
-
-  def initWebSockets[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
-    log info "Mapping native Web Sockets to: " + path
-    val filter = newWicketFilter(webApp = webApp, filter = classOf[Jetty7WebSocketFilter],path = path)
-    context addFilter(filter, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
+  def addWicket[T <: WebApplication, U <: Filter](webApp: Class[T],
+                                                  path: String,
+                                                  filter: Class[U] = classOf[WicketFilter])(implicit context: ServletContextHandler) {
+    log info "Mapping wicket app to: " + path
+    val holder = initWicket(new FilterHolder(filter), webApp, path)
+    context addFilter(holder, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
     context addServlet(classOf[DefaultServlet], path)
   }
 
-  def initAtmosphere[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
-    log info "Mapping atmosphere to: " + path
+  /**
+   * Adds a Wicket app with WebSockets enabled.
+   * @param webApp
+   * @param path pathSpec
+   * @tparam T app class
+   */
+  def addWebSockets[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
+    addWicket(webApp, path, filter = classOf[Jetty7WebSocketFilter])
+  }
+
+  def addAtmosphere[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
+    log info "Mapping Atmosphere app to: " + path
     val servlet = new AtmosphereServlet(true)
     /**
      * Codified atmosphere.xml.
@@ -78,19 +79,9 @@ object JettyUtil extends Log {
     server
   }
 
-//  /**
-//   * Alternative to newWicketFilter.
-//   * This method creates a required servlet and configures WicketFilter, but doesn't let the user choose the WicketFilter class.
-//   */
-//  def newWicketServlet[T <: WebApplication, S <: HttpServlet](webApp: Class[T],
-//                                                              servlet: Class[S],
-//                                                              path: String) = {
-//    initWicket(new ServletHolder(classOf[WicketServlet]), webApp, path)
-//  }
-
-  def newWicketFilter[T <: WebApplication, U <: Filter](webApp: Class[T],
-                                                        filter: Class[U],
-                                                        path: String) = {
+  private def newWicketFilter[T <: WebApplication, U <: Filter](webApp: Class[T],
+                                                                filter: Class[U],
+                                                                path: String) = {
     initWicket(new FilterHolder(filter), webApp, path)
   }
 

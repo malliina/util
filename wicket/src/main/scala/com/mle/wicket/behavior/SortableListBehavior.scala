@@ -24,7 +24,6 @@ class SortableListBehavior[T](model: IModel[JArrayList[T]]) extends SortableBeha
       if (sortItem != null) {
         val srcIndex = sortItem.asInstanceOf[ListItem[T]].getIndex
         val destIndex = sortIndex
-        log info "Moving element from position: " + srcIndex + " to position: " + destIndex
         model setObject swap(model.getObject, srcIndex, destIndex)
         log debug "Moved list item from index: " + srcIndex + " to index: " + destIndex
         // source is the parent container of the ListView

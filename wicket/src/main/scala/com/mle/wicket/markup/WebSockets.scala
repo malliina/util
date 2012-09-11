@@ -22,7 +22,7 @@ class WebSockets(id: String) extends Panel(id) with Log {
     val maybeConn = Option(registry.getConnection(getApplication, sessionId, pageId))
     maybeConn.foreach(conn => {
       val handler = new WebSocketRequestHandler(this, conn)
-      val msg = "This message has been pushed as a response to an ajax request"
+      val msg = WsActors.toJson("This message has been pushed as a response to an ajax request")
       //      conn sendMessage msg
       handler push msg
       log info "Server pushed message: " + msg

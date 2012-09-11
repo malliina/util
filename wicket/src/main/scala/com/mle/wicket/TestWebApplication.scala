@@ -17,7 +17,7 @@ class TestWebApplication extends WebApplication with PageMounting {
 
   override def init() {
     super.init()
-//    mount(classOf[Home])
-//    mount(classOf[Single])
+    mount(classOf[Home])
+    mount(classOf[Single])
   }
 }

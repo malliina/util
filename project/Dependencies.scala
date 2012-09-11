@@ -6,7 +6,6 @@ import sbt._
 
 object Dependencies {
   val logbackVersion = "1.0.6"
-  // Newest maven version gives a dependency resolution error
   val jettyVersion = "8.1.3.v20120416"
   val wicketVersion = "6.0.0"
   val slf4j = "org.slf4j" % "slf4j-api" % "1.6.6"
