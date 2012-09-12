@@ -18,13 +18,13 @@ object Application extends Controller {
       "color" -> optional(text)
     )
   )
-
   // -- Actions
 
   /**
    * Home page
    */
   def index = Action {
+    //    Ok("hello")
     Ok(html.index(helloForm))
   }
 
@@ -41,4 +41,13 @@ object Application extends Controller {
       )
   }
 
+  def printId(id: Int) = Action {
+    Ok("Well done, id: " + id)
+  }
+
+  def money = TODO
+
+  def secret = Action {
+    Redirect(routes.Application.printId(666))
+  }
 }

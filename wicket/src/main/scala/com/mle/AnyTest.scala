@@ -3,6 +3,11 @@ package com.mle
 import util.Log
 
 /**
+ * Todo:
+ * deploy to heroku
+ * make tabbedpanel bookmarkable
+ * finish native packaging work
+ *
  * @author Mle
  */
 

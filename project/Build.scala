@@ -1,10 +1,9 @@
 import Dependencies._
 import com.github.siasia.WebPlugin.webSettings
-import com.typesafe.packager.PackagerPlugin._
-import com.typesafe.packager.{PackagerPlugin, linux, debian, rpm, windows}
+import com.typesafe.packager.PackagerPlugin
 import sbt.Keys._
+import sbt.PlayProject._
 import sbt._
-import PlayProject._
 
 /**
  * @author Mle
@@ -31,9 +30,10 @@ object GitBuild extends Build {
     NativePackaging.defaultPackageSettings
   val playDeps = Nil
   lazy val parent = Project("parent", file("."))
-  lazy val play = PlayProject("playapp", applicationVersion = "0.1", dependencies = playDeps, path = file("playapp"), mainLang = SCALA)
   lazy val util = Project("common-util", file("common-util"), settings = commonSettings)
     .settings(libraryDependencies ++= loggingDeps)
+  lazy val play = PlayProject("playapp", applicationVersion = "0.1", dependencies = playDeps, path = file("playapp"), mainLang = SCALA)
+    .dependsOn(util)
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
     .dependsOn(util)
     .settings(libraryDependencies ++= webDeps ++ wiQuery)

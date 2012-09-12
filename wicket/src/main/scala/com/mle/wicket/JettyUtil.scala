@@ -27,7 +27,7 @@ object JettyUtil extends Log {
                                                   path: String,
                                                   filter: Class[U] = classOf[WicketFilter])(implicit context: ServletContextHandler) {
     log info "Mapping wicket app to: " + path
-    val holder = initWicket(new FilterHolder(filter), webApp, path)
+    val holder = initWicketParameters(new FilterHolder(filter), webApp, path)
     context addFilter(holder, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
     context addServlet(classOf[DefaultServlet], path)
   }
@@ -56,7 +56,7 @@ object JettyUtil extends Log {
     handler setServletClassName classOf[AtmosphereServlet].getName
     servlet.framework().addAtmosphereHandler(path, handler)
     val holder = new ServletHolder(servlet)
-    initWicket(holder, webApp, path)
+    initWicketParameters(holder, webApp, path)
     holder setInitParameter("org.atmosphere.useWebSocket", "false")
     holder setInitParameter("org.atmosphere.useNative", "true")
     // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
@@ -79,13 +79,7 @@ object JettyUtil extends Log {
     server
   }
 
-  private def newWicketFilter[T <: WebApplication, U <: Filter](webApp: Class[T],
-                                                                filter: Class[U],
-                                                                path: String) = {
-    initWicket(new FilterHolder(filter), webApp, path)
-  }
-
-  private def initWicket[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {
+  private def initWicketParameters[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {
     holder setInitParameter(ContextParamWebApplicationFactory.APP_CLASS_PARAM, app.getName)
     holder setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, path)
     holder
