@@ -9,7 +9,7 @@
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
-    <!-- additivity=false means "don't propagate up" -->
+    <!-- Silence verbose Atmosphere logging. additivity=false means "don't propagate up" -->
     <logger name="org.apache.wicket.atmosphere.AtmosphereBehavior" additivity="false">
     </logger>
 </configuration>

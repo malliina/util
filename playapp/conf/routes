@@ -4,6 +4,8 @@
 
 # Home page
 GET     /                           controllers.Application.index
+#GET     /                           controllers.WebSockets.index
+
 
 # Hello action
 GET     /hello                      controllers.Application.sayHello
@@ -17,6 +19,16 @@ GET     /money                      controllers.Application.money
 
 GET     /secret                     controllers.Application.secret
 
+# TODO app
 GET     /tasks                      controllers.MyTasks.home
 GET     /tasks/create               controllers.MyTasks.newTask
 GET     /tasks/:id/delete           controllers.MyTasks.delete(id:Long)
+
+# Web Sockets
+GET     /ws                         controllers.WebSockets.index
+GET     /ws/openclose               controllers.WebSockets.openClose
+
+# Chat using Web Sockets
+#GET     /chat                       controllers.Application.index
+#GET     /chat/room                  controllers.Application.chatRoom(username: Option[String] ?= None)
+#GET     /chat/room/chat             controllers.Application.chat(username)

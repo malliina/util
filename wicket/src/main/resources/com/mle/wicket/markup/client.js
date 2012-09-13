@@ -16,7 +16,6 @@
  */
 
 jQuery(function ($) {
-
     Wicket.Event.subscribe("/websocket/open", function (jqEvent) {
         $('#connect').hide();
         $('#disconnect').show();

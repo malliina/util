@@ -3,10 +3,11 @@ package controllers
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
+import util.PlayLog
 import views._
 
 
-object Application extends Controller {
+object Application extends Controller with PlayLog{
 
   /**
    * Describes the hello form.
@@ -24,7 +25,7 @@ object Application extends Controller {
    * Home page
    */
   def index = Action {
-    //    Ok("hello")
+//    play.Logger.of("application") info "Logger.of says hello"
     Ok(html.index(helloForm))
   }
 
