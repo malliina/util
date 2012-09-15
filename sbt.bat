@@ -1,0 +1,1 @@
+java -jar project\sbt\sbt-launch.jar

@@ -1,6 +1,6 @@
 @(name: String, repeat: Int, color: Option[String])
 
-@main("Here is the result:") {
+@helloMain("Here is the result:") {
 
     <ul style="color: @color.getOrElse("inherited")">
         @for(_ <- 1 to repeat) {
@@ -9,7 +9,7 @@
     </ul>
 
     <p class="buttons">
-        <a href="@routes.Application.index">Back to the form</a>
+        <a href="@routes.HelloWorld.index()">Back to the form</a>
     </p>
 
 }

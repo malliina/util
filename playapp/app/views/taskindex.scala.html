@@ -2,8 +2,8 @@
 
 @import helper._
 
-@main(title = "Todo list") {
-    @form(action = routes.MyTasks.newTask, args = 'id -> "helloform") {
+@helloMain(title = "Todo list") {
+    @form(action = routes.MyTasks.newTask(), args = 'id -> "helloform") {
         @inputText(
             field = taskForm("tasktext"),
             args = '_label -> "Enter a description", 'size -> 30, 'placeholder -> "Go to sleep"

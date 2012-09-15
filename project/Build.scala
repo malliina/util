@@ -32,10 +32,12 @@ object GitBuild extends Build {
   lazy val parent = Project("parent", file("."))
   lazy val util = Project("common-util", file("common-util"), settings = commonSettings)
     .settings(libraryDependencies ++= loggingDeps)
-  lazy val play = PlayProject("playapp", applicationVersion = "0.1", dependencies = playDeps, path = file("playapp"), mainLang = SCALA)
+  lazy val utilActor = Project("util-actor", file("util-actor"), settings = commonSettings)
     .dependsOn(util)
+  lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = playDeps, mainLang = SCALA)
+    .dependsOn(util, utilActor)
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
-    .dependsOn(util)
+    .dependsOn(util, utilActor)
     .settings(libraryDependencies ++= webDeps ++ wiQuery)
 
   //  IzPack.variables in IzPack.Config <+= name {

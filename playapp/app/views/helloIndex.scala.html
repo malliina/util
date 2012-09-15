@@ -2,11 +2,11 @@
 
 @import helper._
 
-@main(title = "The 'helloworld' application") {
+@helloMain(title = "The 'helloworld' application") {
 
     <h1>Configure your 'Hello world':</h1>
 
-    @form(action = routes.Application.sayHello, args = 'id -> "helloform") {
+    @form(action = routes.HelloWorld.sayHello(), args = 'id -> "helloform") {
 
         @inputText(
             field = helloForm("name"),

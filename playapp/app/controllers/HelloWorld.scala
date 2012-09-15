@@ -7,7 +7,7 @@ import util.PlayLog
 import views._
 
 
-object Application extends Controller with PlayLog{
+object HelloWorld extends Controller with PlayLog{
 
   /**
    * Describes the hello form.
@@ -25,8 +25,7 @@ object Application extends Controller with PlayLog{
    * Home page
    */
   def index = Action {
-//    play.Logger.of("application") info "Logger.of says hello"
-    Ok(html.index(helloForm))
+    Ok(html.helloIndex(helloForm))
   }
 
   /**
@@ -35,7 +34,7 @@ object Application extends Controller with PlayLog{
   def sayHello = Action {
     implicit request =>
       helloForm.bindFromRequest.fold(
-        formErrors => BadRequest(html.index(formErrors)),
+        formErrors => BadRequest(html.helloIndex(formErrors)),
         formSuccess => formSuccess match {
           case (name, repeat, color) => Ok(html.hello(name, repeat.toInt, color))
         }
@@ -49,6 +48,6 @@ object Application extends Controller with PlayLog{
   def money = TODO
 
   def secret = Action {
-    Redirect(routes.Application.printId(666))
+    Redirect(routes.HelloWorld.printId(666))
   }
 }

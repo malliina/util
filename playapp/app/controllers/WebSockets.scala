@@ -1,23 +1,39 @@
 package controllers
 
-import play.api.libs.iteratee.{Enumerator, Iteratee}
+import play.api.libs.iteratee.{Concurrent, Iteratee}
 import play.api.mvc._
 import util.PlayLog
+import models.WebSocketsManager
+
 
 /**
  *
  * @author Mle
  */
 object WebSockets extends Controller with PlayLog {
-  def index = WebSocket.using(request => {
-    val in = Iteratee.foreach[String](str => log.info(str)).mapDone(_ => log info "Disconnected")
-    val out = Enumerator("Hello, World!")
-    (in, out)
+  type ClientChannel = Concurrent.Channel[String]
+
+  def index = Action {
+    implicit request => Ok(views.html.wsIndex("yo"))
+  }
+
+  def webSocket = WebSocket.using(request => {
+    val (e, channel) = Concurrent.broadcast[String]
+    onConnect(channel)
+    val in = Iteratee.foreach[String](onMessage).mapDone(_ => onClose(channel))
+    (in, e)
   })
 
-  def openClose = WebSocket.using(request => {
-    val in = Iteratee.foreach[String](str => log info str).mapDone(_ => log info "Gone!")
-    val out = Enumerator("Hello, Bye") >>> Enumerator.eof
-    (in, out)
-  })
+  def onConnect(channel: ClientChannel) {
+    WebSocketsManager connect channel
+
+  }
+
+  def onClose(channel: ClientChannel) {
+    WebSocketsManager disconnect channel
+  }
+
+  def onMessage(msg: String) {
+    log info "Server got msg: " + msg
+  }
 }
