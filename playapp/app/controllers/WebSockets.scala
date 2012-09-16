@@ -19,21 +19,28 @@ object WebSockets extends Controller with PlayLog {
 
   def webSocket = WebSocket.using(request => {
     val (e, channel) = Concurrent.broadcast[String]
-    onConnect(channel)
-    val in = Iteratee.foreach[String](onMessage).mapDone(_ => onClose(channel))
+    onConnect(channel, request)
+    val in = Iteratee.foreach[String](onMessage(_, channel)).mapDone(_ => onClose(channel))
     (in, e)
   })
 
-  def onConnect(channel: ClientChannel) {
+  def onConnect(channel: ClientChannel, request: RequestHeader) {
     WebSocketsManager connect channel
-
+    log debug "IP: " + request.remoteAddress +
+      "\nQuery string: " + request.queryString +
+      "\nMethod: " + request.method +
+      "\nPath: " + request.path +
+      "\nURI: " + request.uri +
+      "\nVersion: " + request.version +
+      "\nSession: " + request.session
   }
 
   def onClose(channel: ClientChannel) {
     WebSocketsManager disconnect channel
   }
 
-  def onMessage(msg: String) {
-    log info "Server got msg: " + msg
+  def onMessage(msg: String, channel: ClientChannel) {
+    log info "Server got msg: " + msg + " from: " + channel
+    channel push "Welcome"
   }
 }

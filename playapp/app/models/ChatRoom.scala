@@ -53,31 +53,33 @@ object ChatRoom {
     roomActor
   }
 
-  def join(username:String):Promise[(Iteratee[JsValue,_],Enumerator[JsValue])] = {
+  def join(username: String): Promise[(Iteratee[JsValue, _], Enumerator[JsValue])] = {
     (default ? Join(username)).asPromise.map {
 
       case Connected(enumerator) =>
 
         // Create an Iteratee to consume the feed
-        val iteratee = Iteratee.foreach[JsValue] { event =>
-          default ! Talk(username, (event \ "text").as[String])
-        }.mapDone { _ =>
-          default ! Quit(username)
+        val iteratee = Iteratee.foreach[JsValue] {
+          event =>
+            default ! Talk(username, (event \ "text").as[String])
+        }.mapDone {
+          _ =>
+            default ! Quit(username)
         }
 
-        (iteratee,enumerator)
+        (iteratee, enumerator)
 
       case CannotConnect(error) =>
 
         // Connection error
 
         // A finished Iteratee sending EOF
-        val iteratee = Done[JsValue,Unit]((),Input.EOF)
+        val iteratee = Done[JsValue, Unit]((), Input.EOF)
 
         // Send an error and close the socket
-        val enumerator =  Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
+        val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
 
-        (iteratee,enumerator)
+        (iteratee, enumerator)
 
     }
 
@@ -93,9 +95,9 @@ class ChatRoom extends Actor {
 
     case Join(username) => {
       // Create an Enumerator to write to this socket
-//      val channel = Concurrent.broadcast[JsValue](onStart = self ! NotifyJoin(username))
-      val channel =  Enumerator.imperative[JsValue]( onStart = () => self ! NotifyJoin(username))
-      if(members.contains(username)) {
+      //      val channel = Concurrent.broadcast[JsValue](onStart = self ! NotifyJoin(username))
+      val channel = Enumerator.imperative[JsValue](onStart = () => self ! NotifyJoin(username))
+      if (members.contains(username)) {
         sender ! CannotConnect("This username is already used")
       } else {
         members = members + (username -> channel)
@@ -138,9 +140,13 @@ class ChatRoom extends Actor {
 }
 
 case class Join(username: String)
+
 case class Quit(username: String)
+
 case class Talk(username: String, text: String)
+
 case class NotifyJoin(username: String)
 
-case class Connected(enumerator:Enumerator[JsValue])
+case class Connected(enumerator: Enumerator[JsValue])
+
 case class CannotConnect(msg: String)
