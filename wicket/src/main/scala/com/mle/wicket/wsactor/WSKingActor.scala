@@ -1,6 +1,5 @@
 package com.mle.wicket.wsactor
 
-import com.mle.wicket.wsactor.WsActors.Address
 import com.mle.actor.KingActor
 
 /**

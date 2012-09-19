@@ -2,8 +2,7 @@ package com.mle.wicket.markup
 
 import com.mle.util.Log
 import com.mle.wicket.component.SAjaxLink
-import com.mle.wicket.wsactor.WsActors
-import com.mle.wicket.wsactor.WsActors.Address
+import com.mle.wicket.wsactor.{Address, WsActors}
 import org.apache.wicket.ajax.WebSocketRequestHandler
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.protocol.ws.api.message.{ClosedMessage, ConnectedMessage, TextMessage}

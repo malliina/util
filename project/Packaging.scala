@@ -1,6 +1,5 @@
 import java.nio.file._
 import sbt._
-import inc.Analysis
 import Keys._
 import com.mle.util.FileUtilities
 
@@ -20,31 +19,65 @@ object Packaging extends Plugin {
   val confOutDir = outDir + "/" + confDir
   val scriptOutDir = outDir + "/" + scriptDir
   val packageKey = packageBin in Compile
-  // Tasks and keys
-  val compileKey: TaskKey[Analysis] = compile in Compile
-  val deployTask = TaskKey[File]("deploy", "Compiles the sources, packages a .jar and deploys the .jar to a server")
+  // Settings
   val basePath = SettingKey[Path]("base-path", "Same as base-directory")
   val distribDir = SettingKey[Path]("package-dist-dir", "The directory to package dists into")
   val configPath = SettingKey[Option[Path]]("config-path", "Location of config files (if any)")
   val configOutputPath = SettingKey[Option[Path]]("config-output-path", "Output location of config files (if any)")
   val scriptPath = SettingKey[Option[Path]]("script-path", "Location of scripts (if any)")
   val scriptOutPath = SettingKey[Option[Path]]("script-output-path", "Output location of scripts (if any)")
-  val configFiles = TaskKey[Set[Path]]("config-files", "Config files to package with the app")
-  val scriptFiles = TaskKey[Set[Path]]("scripts", "Scripts to package with the app")
-  val copyConfs = TaskKey[Set[Path]]("copy-confs", "Copies all configuration files to " + confOutDir)
-  val copyScripts = TaskKey[Set[Path]]("copy-scripts", "Copies all configuration files to " + scriptOutDir)
+  // Native
+  val unixHome = SettingKey[Path]("unix-home", "Home dir on unix")
+  val unixLibHome = SettingKey[Path]("unix-lib-home", "Lib dir on unix")
+  val unixConfHome = SettingKey[Path]("unix-conf-home", "Conf dir on unix")
+  val unixScriptHome = SettingKey[Path]("unix-script-home", "Script dir on unix")
+  // Tasks
+  val deployTask = TaskKey[File]("deploy", "Compiles the sources, packages a .jar and deploys the .jar to a server")
+  val appJar = TaskKey[Path]("app-jar", "The application jar")
+  val defaultsFile = TaskKey[Path]("defaults-file", "The defaults config file")
+  val configFiles = TaskKey[Seq[Path]]("config-files", "Config files to package with the app")
+  val scriptFiles = TaskKey[Seq[Path]]("scripts", "Scripts to package with the app")
+  val copyConfs = TaskKey[Seq[Path]]("copy-confs", "Copies all configuration files to " + confOutDir)
+  val copyScripts = TaskKey[Seq[Path]]("copy-scripts", "Copies all configuration files to " + scriptOutDir)
   val printLibs = TaskKey[Unit]("print-libs", "Prints library .jars to stdout")
-  val libs = TaskKey[Set[Path]]("libs", "All (managed and unmanaged) libs")
-  val copyLibs = TaskKey[Set[Path]]("copy-libs", "Copies all (managed and unmanaged) libs to " + libOutDir)
-  val createJar = TaskKey[Set[Path]]("create-jar", "Copies application .jar to " + outDir)
-  val packageApp = TaskKey[Set[Path]]("package-app", "Copies the app (jars, libs, confs) to " + outDir)
-  val bat = TaskKey[Set[Path]]("bat", "Copies the app (jars, libs, confs) along with a .bat file to " + outDir)
-  val sh = TaskKey[Set[Path]]("sh", "Copies the app (jars, libs, confs) along with a .sh file to " + outDir)
+  val libs = TaskKey[Seq[Path]]("libs", "All (managed and unmanaged) libs")
+  val copyLibs = TaskKey[Seq[Path]]("copy-libs", "Copies all (managed and unmanaged) libs to " + libOutDir)
+  val createJar = TaskKey[Seq[Path]]("create-jar", "Copies application .jar to " + outDir)
+  val packageApp = TaskKey[Seq[Path]]("package-app", "Copies the app (jars, libs, confs) to " + outDir)
+  val bat = TaskKey[Seq[Path]]("bat", "Copies the app (jars, libs, confs) along with a .bat file to " + outDir)
+  val sh = TaskKey[Seq[Path]]("sh", "Copies the app (jars, libs, confs) along with a .sh file to " + outDir)
   val zip = TaskKey[File]("zip", "Creates a zip of the app to " + outDir)
+  // Native tasks
+  val libMappings = TaskKey[Seq[(Path, String)]]("lib-mappings", "Libs mapped to paths")
+  val confMappings = TaskKey[Seq[(Path, String)]]("conf-mappings", "Confs mapped to paths")
+  val scriptMappings = TaskKey[Seq[(Path, String)]]("script-mappings", "Scripts mapped to paths")
+  val launcherMapping = TaskKey[(Path, String)]("launcher-mapping", "Launcher file path")
+  val defaultsMapping = TaskKey[(Path, String)]("defaults-mapping", "Defaults file path")
+  val dirStructure = TaskKey[Seq[String]]("dir-structure", "Prints the directory structure")
+
   // Codify what the tasks do
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
+    unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
+    unixLibHome <<= (unixHome)(appHome => appHome resolve "lib"),
+    unixConfHome <<= (unixHome)(appHome => appHome resolve "conf"),
+    unixScriptHome <<= (unixHome)(appHome => appHome resolve "scripts"),
+    libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
+      libFiles.map(file => file -> (destDir resolve file.getFileName).toString)
+    }),
+    confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
+    scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
+    launcherMapping <<= (appJar, unixHome,name) map ((jar, home,pkgName) => jar -> (home resolve (pkgName+".jar")).toString),
+    defaultsMapping <<= (basePath, name) map ((base, pkgName) => {
+      (base resolve ("dist/" + pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
+    }),
+    dirStructure <<= (launcherMapping, defaultsMapping, libMappings, confMappings, scriptMappings) map ((jar, defaults, libz, confz, scriptz) => {
+      val ret = (Seq(jar, defaults) ++ libz ++ confz ++ scriptz).map(_._2).sorted
+      ret foreach println
+      ret
+    }),
+    confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     exportJars := true,
     basePath <<= (baseDirectory)(b => b.toPath),
     distribDir <<= (basePath)(b => (b resolve outDir)),
@@ -53,6 +86,7 @@ object Packaging extends Plugin {
     configOutputPath <<= (distribDir)(d => Some((d resolve confDir))),
     configFiles <<= filesIn(configPath),
     scriptFiles <<= filesIn(scriptPath),
+    appJar <<= (exportedProducts in Compile) map ((jars) => jars.files.head.toPath),
     copyConfs <<= copyTask(configFiles),
     copyScripts <<= copyTask(scriptFiles),
     libs <<= (
@@ -60,15 +94,15 @@ object Packaging extends Plugin {
       exportedProducts in Compile
       ) map ((cp, products) => {
       // Libs, but not my own jars
-      cp.files.filter(f => !products.files.contains(f)).map(_.toPath).toSet
+      cp.files.filter(f => !products.files.contains(f)).map(_.toPath)
     }),
     printLibs <<= (libs) map ((l) => {
       l foreach println
     }),
-    copyLibs <<=(
+    copyLibs <<= (
       libs,
       distribDir
-    ) map ((libJars, dest) => {
+      ) map ((libJars, dest) => {
       val libDestination = dest resolve libDir
       Files.createDirectories(libDestination)
       libJars.map(libJar => Files.copy(libJar, libDestination resolve libJar.getFileName, StandardCopyOption.REPLACE_EXISTING))
@@ -80,9 +114,12 @@ object Packaging extends Plugin {
       version,
       scalaVersion
       ) map ((products, dest, appName, appVer, scalaVer) => {
+      Files.createDirectories(dest)
       val versionSuffix = "_" + scalaVer + "-" + appVer
-      val jarPaths = products.files.map(_.toPath).toSet
-      jarPaths.map(jarPath => Files.copy(jarPath, (dest resolve stripSection(jarPath.getFileName.toString, versionSuffix)), StandardCopyOption.REPLACE_EXISTING))
+      val jarPaths = products.files.map(_.toPath)
+      jarPaths.map(jarPath => {
+        Files.copy(jarPath, (dest resolve stripSection(jarPath.getFileName.toString, versionSuffix)), StandardCopyOption.REPLACE_EXISTING)
+      })
     }),
     packageApp <<= (
       copyLibs,
@@ -104,6 +141,7 @@ object Packaging extends Plugin {
       distribDir,
       name
       ) map ((base, files, distribDir, appName) => {
+      Files.createDirectories(distribDir)
       val zipFile = base / outDir / (appName + ".zip")
       val rebaser = sbt.Path.rebase(distribDir.toFile, "")
       val filez = files.map(_.toFile)
@@ -119,10 +157,10 @@ object Packaging extends Plugin {
   )
 
   def launcher(appDir: Path,
-               files: Types.Id[Set[Path]],
+               files: Types.Id[Seq[Path]],
                appName: String,
                extension: String,
-               appFiles: Types.Id[Set[Path]]) = {
+               appFiles: Types.Id[Seq[Path]]) = {
     val launcherFilename = appName.toLowerCase + extension
     val launcherDestination = appDir resolve launcherFilename
     val maybeLauncherFile = files.find(_.getFileName.toString == launcherFilename)
@@ -136,19 +174,30 @@ object Packaging extends Plugin {
   }
 
   // Helpers
-  def copyTask(files: TaskKey[Set[Path]]) = (
+  def copyTask(files: TaskKey[Seq[Path]]) = (
     basePath,
     files,
     distribDir
-    ) map (FileUtilities.copy)
+    ) map ((base, filez, dest) => FileUtilities.copy(base, filez.toSet, dest).toSeq)
 
-  def filesIn(dir: SettingKey[Option[Path]]): Project.Initialize[Task[Set[Path]]] = dir.map((path: Option[Path]) => {
-    path.map(p => if (Files isDirectory p) FileUtilities.listPaths(p).toSet[Path] else Set.empty[Path]).getOrElse(Set.empty[Path])
+  def filesIn(dir: SettingKey[Option[Path]]): Project.Initialize[Task[Seq[Path]]] = dir.map((path: Option[Path]) => {
+    path.map(p => if (Files isDirectory p) FileUtilities.listPaths(p) else Seq.empty[Path]).getOrElse(Seq.empty[Path])
   })
 
   /**
    * Removes section from name
    */
-  def stripSection(name: String, section: String) = if (name.contains(section) && name.endsWith(".jar")) name.slice(0, name indexOf section) + ".jar" else name
+  def stripSection(name: String, section: String) =
+    if (name.contains(section) && name.endsWith(".jar"))
+      name.slice(0, name indexOf section) + ".jar"
+    else
+      name
 
+  def rebase(file: Path, srcBase: Path, destBase: Path) = destBase resolve (srcBase relativize file)
+
+  def rebase(files: Seq[Path], srcBase: Path, destBase: Path): Seq[(Path, String)] =
+    files map (file => file -> rebase(file, srcBase, destBase).toString)
+
+  def rebase(files: Seq[Path], maybeSrcBase: Option[Path], destBase: Path): Seq[(Path, String)] =
+    maybeSrcBase.map(srcBase => rebase(files, srcBase, destBase)).getOrElse(Seq.empty[(Path, String)])
 }

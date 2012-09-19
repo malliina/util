@@ -1,7 +1,6 @@
 package com.mle.wicket.wsactor
 
 import com.mle.actor.ConnectionActor
-import com.mle.wicket.wsactor.WsActors.Address
 import org.apache.wicket.Application
 import org.apache.wicket.protocol.ws.api.SimpleWebSocketConnectionRegistry
 

@@ -1,0 +1,7 @@
+APP_NAME=wicket
+APP_HOME=/opt/wicket
+APP_USER=wicket
+JAVA_OPTS="-Dwicket.home=/opt/wicket"
+JAVA_CMD=/usr/lib/jvm/jdk7/bin/java
+PID_FILE=/var/run/wicket.pid
+MAIN_CLASS=com.mle.wicket.WicketStart

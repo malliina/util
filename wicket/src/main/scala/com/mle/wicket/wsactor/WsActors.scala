@@ -9,7 +9,7 @@ import com.mle.actor.ActorManager
  * @author Mle
  */
 
-object WsActors extends ActorManager(new WSKingActor) with Log {
+object WsActors extends ActorManager[Address](new WSKingActor) with Log {
   log info "Initializing Web Services actors"
   val JSON_FORMAT = """{"message": "%s", "version": %d}"""
   private var i = 0
@@ -27,7 +27,6 @@ object WsActors extends ActorManager(new WSKingActor) with Log {
    * @return the message in JSON format
    */
   def toJson(msg: String, version: java.lang.Integer = new Integer(4)) = String.format(JSON_FORMAT, msg, version)
-
-  case class Address(appName: String, sessionId: String, pageId: Int)
-
 }
+case class Address(appName: String, sessionId: String, pageId: Int)
+

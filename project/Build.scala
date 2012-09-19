@@ -11,7 +11,7 @@ import sbt._
 
 object GitBuild extends Build {
 
-  override def settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
+  override lazy val settings = super.settings
 
   val commonSettings = Defaults.defaultSettings ++ Seq(
     scalaVersion := "2.9.2",
