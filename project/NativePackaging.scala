@@ -19,27 +19,47 @@ object NativePackaging {
     rpm.Keys.rpmVendor := "kingmichael",
     rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
     windows.Keys.wixFile := new File("doesnotexist"),
-    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name) map (
+    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name, controlDir, defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping) map (
       // http://lintian.debian.org/tags/no-copyright-file.html
-      (dir, pkgName) => Seq(
-        (pkgMapping((dir / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright"))
-          withUser "root" withPerms "0644"),
-        (pkgMapping((dir / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"))
-          withUser "root" withPerms "0644" gzipped) asDocs()
+      (home, pkgName, control, etcDefault, libs, confs, scripts, launcher) => Seq(
+        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")),
+        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz")) asDocs(),
+        pkgMaps(Seq(
+          control / "preinstall.sh" -> "DEBIAN/preinst",
+          control / "postinstall.sh" -> "DEBIAN/postinst",
+          control / "preuninstall.sh" -> "DEBIAN/prerm",
+          control / "postuninstall.sh" -> "DEBIAN/postrm",
+          launcher
+        ) ++ scripts, perms = "0755"),
+        pkgMap(etcDefault),
+        pkgMaps(libs),
+        pkgMaps(confs :+ etcDefault, isConfig = true)
       )),
-    debian.Keys.linuxPackageMappings in Debian <+= (controlDir, name) map (
-      (dir, pkgName) => (pkgMapping(
-        (dir / "preinstall.sh") -> "DEBIAN/preinst",
-        (dir / "postinstall.sh") -> "DEBIAN/postinst",
-        (dir / "preuninstall.sh") -> "DEBIAN/prerm",
-        (dir / "postuninstall.sh") -> "DEBIAN/postrm"
-      ) withUser "root" withPerms "0755")
-      ),
-    debian.Keys.linuxPackageMappings in Debian <+= (defaultsMapping, name) map (
-      (defMap, pkgName) => (pkgMapping(defMap) withUser "root" withPerms "0755")
-      ),
+    //    debian.Keys.linuxPackageMappings in Debian <+= (defaultsMapping, name) map (
+    //      (defMap, pkgName) => (pkgMapping(defMap) withUser "root" withPerms "0755")
+    //      ),
+    //    debian.Keys.linuxPackageMappings in Debian <+= (libMappings, name) map (
+    //      (defMap, pkgName) => (pkgMapping(defMap: _*) withUser "root" withPerms "0644")
+    //      ),
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
   )
+
+  def pkgMap(file: (Path, String), perms: String = "0644", gzipped: Boolean = false) =
+    pkgMaps(Seq(file), perms = perms, gzipped = gzipped)
+
+  def pkgMaps(files: Seq[(Path, String)],
+              user: String = "root",
+              group: String = "root",
+              perms: String = "0644",
+              isConfig: Boolean = false,
+              gzipped: Boolean = false) = {
+    var mapping = pkgMapping(files: _*) withUser user withGroup group withPerms perms
+    if (isConfig)
+      mapping = mapping withConfig()
+    if (gzipped)
+      mapping = mapping.gzipped
+    mapping
+  }
 
   def pkgMapping(files: (Path, String)*) = {
     packageMapping(files.map(pair => pair._1.toFile -> pair._2): _*)

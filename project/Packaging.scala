@@ -2,6 +2,8 @@ import java.nio.file._
 import sbt._
 import Keys._
 import com.mle.util.FileUtilities
+import com.typesafe.packager.PackagerPlugin._
+import com.typesafe.packager._
 
 /**
  * Builds packages containing all the jars, libs, etc. Based on
@@ -58,11 +60,16 @@ object Packaging extends Plugin {
   val launcherMapping = TaskKey[(Path, String)]("launcher-mapping", "Launcher file path")
   val defaultsMapping = SettingKey[(Path, String)]("defaults-mapping", "Defaults file path")
   val dirStructure = TaskKey[Seq[String]]("dir-structure", "Prints the directory structure")
+  val debFiles = TaskKey[Seq[String]]("deb-files","Files on Debian")
+
 
   // Codify what the tasks do
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
+    debFiles <<= (debian.Keys.linuxPackageMappings in Debian,name) map((mappings,pkgName) => {
+        mappings.flatMap(_.mappings).map(_._2)
+    }),
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
     unixLibHome <<= (unixHome)(appHome => appHome / "lib"),
     unixConfHome <<= (unixHome)(appHome => appHome / "conf"),
