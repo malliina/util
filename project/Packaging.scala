@@ -10,6 +10,9 @@ import com.mle.util.FileUtilities
  * @author Mle
  */
 object Packaging extends Plugin {
+  implicit def path2path(path: Path) = new {
+    def /(next: String) = path resolve next
+  }
   // Relative to the project
   val outDir = "distrib"
   val confDir = "conf"
@@ -31,8 +34,9 @@ object Packaging extends Plugin {
   val unixLibHome = SettingKey[Path]("unix-lib-home", "Lib dir on unix")
   val unixConfHome = SettingKey[Path]("unix-conf-home", "Conf dir on unix")
   val unixScriptHome = SettingKey[Path]("unix-script-home", "Script dir on unix")
+  val pkgSrcHome = SettingKey[Path]("pkg-src-home","Packaging home directory")
+  val controlDir = SettingKey[Path]("control-dir","Directory for control files for native packaging")
   // Tasks
-  val deployTask = TaskKey[File]("deploy", "Compiles the sources, packages a .jar and deploys the .jar to a server")
   val appJar = TaskKey[Path]("app-jar", "The application jar")
   val defaultsFile = TaskKey[Path]("defaults-file", "The defaults config file")
   val configFiles = TaskKey[Seq[Path]]("config-files", "Config files to package with the app")
@@ -60,9 +64,11 @@ object Packaging extends Plugin {
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
-    unixLibHome <<= (unixHome)(appHome => appHome resolve "lib"),
-    unixConfHome <<= (unixHome)(appHome => appHome resolve "conf"),
-    unixScriptHome <<= (unixHome)(appHome => appHome resolve "scripts"),
+    unixLibHome <<= (unixHome)(appHome => appHome / "lib"),
+    unixConfHome <<= (unixHome)(appHome => appHome / "conf"),
+    unixScriptHome <<= (unixHome)(appHome => appHome / "scripts"),
+    pkgSrcHome <<= (basePath)(base => base / "src/pkg"),
+    controlDir <<=(pkgSrcHome)(home => home / "control"),
     libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
       libFiles.map(file => file -> (destDir resolve file.getFileName).toString)
     }),
@@ -70,7 +76,7 @@ object Packaging extends Plugin {
     scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
     launcherMapping <<= (appJar, unixHome,name) map ((jar, home,pkgName) => jar -> (home resolve (pkgName+".jar")).toString),
     defaultsMapping <<= (basePath, name) map ((base, pkgName) => {
-      (base resolve ("dist/" + pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
+      (base / ("dist/" + pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
     }),
     dirStructure <<= (launcherMapping, defaultsMapping, libMappings, confMappings, scriptMappings) map ((jar, defaults, libz, confz, scriptz) => {
       val ret = (Seq(jar, defaults) ++ libz ++ confz ++ scriptz).map(_._2).sorted
@@ -86,7 +92,7 @@ object Packaging extends Plugin {
     configOutputPath <<= (distribDir)(d => Some((d resolve confDir))),
     configFiles <<= filesIn(configPath),
     scriptFiles <<= filesIn(scriptPath),
-    appJar <<= (exportedProducts in Compile) map ((jars) => jars.files.head.toPath),
+    appJar <<= (exportedProducts in Compile,name) map ((jars:Classpath,pkgName) => jars.files.head.toPath),
     copyConfs <<= copyTask(configFiles),
     copyScripts <<= copyTask(scriptFiles),
     libs <<= (
@@ -96,7 +102,7 @@ object Packaging extends Plugin {
       // Libs, but not my own jars
       cp.files.filter(f => !products.files.contains(f)).map(_.toPath)
     }),
-    printLibs <<= (libs) map ((l) => {
+    printLibs <<= (libs,name) map ((l:Seq[Path],pkgName) => {
       l foreach println
     }),
     copyLibs <<= (
@@ -148,11 +154,6 @@ object Packaging extends Plugin {
       IO.zip(filez.map(f => (f, rebaser(f).get)), zipFile)
       println("Packaged: " + zipFile)
       zipFile
-    }),
-    deployTask <<= packageKey map ((packageResult: File) => {
-      println("Packaged: " + packageResult.getAbsolutePath)
-      println("Deployment not yet implemented...")
-      packageResult
     })
   )
 
@@ -180,7 +181,7 @@ object Packaging extends Plugin {
     distribDir
     ) map ((base, filez, dest) => FileUtilities.copy(base, filez.toSet, dest).toSeq)
 
-  def filesIn(dir: SettingKey[Option[Path]]): Project.Initialize[Task[Seq[Path]]] = dir.map((path: Option[Path]) => {
+  def filesIn(dir: SettingKey[Option[Path]]): Project.Initialize[Task[Seq[Path]]] = (dir,name).map((path: Option[Path],pkgName) => {
     path.map(p => if (Files isDirectory p) FileUtilities.listPaths(p) else Seq.empty[Path]).getOrElse(Seq.empty[Path])
   })
 

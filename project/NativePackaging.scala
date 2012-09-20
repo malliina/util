@@ -1,7 +1,10 @@
 import com.typesafe.packager.PackagerPlugin._
-import com.typesafe.packager.{linux, debian, rpm, windows}
+import com.typesafe.packager._
+import java.nio.file.Path
 import sbt.Keys._
 import sbt._
+import Packaging._
+import scala.Some
 
 object NativePackaging {
   val defaultPackageSettings = Seq(
@@ -16,17 +19,26 @@ object NativePackaging {
     rpm.Keys.rpmVendor := "kingmichael",
     rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
     windows.Keys.wixFile := new File("doesnotexist"),
-    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map (
+    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name) map (
       // http://lintian.debian.org/tags/no-copyright-file.html
-      (bd, pkgName) => (packageMapping((bd / "dist" / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")) withUser "root" withPerms "0644")
-      ),
-    debian.Keys.linuxPackageMappings in Debian <+= (baseDirectory, name) map (
-      // http://lintian.debian.org/tags/changelog-file-missing-in-native-package.html
-      (bd, pkgName) => (packageMapping((bd / "dist" / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz")) withUser "root" withPerms "0644" gzipped) asDocs()
-      ),
-    linux.Keys.linuxPackageMappings <+= (baseDirectory) map (
-      (bd: File) => (packageMapping((bd / "dist" / "app.txt") -> "/opt/test/app.txt") withUser "root" withPerms "0644")
+      (dir, pkgName) => Seq(
+        (pkgMapping((dir / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright"))
+          withUser "root" withPerms "0644"),
+        (pkgMapping((dir / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"))
+          withUser "root" withPerms "0644" gzipped) asDocs()
+      )),
+    debian.Keys.linuxPackageMappings in Debian <+= (controlDir, name) map (
+      (dir, pkgName) => (pkgMapping(
+        (dir / "preinstall.sh") -> "DEBIAN/preinst",
+        (dir / "postinstall.sh") -> "DEBIAN/postinst",
+        (dir / "preuninstall.sh") -> "DEBIAN/prerm",
+        (dir / "postuninstall.sh") -> "DEBIAN/postrm"
+      ) withUser "root" withPerms "0755")
       ),
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
-    )
+  )
+
+  def pkgMapping(files: (Path, String)*) = {
+    packageMapping(files.map(pair => pair._1.toFile -> pair._2): _*)
+  }
 }

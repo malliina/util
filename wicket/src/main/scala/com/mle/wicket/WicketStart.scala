@@ -1,15 +1,17 @@
 package com.mle.wicket
 
 import ch.qos.logback.classic.Level
-import com.mle.util.{AppUtils, Log}
+import com.mle.util.{FileUtilities, AppUtils, Log}
 import com.mle.wicket.JettyUtil._
+import java.nio.file.Paths
 
 /**
  * @author Mle
  */
 
 object WicketStart extends Log {
-  val appHome = sys.props.getOrElseUpdate("wicket.home", "/opt/wicket")
+  sys.props.get("wicket.home").foreach(home =>
+    FileUtilities.basePath = Paths get home)
 
   def main(args: Array[String]) {
     AppUtils setLogLevel Level.INFO

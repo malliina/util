@@ -2,16 +2,20 @@ package com.mle.util
 
 import java.nio.file._
 import com.mle.util.FileVisitors.FileCollectingVisitor
+import Implicits._
 
 /**
  *
  * @author mle
  */
 object FileUtilities extends Log {
-  def listFiles(srcDir: String, visitor: FileCollectingVisitor): Seq[Path] = {
-    val path = Paths get srcDir
-    log debug "Reading " + path.toAbsolutePath.toString
-    Files.walkFileTree(path, visitor)
+  var basePath = Paths get sys.props.getOrElse("app.home", sys.props("user.dir"))
+
+  def pathTo(location: String) = basePath / location
+
+  def listFiles(srcDir: Path, visitor: FileCollectingVisitor): Seq[Path] = {
+    log debug "Reading " + srcDir.toAbsolutePath.toString
+    Files.walkFileTree(srcDir, visitor)
     visitor.files
   }
 
@@ -20,9 +24,8 @@ object FileUtilities extends Log {
    * @param path the path to the disk or file store
    * @return the amount of used disk space as a percentage [0,100] of the total disk space capacity, rounded up to the next integer
    */
-  def diskUsagePercentage(path: String) = {
-    val dataPath = Paths get path
-    val fileStore = Files getFileStore dataPath
+  def diskUsagePercentage(path: Path) = {
+    val fileStore = Files getFileStore path
     val totalSpace = fileStore.getTotalSpace
     val freeSpace = fileStore.getUsableSpace
     math.ceil(100.0 * freeSpace / totalSpace).toInt
@@ -30,13 +33,14 @@ object FileUtilities extends Log {
 
   /**
    * Copies the given files to a destination directory, where the files' subdirectory is calculated relative to the given base directory.
+   *
    * @param srcBase the base directory for the source files
    * @param files the source files to copy
    * @param dest the destination directory, so each source file is copied to <code>dest / srcBase.relativize(file)</code>
    * @return the destination files
    */
   def copy(srcBase: Path, files: Set[Path], dest: Path) = files map (file => {
-    val destFile = dest resolve srcBase.relativize(file)
+    val destFile = rebase(file, srcBase, dest)
     // Create parent dirs if they don't exist
     val parentDir = destFile.getParent
     if (parentDir != null && !Files.isDirectory(parentDir))
@@ -46,6 +50,8 @@ object FileUtilities extends Log {
       Files.copy(file, destFile, StandardCopyOption.REPLACE_EXISTING)
     else destFile
   })
+
+  def rebase(file: Path, srcBase: Path, destBase: Path) = destBase resolve (srcBase relativize file)
 
   /**
    * Performs a recursive search of files and directories under the given base path.
@@ -64,7 +70,7 @@ object FileUtilities extends Log {
    * @see [[java.nio.file.Files]], [[java.nio.file.Paths]]
    */
   def createFile(path: String) {
-    val file = Paths get path
+    val file = pathTo(path)
     if (!Files.exists(file)) {
       val maybeParent = file.getParent
       if (maybeParent != null)

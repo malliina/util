@@ -8,7 +8,7 @@ import java.nio.file.attribute.BasicFileAttributes
  * @author Mle
  */
 object FileVisitors {
-  def build(srcDir: String, recursive: Boolean = true, ageLimitHours: Option[Long] = None, sortByAge: Boolean = true) = {
+  def build(srcDir: Path, recursive: Boolean = true, ageLimitHours: Option[Long] = None, sortByAge: Boolean = true) = {
     if (recursive) {
       if (sortByAge) {
         ageLimitHours.map(age =>
@@ -57,7 +57,7 @@ object FileVisitors {
     private[this] var fileBuffer: List[Path] = Nil
 
     /**
-     * @return the files that have been visited and added to the buffer
+     * @return the files that have been visited and passed any filters
      */
     def files = fileBuffer
 
@@ -139,12 +139,10 @@ object FileVisitors {
   }
 
   trait NonRecursiveSearch extends SimpleFileVisitor[Path] with Log {
-    def startDir: String
-
-    lazy val startPath = Paths get startDir
+    def startDir: Path
 
     override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes) = {
-      if (Files.isSameFile(startPath, dir))
+      if (Files.isSameFile(startDir, dir))
         FileVisitResult.CONTINUE
       else
         FileVisitResult.SKIP_SUBTREE
