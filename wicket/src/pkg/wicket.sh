@@ -54,9 +54,9 @@ case "$1" in
         fi
         COMMAND="exec ${JAVA_CMD} ${JAVA_OPTS} -cp ${APP_HOME}/lib/*:${APP_HOME}/${APP_NAME}.jar ${MAIN_CLASS} >> ${APP_HOME}/logs/console.out 2>&1"
         if [ -z "${APP_USER}" ]; then
-            nohup sh -c ${COMMAND} >/dev/null &
+            nohup sh -c "${COMMAND}" >/dev/null 2>&1 &
         else
-            nohup su - ${APP_USER} --shell=/bin/sh -c ${COMMAND} >/dev/null &
+            nohup su - ${APP_USER} --shell=/bin/sh -c "${COMMAND}" >/dev/null 2>&1 &
         fi
         echo $! > ${PID_FILE}
         echo "Started"
