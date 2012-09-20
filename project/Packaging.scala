@@ -15,6 +15,7 @@ object Packaging extends Plugin {
   implicit def path2path(path: Path) = new {
     def /(next: String) = path resolve next
   }
+
   // Relative to the project
   val outDir = "distrib"
   val confDir = "conf"
@@ -36,8 +37,8 @@ object Packaging extends Plugin {
   val unixLibHome = SettingKey[Path]("unix-lib-home", "Lib dir on unix")
   val unixConfHome = SettingKey[Path]("unix-conf-home", "Conf dir on unix")
   val unixScriptHome = SettingKey[Path]("unix-script-home", "Script dir on unix")
-  val pkgSrcHome = SettingKey[Path]("pkg-src-home","Packaging home directory")
-  val controlDir = SettingKey[Path]("control-dir","Directory for control files for native packaging")
+  val pkgSrcHome = SettingKey[Path]("pkg-src-home", "Packaging home directory")
+  val controlDir = SettingKey[Path]("control-dir", "Directory for control files for native packaging")
   // Tasks
   val appJar = TaskKey[Path]("app-jar", "The application jar")
   val defaultsFile = TaskKey[Path]("defaults-file", "The defaults config file")
@@ -57,31 +58,37 @@ object Packaging extends Plugin {
   val libMappings = TaskKey[Seq[(Path, String)]]("lib-mappings", "Libs mapped to paths")
   val confMappings = TaskKey[Seq[(Path, String)]]("conf-mappings", "Confs mapped to paths")
   val scriptMappings = TaskKey[Seq[(Path, String)]]("script-mappings", "Scripts mapped to paths")
-  val launcherMapping = TaskKey[(Path, String)]("launcher-mapping", "Launcher file path")
+  val launcherMapping = TaskKey[(Path, String)]("launcher-mapping", "Launcher jar file path")
+  val initdMapping = SettingKey[(Path, String)]("initd-mapping", "/etc/init.d start script")
   val defaultsMapping = SettingKey[(Path, String)]("defaults-mapping", "Defaults file path")
   val dirStructure = TaskKey[Seq[String]]("dir-structure", "Prints the directory structure")
-  val debFiles = TaskKey[Seq[String]]("deb-files","Files on Debian")
+  val debFiles = TaskKey[Seq[String]]("deb-files", "Files on Debian")
 
 
   // Codify what the tasks do
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
-    debFiles <<= (debian.Keys.linuxPackageMappings in Debian,name) map((mappings,pkgName) => {
-        mappings.flatMap(_.mappings).map(_._2)
+    debFiles <<= (debian.Keys.linuxPackageMappings in Debian, name) map ((mappings, pkgName) => {
+      val ret = mappings.flatMap(_.mappings).map(_._2)
+      ret foreach println
+      ret
     }),
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
     unixLibHome <<= (unixHome)(appHome => appHome / "lib"),
     unixConfHome <<= (unixHome)(appHome => appHome / "conf"),
     unixScriptHome <<= (unixHome)(appHome => appHome / "scripts"),
     pkgSrcHome <<= (basePath)(base => base / "src/pkg"),
-    controlDir <<=(pkgSrcHome)(home => home / "control"),
+    controlDir <<= (pkgSrcHome)(home => home / "control"),
     libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
       libFiles.map(file => file -> (destDir resolve file.getFileName).toString)
     }),
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
-    launcherMapping <<= (appJar, unixHome,name) map ((jar, home,pkgName) => jar -> (home / (pkgName+".jar")).toString),
+    launcherMapping <<= (appJar, unixHome, name) map ((jar, home, pkgName) => jar -> (home / (pkgName + ".jar")).toString),
+    initdMapping <<= (pkgSrcHome, name)((base, pkgName) => {
+      (base / (pkgName + ".sh")) -> ("/etc/init.d/" + pkgName)
+    }),
     defaultsMapping <<= (pkgSrcHome, name)((base, pkgName) => {
       (base / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
     }),
@@ -99,7 +106,7 @@ object Packaging extends Plugin {
     configOutputPath <<= (distribDir)(d => Some((d resolve confDir))),
     configFiles <<= filesIn(configPath),
     scriptFiles <<= filesIn(scriptPath),
-    appJar <<= (exportedProducts in Compile,name) map ((jars:Classpath,pkgName) => jars.files.head.toPath),
+    appJar <<= (exportedProducts in Compile, name) map ((jars: Classpath, pkgName) => jars.files.head.toPath),
     copyConfs <<= copyTask(configFiles),
     copyScripts <<= copyTask(scriptFiles),
     libs <<= (
@@ -109,7 +116,7 @@ object Packaging extends Plugin {
       // Libs, but not my own jars
       cp.files.filter(f => !products.files.contains(f)).map(_.toPath)
     }),
-    printLibs <<= (libs,name) map ((l:Seq[Path],pkgName) => {
+    printLibs <<= (libs, name) map ((l: Seq[Path], pkgName) => {
       l foreach println
     }),
     copyLibs <<= (
@@ -188,7 +195,7 @@ object Packaging extends Plugin {
     distribDir
     ) map ((base, filez, dest) => FileUtilities.copy(base, filez.toSet, dest).toSeq)
 
-  def filesIn(dir: SettingKey[Option[Path]]): Project.Initialize[Task[Seq[Path]]] = (dir,name).map((path: Option[Path],pkgName) => {
+  def filesIn(dir: SettingKey[Option[Path]]): Project.Initialize[Task[Seq[Path]]] = (dir, name).map((path: Option[Path], pkgName) => {
     path.map(p => if (Files isDirectory p) FileUtilities.listPaths(p) else Seq.empty[Path]).getOrElse(Seq.empty[Path])
   })
 

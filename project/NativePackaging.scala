@@ -19,19 +19,19 @@ object NativePackaging {
     rpm.Keys.rpmVendor := "kingmichael",
     rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
     windows.Keys.wixFile := new File("doesnotexist"),
-    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name, controlDir, defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping) map (
+    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name, controlDir, defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping, initdMapping) map (
       // http://lintian.debian.org/tags/no-copyright-file.html
-      (home, pkgName, control, etcDefault, libs, confs, scripts, launcher) => Seq(
+      (home, pkgName, control, etcDefault, libs, confs, scripts, launcher, initd) => Seq(
         pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")),
-        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz")) asDocs(),
+        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"), gzipped = true) asDocs(),
         pkgMaps(Seq(
           control / "preinstall.sh" -> "DEBIAN/preinst",
           control / "postinstall.sh" -> "DEBIAN/postinst",
           control / "preuninstall.sh" -> "DEBIAN/prerm",
           control / "postuninstall.sh" -> "DEBIAN/postrm",
-          launcher
+          launcher,
+          initd
         ) ++ scripts, perms = "0755"),
-        pkgMap(etcDefault),
         pkgMaps(libs),
         pkgMaps(confs :+ etcDefault, isConfig = true)
       )),
