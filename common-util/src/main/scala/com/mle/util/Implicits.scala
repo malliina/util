@@ -8,6 +8,11 @@ import java.nio.file.Path
  */
 
 object Implicits {
+  /**
+   * Usage: <code>5.seconds</code>
+   * @param i amount
+   * @return the amount along with the given time unit
+   */
   implicit def int2timeUnits(i: Int) = new {
     def milliseconds = (i, TimeUnit.MILLISECONDS)
 
@@ -23,7 +28,7 @@ object Implicits {
   implicit def code2callable[T](code: => T) = Scheduling.callable(code)
 
   /**
-   * Aliases / to <code>Path.resolve</code>
+   * Aliases / to <code>Path.resolve</code> ala sbt
    * @param path this
    * @return path resolve next
    */

@@ -28,23 +28,31 @@ pid_exists(){
        return 1
     fi
 }
+is_running(){
+    if pid_exists; then
+        if [ "$(ps -p `cat ${PID_FILE}` | wc -l)" -gt 1 ]; then
+            return 0
+        else
+            # not running, but PID file exists
+            echo "The app was not stopped correctly. Removing old pid file."
+            rm ${PID_FILE}
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
 if [ -f /etc/default/${APP_NAME} ] ; then
   . /etc/default/${APP_NAME}
 fi
 
 case "$1" in
     start)
-        if [ -f ${PID_FILE} ]; then
-            if [ "$(ps -p `cat ${PID_FILE}` | wc -l)" -gt 1 ]; then
-                echo "Already running"
-                exit 1
-            else
-                # not running, but PID file exists
-                echo "The app was not stopped correctly. Removing old pid file."
-                rm ${PID_FILE}
-            fi
+        if is_running; then
+            echo "Already running"
+            exit 1
         fi
-        COMMAND="exec ${JAVA_CMD} -cp ${APP_HOME}/lib/*:${APP_HOME}/${APP_NAME}.jar ${MAIN_CLASS} >> ${APP_HOME}/logs/console.out 2>&1"
+        COMMAND="exec ${JAVA_CMD} ${JAVA_OPTS} -cp ${APP_HOME}/lib/*:${APP_HOME}/${APP_NAME}.jar ${MAIN_CLASS} >> ${APP_HOME}/logs/console.out 2>&1"
         if [ -z "${APP_USER}" ]; then
             nohup sh -c ${COMMAND} >/dev/null &
         else
@@ -67,6 +75,13 @@ case "$1" in
         $0 stop $*
         sleep 5
         $0 start $*
+        ;;
+    status)
+        if is_running; then
+            echo "Running"
+        else
+            echo "Not running"
+        fi
         ;;
     *)
         usage

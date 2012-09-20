@@ -56,7 +56,7 @@ object Packaging extends Plugin {
   val confMappings = TaskKey[Seq[(Path, String)]]("conf-mappings", "Confs mapped to paths")
   val scriptMappings = TaskKey[Seq[(Path, String)]]("script-mappings", "Scripts mapped to paths")
   val launcherMapping = TaskKey[(Path, String)]("launcher-mapping", "Launcher file path")
-  val defaultsMapping = TaskKey[(Path, String)]("defaults-mapping", "Defaults file path")
+  val defaultsMapping = SettingKey[(Path, String)]("defaults-mapping", "Defaults file path")
   val dirStructure = TaskKey[Seq[String]]("dir-structure", "Prints the directory structure")
 
   // Codify what the tasks do
@@ -74,9 +74,9 @@ object Packaging extends Plugin {
     }),
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
-    launcherMapping <<= (appJar, unixHome,name) map ((jar, home,pkgName) => jar -> (home resolve (pkgName+".jar")).toString),
-    defaultsMapping <<= (basePath, name) map ((base, pkgName) => {
-      (base / ("dist/" + pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
+    launcherMapping <<= (appJar, unixHome,name) map ((jar, home,pkgName) => jar -> (home / (pkgName+".jar")).toString),
+    defaultsMapping <<= (pkgSrcHome, name)((base, pkgName) => {
+      (base / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
     }),
     dirStructure <<= (launcherMapping, defaultsMapping, libMappings, confMappings, scriptMappings) map ((jar, defaults, libz, confz, scriptz) => {
       val ret = (Seq(jar, defaults) ++ libz ++ confz ++ scriptz).map(_._2).sorted

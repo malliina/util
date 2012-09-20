@@ -35,6 +35,9 @@ object NativePackaging {
         (dir / "postuninstall.sh") -> "DEBIAN/postrm"
       ) withUser "root" withPerms "0755")
       ),
+    debian.Keys.linuxPackageMappings in Debian <+= (defaultsMapping, name) map (
+      (defMap, pkgName) => (pkgMapping(defMap) withUser "root" withPerms "0755")
+      ),
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
   )
 
