@@ -1,4 +1,4 @@
 #!/bin/sh
 echo "Executing postuninstall..."
-userdel wicket
+#userdel wicket
 echo "Done"

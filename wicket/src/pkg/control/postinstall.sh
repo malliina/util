@@ -4,8 +4,8 @@ APP_NAME=wicket
 if [ -f /etc/default/${APP_NAME} ] ; then
   . /etc/default/${APP_NAME}
 fi
-# Create user
-user=`id -nu ${APP_USER}`
+# Creates user
+user=`id -nu ${APP_USER} 2>/dev/null`
 if [ "${user}" = "${APP_USER}" ]; then
     echo -n "User already exists..."
 else
@@ -16,22 +16,19 @@ else
         exit 1
     fi
 fi
-# Permissions
-mkdir -p ${APP_HOME}/logs
+# Sets permissions
 chown -R ${APP_USER}:${APP_USER} ${APP_HOME}
-# Install as service
-# Try update-rc.d for debian/ubuntu else use chkconfig
+# Installs as service
+# Use update-rc.d for debian/ubuntu else chkconfig
 if [ -x /usr/sbin/update-rc.d ]; then
     echo -n "Adding as service with update-rc.d..."
     update-rc.d ${APP_NAME} defaults && serviceOK=true
 else
     echo -n "Initializing service with chkconfig..."
-    chkconfig --add ${APP_NAME} && chkconfig ${APP_NAME} on && chkconfig --list ${APP_NAME} &&  serviceOK=true
+    chkconfig --add ${APP_NAME} && chkconfig ${APP_NAME} on && chkconfig --list ${APP_NAME} && serviceOK=true
 fi
 if [ ! $serviceOK ]; then
     echo "Error adding service"
     exit 1
 fi
 echo "Done. You can now use 'service ${APP_NAME} start/stop/restart/status'."
-
-

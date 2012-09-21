@@ -3,6 +3,7 @@ package com.mle.util
 import java.nio.file._
 import com.mle.util.FileVisitors.FileCollectingVisitor
 import Implicits._
+import org.apache.commons.io.IOUtils
 
 /**
  *
@@ -78,4 +79,24 @@ object FileUtilities extends Log {
       Files createFile file
     }
   }
+
+  def propsToFile(props: String*) = {
+    props flatMap (prop => resourceToFile(sys.props(prop)))
+  }
+
+  /**
+   *
+   * @param resource the resource to lookup and write to file
+   * @return the path wrapped in an option if it was written, None if no file was written because it already existed
+   */
+  def resourceToFile(resource: String): Option[Path] = {
+    val destFile = pathTo(resource)
+    if (!Files.exists(destFile)) {
+      val url = Util resource resource
+      val bytes = IOUtils.toByteArray(url)
+      Some(Files.write(destFile, bytes))
+    }
+    None
+  }
+
 }

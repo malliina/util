@@ -1,6 +1,8 @@
 package com.mle.util
 
 import java.io.{Closeable, FileWriter, BufferedWriter, PrintWriter}
+import java.net.URL
+import com.mle.exception.ResourceNotFoundException
 
 /**
  * Utility methods.
@@ -61,4 +63,7 @@ object Util {
       }
     })
   }
+
+  def resource(path: String): URL = Option(getClass.getClassLoader.getResource(path))
+    .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: " + path))
 }

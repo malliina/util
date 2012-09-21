@@ -11,7 +11,7 @@ import sbt._
 
 object GitBuild extends Build {
 
-  override lazy val settings = super.settings
+  override lazy val settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
 
   val commonSettings = Defaults.defaultSettings ++ Seq(
     scalaVersion := "2.9.2",
@@ -28,20 +28,22 @@ object GitBuild extends Build {
     webSettings ++
     PackagerPlugin.packagerSettings ++
     NativePackaging.defaultPackageSettings
-  val playDeps = Nil
   lazy val parent = Project("parent", file("."))
-  lazy val util = Project("common-util", file("common-util"), settings = commonSettings)
-    .settings(libraryDependencies ++= loggingDeps)
-  lazy val utilActor = Project("util-actor", file("util-actor"), settings = commonSettings)
+  lazy val util = myProject("common-util")
+    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO))
+  lazy val utilActor = myProject("util-actor")
     .dependsOn(util)
-  lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = playDeps, mainLang = SCALA)
+  lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
     .dependsOn(util, utilActor)
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
     .dependsOn(util, utilActor)
     .settings(libraryDependencies ++= webDeps ++ wiQuery)
+  lazy val rmi = myProject("util-rmi")
+    .dependsOn(util)
 
   //  IzPack.variables in IzPack.Config <+= name {
   //    name => ("projectName", "My test project")
   //  }
   //  IzPack.variables in IzPack.Config +=("author", "Michael Skogberg")
+  def myProject(id: String) = Project(id, file(id), settings = commonSettings)
 }
