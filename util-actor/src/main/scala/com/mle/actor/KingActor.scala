@@ -11,7 +11,7 @@ import com.mle.actor.Messages.{StringMessage, Stop}
  *
  * KingActors manage client connections/disconnections and can broadcast messages to all clients.
  *
- * @tparam T client connection
+ * @tparam T client address
  * @author Mle
  */
 abstract class KingActor[T] extends Actor with Log {
@@ -34,15 +34,15 @@ abstract class KingActor[T] extends Actor with Log {
     }
   }
 
-  def onConnect(client: T) {
-    val clientActor = clientBuilder(client)
+  def onConnect(clientAddress: T) {
+    val clientActor = clientBuilder(clientAddress)
     clientActor.start()
     connections += clientActor
     log info "Client connected. Open connections: " + connections.size
   }
 
-  def onDisconnect(client: T) {
-    connections.find(_.address == client).foreach(clientActor => {
+  def onDisconnect(clientAddress: T) {
+    connections.find(_.address == clientAddress).foreach(clientActor => {
       connections -= clientActor
       clientActor ! Stop
     })

@@ -26,7 +26,7 @@ object JettyUtil extends Log {
   def addWicket[T <: WebApplication, U <: Filter](webApp: Class[T],
                                                   path: String,
                                                   filter: Class[U] = classOf[WicketFilter])(implicit context: ServletContextHandler) {
-    log info "Mapping wicket app to: " + path
+    log info "Mapping Wicket app to: " + path
     val holder = initWicketParameters(new FilterHolder(filter), webApp, path)
     context addFilter(holder, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
     context addServlet(classOf[DefaultServlet], path)
@@ -75,7 +75,10 @@ object JettyUtil extends Log {
     val contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS)
     contextInit(contextHandler)
     server setHandler contextHandler
+    val pathSpecs = contextHandler.getServletHandler.getServletMappings.flatMap(_.getPathSpecs).mkString(", ")
     server.start()
+    val host = Option(connector.getHost) getOrElse "0.0.0.0"
+    log info "Server started on: http://" + host + ":" + connector.getPort + ", paths: " + pathSpecs
     server
   }
 
