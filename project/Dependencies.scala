@@ -5,17 +5,17 @@ import sbt._
  */
 
 object Dependencies {
-  val logbackVersion = "1.0.6"
+  val logbackVersion = "[1.0.6,)"
   val jettyVersion = "8.1.3.v20120416"
-  val wicketVersion = "6.0.0"
-  val slf4j = "org.slf4j" % "slf4j-api" % "1.6.6"
+  val wicketVersion = "[6.0.0,)"
+  val slf4j = "org.slf4j" % "slf4j-api" % "[1.6.6,)"
   val logBackClassic = "ch.qos.logback" % "logback-classic" % logbackVersion
   val logBackCore = "ch.qos.logback" % "logback-core" % logbackVersion
   val loggingDeps = Seq(slf4j, logBackClassic, logBackCore)
   val wicket = "org.apache.wicket" % "wicket-core" % wicketVersion
   val wicketExt = "org.apache.wicket" % "wicket-extensions" % wicketVersion
-  val wicketWebSockets = "org.apache.wicket" % "wicket-native-websocket-jetty" % "0.2"
-  val wicketAtmosphere = "org.apache.wicket" % "wicket-atmosphere" % "0.3"
+  val wicketWebSockets = "org.apache.wicket" % "wicket-native-websocket-jetty" % "[0.2,)"
+  val wicketAtmosphere = "org.apache.wicket" % "wicket-atmosphere" % "[0.3,)"
   val jettyHack = "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" artifacts Artifact("javax.servlet", "jar", "jar")
   val jettyServer = "org.eclipse.jetty" % "jetty-server" % jettyVersion artifacts Artifact("jetty-server", "jar", "jar")
   val jettyServlet = "org.eclipse.jetty" % "jetty-servlet" % jettyVersion artifacts Artifact("jetty-servlet", "jar", "jar")
