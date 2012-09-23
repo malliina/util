@@ -6,7 +6,10 @@ import com.mle.wicket.wsactor.{Address, WsActors}
 import org.apache.wicket.ajax.WebSocketRequestHandler
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.protocol.ws.api.message.{ClosedMessage, ConnectedMessage, TextMessage}
-import org.apache.wicket.protocol.ws.api.{SimpleWebSocketConnectionRegistry, WebSocketBehavior}
+import org.apache.wicket.protocol.ws.api.{WicketWebSocketJQueryResourceReference, SimpleWebSocketConnectionRegistry, WebSocketBehavior}
+import org.apache.wicket.markup.head.{JavaScriptHeaderItem, IHeaderResponse}
+import org.apache.wicket.request.resource.PackageResourceReference
+import collection.JavaConversions._
 
 /**
  * @author Mle
@@ -48,4 +51,14 @@ class WebSockets(id: String) extends Panel(id) with Log {
       log info "Pushed this response: " + pushMsg
     }
   })
+
+  override def renderHead(response: IHeaderResponse) {
+    super.renderHead(response)
+    response.render(JavaScriptHeaderItem.forReference(new ClientResourceReference))
+  }
+
+  private class ClientResourceReference extends PackageResourceReference(classOf[Home], "client.js") {
+    override def getDependencies = Seq(JavaScriptHeaderItem.forReference(WicketWebSocketJQueryResourceReference.get()))
+  }
+
 }
