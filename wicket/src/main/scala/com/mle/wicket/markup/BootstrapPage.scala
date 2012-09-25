@@ -12,11 +12,7 @@ import org.apache.wicket.markup.html.panel.Panel
  *
  * @author Mle
  */
-class PanelPage(panelBuilder: String => Panel) extends WebPage {
+abstract class BootstrapPage(panelBuilder: String => Panel) extends WebPage with BootstrapNav {
   val panelId = "panel"
   add(panelBuilder(panelId))
-}
-
-object PanelPage {
-  def apply(panelBuilder: String => Panel) = new PanelPage(panelBuilder)
 }

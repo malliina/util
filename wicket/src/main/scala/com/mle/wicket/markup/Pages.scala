@@ -1,20 +1,20 @@
 package com.mle.wicket.markup
 
 /**
- * Page classes for cases where [[org.apache.wicket.markup.html.panel.Panel]]s are not desirable.
+ * Page classes for cases where we have [[org.apache.wicket.markup.html.panel.Panel]]s but want [[org.apache.wicket.Page]]s.
  *
  * @author Mle
  */
 object Pages {
 
-  class WebSocketsPage extends PanelPage(new WebSockets(_))
+  class WebSocketsPage extends BootstrapPage(new WebSockets(_))
 
-  class AtmospherePage extends PanelPage(new Atmosphere(_))
+  class AtmospherePage extends BootstrapPage(new Atmosphere(_))
 
-  class SettingsPage extends PanelPage(new Settings(_))
+  class SettingsPage extends BootstrapPage(new Settings(_))
 
-  class SortPage extends PanelPage(new SortPanel(_))
+  class SortPage extends BootstrapPage(new SortPanel(_))
 
-  class BootstrapPage extends PanelPage(new BootstrapTest(_))
+  class MessagePage extends BootstrapPage(new MessagePanel(_))
 
 }

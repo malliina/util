@@ -27,7 +27,7 @@ object JettyUtil extends Log {
                                                   path: String,
                                                   filter: Class[U] = classOf[WicketFilter])(implicit context: ServletContextHandler) {
     log info "Mapping Wicket app to: " + path
-    val holder = initWicketParameters(new FilterHolder(filter), webApp, path)
+    val holder = addWicketParameters(new FilterHolder(filter), webApp, path)
     context addFilter(holder, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
     context addServlet(classOf[DefaultServlet], path)
   }
@@ -44,6 +44,23 @@ object JettyUtil extends Log {
 
   def addAtmosphere[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
     log info "Mapping Atmosphere app to: " + path
+    val holder = new ServletHolder(newAtmosphereServlet(path))
+    addWicketParameters(holder, webApp, path)
+    addAtmosphereParameters(holder)
+    context addServlet(holder, path)
+  }
+
+  def addAtmosphereParameters(holder: ServletHolder) {
+    holder setInitParameter("org.atmosphere.useWebSocket", "false")// if true, ie works but firefox doesn't
+    holder setInitParameter("org.atmosphere.useNative", "true")
+    // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
+    holder setInitParameter("org.atmosphere.websocket.WebSocketProtocol", classOf[EchoProtocol].getName)
+    holder setInitParameter("org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults", "true")
+    holder setInitParameter("org.atmosphere.cpr.broadcasterCacheClass", classOf[HeaderBroadcasterCache].getName)
+    holder setInitOrder 1
+  }
+
+  def newAtmosphereServlet(path: String) = {
     val servlet = new AtmosphereServlet(true)
     /**
      * Codified atmosphere.xml.
@@ -55,16 +72,7 @@ object JettyUtil extends Log {
     handler setFilterClassName classOf[WicketFilter].getName
     handler setServletClassName classOf[AtmosphereServlet].getName
     servlet.framework().addAtmosphereHandler(path, handler)
-    val holder = new ServletHolder(servlet)
-    initWicketParameters(holder, webApp, path)
-    holder setInitParameter("org.atmosphere.useWebSocket", "false")
-    holder setInitParameter("org.atmosphere.useNative", "true")
-    // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
-    holder setInitParameter("org.atmosphere.websocket.WebSocketProtocol", classOf[EchoProtocol].getName)
-    holder setInitParameter("org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults", "true")
-    holder setInitParameter("org.atmosphere.cpr.broadcasterCacheClass", classOf[HeaderBroadcasterCache].getName)
-    holder setInitOrder 1
-    context addServlet(holder, path)
+    servlet
   }
 
   def startServer(port: Int = 8080)(contextInit: ServletContextHandler => Unit): Server = {
@@ -82,7 +90,7 @@ object JettyUtil extends Log {
     server
   }
 
-  private def initWicketParameters[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {
+  private def addWicketParameters[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {
     holder setInitParameter(ContextParamWebApplicationFactory.APP_CLASS_PARAM, app.getName)
     holder setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, path)
     holder
