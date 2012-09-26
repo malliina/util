@@ -8,13 +8,13 @@ import org.apache.wicket.protocol.ws.api.SimpleWebSocketConnectionRegistry
  *
  * @author Mle
  */
-class WSConnectionActor(address: Address) extends ConnectionActor[Address](address) {
+class WicketClient(address: Address) extends ConnectionActor[Address](address) {
   val appName = address.appName
   val session = address.sessionId
   val page = address.pageId
   val id = appName + "-" + session + "-" + page
 
-  override val onMessage: String => Unit = (msg) => {
+  override val pushMessage: String => Unit = (msg) => {
     val registry = new SimpleWebSocketConnectionRegistry
     val conn = registry.getConnection(Application.get(appName), session, page)
     conn sendMessage msg

@@ -14,11 +14,11 @@ import org.apache.wicket.markup.html.WebPage
  */
 trait Bootstrapping extends WebApplication {
   var themes: Seq[String] = Nil
-  private val defaultTabs = bootTabs(
+  private val defaultTabs = buildTabs(
     "Home" -> classOf[Home],
     "Sorting" -> classOf[SortPage],
     "Settings" -> classOf[SettingsPage],
-    "Bootstrap" -> classOf[MessagePage]
+    "MOTD" -> classOf[MessagePage]
   )
 
   def tabs: Seq[BootTab[_ <: WebPage]] = defaultTabs
@@ -27,15 +27,19 @@ trait Bootstrapping extends WebApplication {
     super.init()
     val settings = new BootstrapSettings()
     settings minify true // use minimized version of all bootstrap references
-    // default theme
-    val themeProvider = settings.getThemeProvider.asInstanceOf[DefaultThemeProvider]
-    themeProvider.available().find(_.name() == "readable")
-      .foreach(themeProvider.defaultTheme)
+    themes = initThemes(settings)
     Bootstrap.install(this, settings)
-    themes = settings.getThemeProvider.available().map(_.name())
   }
 
-  def bootTabs(tabs: (String, Class[_ <: WebPage])*) = tabs.map(pair => {
+  private def initThemes(settings: BootstrapSettings) = {
+    // default theme
+    val themeProvider = settings.getThemeProvider.asInstanceOf[DefaultThemeProvider]
+    val themeNames = settings.getThemeProvider.available().map(_.name())
+    themeNames.find(_ == "readable").foreach(themeProvider.defaultTheme)
+    themeNames
+  }
+
+  def buildTabs(tabs: (String, Class[_ <: WebPage])*) = tabs.map(pair => {
     val (title, clazz) = pair
     BootTab(title, clazz)
   })

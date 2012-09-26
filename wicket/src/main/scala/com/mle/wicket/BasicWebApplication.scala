@@ -2,8 +2,6 @@ package com.mle.wicket
 
 import markup.Pages.{MessagePage, SortPage, SettingsPage}
 import markup.{BootstrapNav => BootstrapPage, Home}
-import org.apache.wicket.Page
-import org.apache.wicket.markup.html.WebPage
 import org.apache.wicket.protocol.http.WebApplication
 
 /**
@@ -22,6 +20,8 @@ class BasicWebApplication extends Bootstrapping with PageMounting {
     super.init()
     mount(classOf[Home])
     mount(classOf[SettingsPage])
+    mount(classOf[MessagePage])
+    mount(classOf[SortPage])
   }
 }
 

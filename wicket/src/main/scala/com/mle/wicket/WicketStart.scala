@@ -11,7 +11,8 @@ import java.nio.file.Paths
 
 object WicketStart extends Log {
   sys.props.get("wicket.home").foreach(home =>
-    FileUtilities.basePath = Paths get home)
+    FileUtilities.basePath = Paths get home
+  )
 
   def main(args: Array[String]) {
     AppUtils setLogLevel Level.INFO

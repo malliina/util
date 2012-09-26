@@ -7,4 +7,9 @@ import markup.Pages.WebSocketsPage
  */
 class WebSocketsApplication extends BasicWebApplication {
   override def tabs = super.tabs :+ BootTab("Web Sockets", classOf[WebSocketsPage])
+
+  override def init() {
+    super.init()
+    mount(classOf[WebSocketsPage])
+  }
 }

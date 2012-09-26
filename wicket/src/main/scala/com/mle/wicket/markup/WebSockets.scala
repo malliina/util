@@ -1,6 +1,6 @@
 package com.mle.wicket.markup
 
-import com.mle.util.Log
+import com.mle.util.{JsonUtils, Log}
 import com.mle.wicket.component.SAjaxLink
 import com.mle.wicket.wsactor.{Address, WsActors}
 import org.apache.wicket.ajax.WebSocketRequestHandler
@@ -24,7 +24,7 @@ class WebSockets(id: String) extends Panel(id) with Log {
     val maybeConn = Option(registry.getConnection(getApplication, sessionId, pageId))
     maybeConn.foreach(conn => {
       val handler = new WebSocketRequestHandler(this, conn)
-      val msg = WsActors.toJson("This message has been pushed as a response to an ajax request")
+      val msg = JsonUtils.toJson("This message has been pushed as a response to an ajax request")
       //      conn sendMessage msg
       handler push msg
       log info "Server pushed message: " + msg
@@ -46,7 +46,7 @@ class WebSockets(id: String) extends Panel(id) with Log {
 
     override def onMessage(handler: WebSocketRequestHandler, message: TextMessage) {
       log info "Got message: " + message.getText
-      val pushMsg = WsActors.toJson("This is a reply to: " + message.getText)
+      val pushMsg = JsonUtils.toJson("This is a reply to: " + message.getText)
       handler push pushMsg
       log info "Pushed this response: " + pushMsg
     }

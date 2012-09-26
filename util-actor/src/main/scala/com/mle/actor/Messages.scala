@@ -6,7 +6,11 @@ package com.mle.actor
  */
 object Messages {
 
+  case object Start
+
   case object Stop
+
+  case class Broadcast(msg: String)
 
   case class StringMessage(msg: String)
 

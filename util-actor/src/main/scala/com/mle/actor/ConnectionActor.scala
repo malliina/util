@@ -9,15 +9,21 @@ import com.mle.actor.Messages.{StringMessage, Stop}
  * @author Mle
  */
 abstract class ConnectionActor[T](val address: T) extends Actor with Log {
-  val onMessage: String => Unit
+  /**
+   * Pushes the message to the client.
+   *
+   * Implementations can use the address to push the message.
+   */
+  val pushMessage: String => Unit
 
   def act() {
     loop {
       react {
         case StringMessage(msg) =>
-          onMessage(msg)
+          log debug "Client got message: " + msg
+          pushMessage(msg)
         case Stop =>
-          log info "Closing client"
+          log debug "Client exiting"
           exit()
       }
     }
