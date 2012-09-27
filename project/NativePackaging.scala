@@ -23,7 +23,7 @@ object NativePackaging {
         pkgMaps(Seq(launcher, initd) ++ scripts, perms = "0755"),
         pkgMaps(libs),
         pkgMaps(confs :+ etcDefault, isConfig = true),
-        pkgMap((home / "logs" / "dummy.log") -> (logDir / "dummy.log").toString, perms = "0755")
+        pkgMap((home / "logs") -> logDir.toString, perms = "0755")
       )),
     // Debian
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
