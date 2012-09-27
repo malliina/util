@@ -39,6 +39,10 @@ object Packaging extends Plugin {
   val unixScriptHome = SettingKey[Path]("unix-script-home", "Script dir on unix")
   val pkgSrcHome = SettingKey[Path]("pkg-src-home", "Packaging home directory")
   val controlDir = SettingKey[Path]("control-dir", "Directory for control files for native packaging")
+  val preInstall = SettingKey[Path]("pre-install", "Preinstall script")
+  val postInstall = SettingKey[Path]("post-install", "Postinstall script")
+  val preRemove = SettingKey[Path]("pre-remove", "Preremove script")
+  val postRemove = SettingKey[Path]("post-remove", "Postremove script")
   // Tasks
   val appJar = TaskKey[Path]("app-jar", "The application jar")
   val defaultsFile = TaskKey[Path]("defaults-file", "The defaults config file")
@@ -80,6 +84,10 @@ object Packaging extends Plugin {
     unixScriptHome <<= (unixHome)(appHome => appHome / "scripts"),
     pkgSrcHome <<= (basePath)(base => base / "src/pkg"),
     controlDir <<= (pkgSrcHome)(home => home / "control"),
+    preInstall <<= (controlDir)(_ / "preinstall.sh"),
+    postInstall <<= (controlDir)(_ / "postinstall.sh"),
+    preRemove <<= (controlDir)(_ / "preremove.sh"),
+    postRemove <<= (controlDir)(_ / "postremove.sh"),
     libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
       libFiles.map(file => file -> (destDir resolve file.getFileName).toString)
     }),
@@ -98,7 +106,6 @@ object Packaging extends Plugin {
       ret
     }),
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
-    exportJars := true,
     basePath <<= (baseDirectory)(b => b.toPath),
     distribDir <<= (basePath)(b => (b resolve outDir)),
     configPath <<= (basePath)(b => Some((b resolve confDir))),

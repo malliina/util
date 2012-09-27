@@ -4,44 +4,53 @@ import java.nio.file.Path
 import sbt.Keys._
 import sbt._
 import Packaging._
-import scala.Some
 
 object NativePackaging {
+  implicit def p2f(path: Path) = path.toFile
+
   val defaultPackageSettings = Seq(
+    // Linux
     // http://lintian.debian.org/tags/maintainer-address-missing.html
     linux.Keys.maintainer := "Michael Skogberg <malliina123@gmail.com>",
     linux.Keys.packageSummary := "This is a summary of the package",
     linux.Keys.packageDescription := "This is the description of the package.",
     //    name := "wicket",
-    debian.Keys.version := "0.1",
-    // Tag takes single token only
-    rpm.Keys.rpmRelease := "0.1",
-    rpm.Keys.rpmVendor := "kingmichael",
-    rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
-    windows.Keys.wixFile := new File("doesnotexist"),
-    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name, controlDir, defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping, initdMapping) map (
+    linux.Keys.linuxPackageMappings in Linux <++= (defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping, initdMapping) map (
       // http://lintian.debian.org/tags/no-copyright-file.html
-      (home, pkgName, control, etcDefault, libs, confs, scripts, launcher, initd) => Seq(
-        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")),
-        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"), gzipped = true) asDocs(),
-        pkgMaps(Seq(
-          control / "preinstall.sh" -> "DEBIAN/preinst",
-          control / "postinstall.sh" -> "DEBIAN/postinst",
-          control / "preuninstall.sh" -> "DEBIAN/prerm",
-          control / "postuninstall.sh" -> "DEBIAN/postrm",
-          launcher,
-          initd
-        ) ++ scripts, perms = "0755"),
+      (etcDefault, libs, confs, scripts, launcher, initd) => Seq(
+        pkgMaps(Seq(launcher, initd) ++ scripts, perms = "0755"),
         pkgMaps(libs),
         pkgMaps(confs :+ etcDefault, isConfig = true)
       )),
-    //    debian.Keys.linuxPackageMappings in Debian <+= (defaultsMapping, name) map (
-    //      (defMap, pkgName) => (pkgMapping(defMap) withUser "root" withPerms "0755")
-    //      ),
-    //    debian.Keys.linuxPackageMappings in Debian <+= (libMappings, name) map (
-    //      (defMap, pkgName) => (pkgMapping(defMap: _*) withUser "root" withPerms "0644")
-    //      ),
-    debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
+    // Debian
+    debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
+    debian.Keys.version := "0.1",
+    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name, defaultsMapping,
+      libMappings, confMappings, scriptMappings, launcherMapping, initdMapping,
+      preInstall, postInstall, preRemove, postRemove) map (
+      (home, pkgName, etcDefault, libs, confs, scripts, launcher, initd, preinst, postinst, prerm, postrm) => Seq(
+        // http://lintian.debian.org/tags/no-copyright-file.html
+        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")),
+        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"), gzipped = true) asDocs(),
+        pkgMaps(Seq(
+          preinst -> "DEBIAN/preinst",
+          postinst -> "DEBIAN/postinst",
+          prerm -> "DEBIAN/prerm",
+          prerm -> "DEBIAN/postrm"
+        ), perms = "0755")
+      )),
+    debian.Keys.debianPackageDependencies in Debian ++= Seq("wget"),
+    // RPM
+    rpm.Keys.linuxPackageMappings in Rpm <++= linux.Keys.linuxPackageMappings in Linux,
+    rpm.Keys.rpmRelease := "0.1",
+    rpm.Keys.rpmVendor := "kingmichael",
+    rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
+    rpm.Keys.rpmPreInstall <<= (preInstall)(Some(_)),
+    rpm.Keys.rpmPostInstall <<= (postInstall)(Some(_)),
+    rpm.Keys.rpmPreRemove <<= (preRemove)(Some(_)),
+    rpm.Keys.rpmPostRemove <<= (postRemove)(Some(_)),
+    // Windows
+    windows.Keys.wixFile := new File("doesnotexist")
   )
 
   def pkgMap(file: (Path, String), perms: String = "0644", gzipped: Boolean = false) =
