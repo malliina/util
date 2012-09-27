@@ -17,13 +17,14 @@ object NativePackaging {
     linux.Keys.packageDescription := "This is the description of the package.",
     //    name := "wicket",
     linux.Keys.linuxPackageMappings in Linux <++= (
-      pkgSrcHome, defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping, initdMapping, unixLogDir
+      pkgSrcHome, defaultsMapping, libMappings, confMappings,
+      scriptMappings, launcherMapping, initdMapping, unixLogDir
       ) map (
-      (home, etcDefault, libs, confs, scripts, launcher, initd, logDir) => Seq(
+      (pkgSrc, etcDefault, libs, confs, scripts, launcher, initd, logDir) => Seq(
         pkgMaps(Seq(launcher, initd) ++ scripts, perms = "0755"),
         pkgMaps(libs),
         pkgMaps(confs :+ etcDefault, isConfig = true),
-        pkgMap((home / "logs") -> logDir.toString, perms = "0755")
+        pkgMap((pkgSrc / "logs") -> logDir.toString, perms = "0755")
       )),
     // Debian
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
@@ -31,15 +32,15 @@ object NativePackaging {
     debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name, defaultsMapping,
       libMappings, confMappings, scriptMappings, launcherMapping, initdMapping,
       preInstall, postInstall, preRemove, postRemove) map (
-      (home, pkgName, etcDefault, libs, confs, scripts, launcher, initd, preinst, postinst, prerm, postrm) => Seq(
+      (pkgSrc, pkgName, etcDefault, libs, confs, scripts, launcher, initd, preinst, postinst, prerm, postrm) => Seq(
         // http://lintian.debian.org/tags/no-copyright-file.html
-        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")),
-        pkgMap((home / "copyright") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"), gzipped = true) asDocs(),
+        pkgMap((pkgSrc / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")),
+        pkgMap((pkgSrc / "changelog") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"), gzipped = true) asDocs(),
         pkgMaps(Seq(
           preinst -> "DEBIAN/preinst",
           postinst -> "DEBIAN/postinst",
           prerm -> "DEBIAN/prerm",
-          prerm -> "DEBIAN/postrm"
+          postrm -> "DEBIAN/postrm"
         ), perms = "0755")
       )),
     debian.Keys.debianPackageDependencies in Debian ++= Seq("wget"),
