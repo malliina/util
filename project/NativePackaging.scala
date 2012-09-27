@@ -1,6 +1,7 @@
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager._
 import java.nio.file.Path
+import linux.LinuxPackageMapping
 import sbt.Keys._
 import sbt._
 import Packaging._
@@ -64,7 +65,8 @@ object NativePackaging {
               perms: String = "0644",
               isConfig: Boolean = false,
               gzipped: Boolean = false) = {
-    var mapping = pkgMapping(files: _*) withUser user withGroup group withPerms perms
+    var mapping = LinuxPackageMapping(files.map(pair => pair._1.toFile -> pair._2)) withUser user withGroup group withPerms perms
+//    printMapping(mapping)
     if (isConfig)
       mapping = mapping withConfig()
     if (gzipped)
@@ -75,5 +77,11 @@ object NativePackaging {
   def pkgMapping(files: (Path, String)*) = {
     packageMapping(files.map(pair => pair._1.toFile -> pair._2): _*)
     packageMapping()
+  }
+  def printMapping(mapping:LinuxPackageMapping){
+     mapping.mappings.foreach(ping => {
+       val (file,dest)=ping
+       println("file: "+file+", dest: "+dest)
+     })
   }
 }

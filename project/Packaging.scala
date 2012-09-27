@@ -75,12 +75,6 @@ object Packaging extends Plugin {
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
-    debFiles <<= (debian.Keys.linuxPackageMappings in Debian, name) map ((mappings, pkgName) => {
-      printMappingDestinations(mappings)
-    }),
-    rpmFiles <<= (rpm.Keys.linuxPackageMappings in Rpm, name) map ((mappings, pkgName) => {
-      printMappingDestinations(mappings)
-    }),
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
     unixLibHome <<= (unixHome)(_ / "lib"),
     unixConfHome <<= (unixHome)(_ / "conf"),
@@ -174,11 +168,22 @@ object Packaging extends Plugin {
       IO.zip(filez.map(f => (f, rebaser(f).get)), zipFile)
       println("Packaged: " + zipFile)
       zipFile
+    }),
+    debFiles <<= (debian.Keys.linuxPackageMappings in Debian, name) map ((mappings, pkgName) => {
+      printMappingDestinations(mappings)
+    }),
+    rpmFiles <<= (rpm.Keys.linuxPackageMappings in Rpm, name) map ((mappings, pkgName) => {
+      printMappingDestinations(mappings)
     })
   )
 
   def printMappingDestinations(mappings: Seq[LinuxPackageMapping]) = {
-    mappings.map(_.mappings.map(_._2))
+//    mappings.foreach(mapping => {
+//      mapping.mappings.foreach(pair => {
+//        val (file, dest) = pair
+//        println("file: " + file + ", dest: " + dest  )
+//      })
+//    })
     val ret = mappings.flatMap(_.mappings.map(_._2))
     ret foreach println
     ret
