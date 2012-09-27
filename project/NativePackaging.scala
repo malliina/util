@@ -23,7 +23,7 @@ object NativePackaging {
         pkgMaps(Seq(launcher, initd) ++ scripts, perms = "0755"),
         pkgMaps(libs),
         pkgMaps(confs :+ etcDefault, isConfig = true),
-        pkgMap(home / "logs" -> logDir.toString, perms = "0755")
+        pkgMap((home / "logs" / "dummy.log") -> (logDir / "dummy.log").toString, perms = "0755")
       )),
     // Debian
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
@@ -66,7 +66,7 @@ object NativePackaging {
               isConfig: Boolean = false,
               gzipped: Boolean = false) = {
     var mapping = LinuxPackageMapping(files.map(pair => pair._1.toFile -> pair._2)) withUser user withGroup group withPerms perms
-//    printMapping(mapping)
+    //    printMapping(mapping)
     if (isConfig)
       mapping = mapping withConfig()
     if (gzipped)
@@ -78,10 +78,11 @@ object NativePackaging {
     packageMapping(files.map(pair => pair._1.toFile -> pair._2): _*)
     packageMapping()
   }
-  def printMapping(mapping:LinuxPackageMapping){
-     mapping.mappings.foreach(ping => {
-       val (file,dest)=ping
-       println("file: "+file+", dest: "+dest)
-     })
+
+  def printMapping(mapping: LinuxPackageMapping) {
+    mapping.mappings.foreach(ping => {
+      val (file, dest) = ping
+      println("file: " + file + ", dest: " + dest)
+    })
   }
 }
