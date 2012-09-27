@@ -24,9 +24,9 @@ object GitBuild extends Build {
     credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt")
   )
   val wicketSettings = commonSettings ++
-    Packaging.newSettings ++
     webSettings ++
     PackagerPlugin.packagerSettings ++
+    Packaging.newSettings ++
     NativePackaging.defaultPackageSettings
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("common-util")

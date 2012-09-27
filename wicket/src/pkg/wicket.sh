@@ -65,7 +65,6 @@ case "$1" in
     stop)
         PID=`cat ${PID_FILE} 2>/dev/null`
         kill $PID 2>/dev/null
-        sleep 1
         kill -9 $PID 2>/dev/null
         rm -f ${PID_FILE}
         echo "Stopped"
@@ -73,7 +72,7 @@ case "$1" in
 
     restart)
         $0 stop $*
-        sleep 5
+        sleep 2
         $0 start $*
         ;;
     status)

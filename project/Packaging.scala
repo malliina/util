@@ -4,6 +4,7 @@ import Keys._
 import com.mle.util.FileUtilities
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager._
+import linux.LinuxPackageMapping
 
 /**
  * Builds packages containing all the jars, libs, etc. Based on
@@ -14,6 +15,8 @@ import com.typesafe.packager._
 object Packaging extends Plugin {
   implicit def path2path(path: Path) = new {
     def /(next: String) = path resolve next
+
+    def /(next: Path) = path resolve next
   }
 
   // Relative to the project
@@ -37,6 +40,7 @@ object Packaging extends Plugin {
   val unixLibHome = SettingKey[Path]("unix-lib-home", "Lib dir on unix")
   val unixConfHome = SettingKey[Path]("unix-conf-home", "Conf dir on unix")
   val unixScriptHome = SettingKey[Path]("unix-script-home", "Script dir on unix")
+  val unixLogDir = SettingKey[Path]("unix-log-home", "Log dir on unix")
   val pkgSrcHome = SettingKey[Path]("pkg-src-home", "Packaging home directory")
   val controlDir = SettingKey[Path]("control-dir", "Directory for control files for native packaging")
   val preInstall = SettingKey[Path]("pre-install", "Preinstall script")
@@ -65,31 +69,31 @@ object Packaging extends Plugin {
   val launcherMapping = TaskKey[(Path, String)]("launcher-mapping", "Launcher jar file path")
   val initdMapping = SettingKey[(Path, String)]("initd-mapping", "/etc/init.d start script")
   val defaultsMapping = SettingKey[(Path, String)]("defaults-mapping", "Defaults file path")
-  val dirStructure = TaskKey[Seq[String]]("dir-structure", "Prints the directory structure")
   val debFiles = TaskKey[Seq[String]]("deb-files", "Files on Debian")
-
-
+  val rpmFiles = TaskKey[Seq[String]]("rpm-files", "Files on RPM")
   // Codify what the tasks do
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
     debFiles <<= (debian.Keys.linuxPackageMappings in Debian, name) map ((mappings, pkgName) => {
-      val ret = mappings.flatMap(_.mappings).map(_._2)
-      ret foreach println
-      ret
+      printMappingDestinations(mappings)
+    }),
+    rpmFiles <<= (rpm.Keys.linuxPackageMappings in Rpm, name) map ((mappings, pkgName) => {
+      printMappingDestinations(mappings)
     }),
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
-    unixLibHome <<= (unixHome)(appHome => appHome / "lib"),
-    unixConfHome <<= (unixHome)(appHome => appHome / "conf"),
-    unixScriptHome <<= (unixHome)(appHome => appHome / "scripts"),
-    pkgSrcHome <<= (basePath)(base => base / "src/pkg"),
-    controlDir <<= (pkgSrcHome)(home => home / "control"),
+    unixLibHome <<= (unixHome)(_ / "lib"),
+    unixConfHome <<= (unixHome)(_ / "conf"),
+    unixScriptHome <<= (unixHome)(_ / "scripts"),
+    unixLogDir <<= (unixHome)(_ / "logs"),
+    pkgSrcHome <<= (basePath)(_ / "src/pkg"),
+    controlDir <<= (pkgSrcHome)(_ / "control"),
     preInstall <<= (controlDir)(_ / "preinstall.sh"),
     postInstall <<= (controlDir)(_ / "postinstall.sh"),
     preRemove <<= (controlDir)(_ / "preremove.sh"),
     postRemove <<= (controlDir)(_ / "postremove.sh"),
     libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
-      libFiles.map(file => file -> (destDir resolve file.getFileName).toString)
+      libFiles.map(file => file -> (destDir / file.getFileName).toString)
     }),
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
@@ -99,11 +103,6 @@ object Packaging extends Plugin {
     }),
     defaultsMapping <<= (pkgSrcHome, name)((base, pkgName) => {
       (base / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
-    }),
-    dirStructure <<= (launcherMapping, defaultsMapping, libMappings, confMappings, scriptMappings) map ((jar, defaults, libz, confz, scriptz) => {
-      val ret = (Seq(jar, defaults) ++ libz ++ confz ++ scriptz).map(_._2).sorted
-      ret foreach println
-      ret
     }),
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     basePath <<= (baseDirectory)(b => b.toPath),
@@ -177,6 +176,13 @@ object Packaging extends Plugin {
       zipFile
     })
   )
+
+  def printMappingDestinations(mappings: Seq[LinuxPackageMapping]) = {
+    mappings.map(_.mappings.map(_._2))
+    val ret = mappings.flatMap(_.mappings.map(_._2))
+    ret foreach println
+    ret
+  }
 
   def launcher(appDir: Path,
                files: Types.Id[Seq[Path]],

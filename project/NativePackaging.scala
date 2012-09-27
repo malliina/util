@@ -15,12 +15,14 @@ object NativePackaging {
     linux.Keys.packageSummary := "This is a summary of the package",
     linux.Keys.packageDescription := "This is the description of the package.",
     //    name := "wicket",
-    linux.Keys.linuxPackageMappings in Linux <++= (defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping, initdMapping) map (
-      // http://lintian.debian.org/tags/no-copyright-file.html
-      (etcDefault, libs, confs, scripts, launcher, initd) => Seq(
+    linux.Keys.linuxPackageMappings in Linux <++= (
+      pkgSrcHome, defaultsMapping, libMappings, confMappings, scriptMappings, launcherMapping, initdMapping, unixLogDir
+      ) map (
+      (home, etcDefault, libs, confs, scripts, launcher, initd, logDir) => Seq(
         pkgMaps(Seq(launcher, initd) ++ scripts, perms = "0755"),
         pkgMaps(libs),
-        pkgMaps(confs :+ etcDefault, isConfig = true)
+        pkgMaps(confs :+ etcDefault, isConfig = true),
+        pkgMap(home / "logs" -> logDir.toString, perms = "0755")
       )),
     // Debian
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
@@ -72,5 +74,6 @@ object NativePackaging {
 
   def pkgMapping(files: (Path, String)*) = {
     packageMapping(files.map(pair => pair._1.toFile -> pair._2): _*)
+    packageMapping()
   }
 }

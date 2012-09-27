@@ -16,7 +16,7 @@ object WicketStart extends Log {
 
   def main(args: Array[String]) {
     AppUtils setLogLevel Level.INFO
-    startWebApps(8080)
+    startWebApps(8889)
   }
 
   def startWebApps(port: Int = 8080) = {
