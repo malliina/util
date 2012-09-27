@@ -66,9 +66,6 @@ object Packaging extends Plugin {
   val libMappings = TaskKey[Seq[(Path, String)]]("lib-mappings", "Libs mapped to paths")
   val confMappings = TaskKey[Seq[(Path, String)]]("conf-mappings", "Confs mapped to paths")
   val scriptMappings = TaskKey[Seq[(Path, String)]]("script-mappings", "Scripts mapped to paths")
-  val launcherMapping = TaskKey[(Path, String)]("launcher-mapping", "Launcher jar file path")
-  val initdMapping = SettingKey[(Path, String)]("initd-mapping", "/etc/init.d start script")
-  val defaultsMapping = SettingKey[(Path, String)]("defaults-mapping", "Defaults file path")
   val debFiles = TaskKey[Seq[String]]("deb-files", "Files on Debian")
   val rpmFiles = TaskKey[Seq[String]]("rpm-files", "Files on RPM")
   // Codify what the tasks do
@@ -84,20 +81,13 @@ object Packaging extends Plugin {
     controlDir <<= (pkgSrcHome)(_ / "control"),
     preInstall <<= (controlDir)(_ / "preinstall.sh"),
     postInstall <<= (controlDir)(_ / "postinstall.sh"),
-    preRemove <<= (controlDir)(_ / "preremove.sh"),
-    postRemove <<= (controlDir)(_ / "postremove.sh"),
+    preRemove <<= (controlDir)(_ / "preuninstall.sh"),
+    postRemove <<= (controlDir)(_ / "postuninstall.sh"),
     libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
       libFiles.map(file => file -> (destDir / file.getFileName).toString)
     }),
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
-    launcherMapping <<= (appJar, unixHome, name) map ((jar, home, pkgName) => jar -> (home / (pkgName + ".jar")).toString),
-    initdMapping <<= (pkgSrcHome, name)((base, pkgName) => {
-      (base / (pkgName + ".sh")) -> ("/etc/init.d/" + pkgName)
-    }),
-    defaultsMapping <<= (pkgSrcHome, name)((base, pkgName) => {
-      (base / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)
-    }),
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     basePath <<= (baseDirectory)(b => b.toPath),
     distribDir <<= (basePath)(b => (b resolve outDir)),
@@ -178,12 +168,15 @@ object Packaging extends Plugin {
   )
 
   def printMappingDestinations(mappings: Seq[LinuxPackageMapping]) = {
-//    mappings.foreach(mapping => {
-//      mapping.mappings.foreach(pair => {
-//        val (file, dest) = pair
-//        println("file: " + file + ", dest: " + dest  )
-//      })
-//    })
+    mappings.foreach(mapping => {
+      mapping.mappings.foreach(pair => {
+        val (file, dest) = pair
+        val fileType = if (file.isFile) "file" else {
+          if (file.isDirectory) "dir" else "UNKNOWN"
+        }
+        println(fileType + file + ", dest: " + dest)
+      })
+    })
     val ret = mappings.flatMap(_.mappings.map(_._2))
     ret foreach println
     ret

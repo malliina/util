@@ -17,9 +17,9 @@ object GitBuild extends Build {
     scalaVersion := "2.9.2",
     version := "0.1-SNAPSHOT",
     //      resolvers := additionalRepos,
-//    exportJars := true,
+    exportJars := true,
     retrieveManaged := true,
-    publishTo := Some(Resolver.url("sbt-plugin-releases", new URL("http://xxx/artifactory/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)),
+    publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
     credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt")
   )

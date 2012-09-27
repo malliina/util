@@ -5,6 +5,7 @@ import linux.LinuxPackageMapping
 import sbt.Keys._
 import sbt._
 import Packaging._
+import sun.tools.jar.resources.jar
 
 object NativePackaging {
   implicit def p2f(path: Path) = path.toFile
@@ -17,22 +18,22 @@ object NativePackaging {
     linux.Keys.packageDescription := "This is the description of the package.",
     //    name := "wicket",
     linux.Keys.linuxPackageMappings in Linux <++= (
-      pkgSrcHome, defaultsMapping, libMappings, confMappings,
-      scriptMappings, launcherMapping, initdMapping, unixLogDir
+      unixHome, pkgSrcHome, name, appJar, libMappings, confMappings,
+      scriptMappings, unixLogDir
       ) map (
-      (pkgSrc, etcDefault, libs, confs, scripts, launcher, initd, logDir) => Seq(
-        pkgMaps(Seq(launcher, initd) ++ scripts, perms = "0755"),
+      (home, pkgSrc, pkgName, jarFile, libs, confs, scripts, logDir) => Seq(
+        pkgMaps(Seq((pkgSrc / (pkgName + ".sh")) -> ("/etc/init.d/" + pkgName)) ++ scripts, perms = "0755"),
         pkgMaps(libs),
-        pkgMaps(confs :+ etcDefault, isConfig = true),
-        pkgMap((pkgSrc / "logs") -> logDir.toString, perms = "0755")
+        pkgMaps(confs ++ Seq((pkgSrc / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)), isConfig = true),
+        pkgMap((pkgSrc / "logs") -> logDir.toString, perms = "0755"),
+        pkgMap(jarFile -> ((home / (pkgName + ".jar")).toString))
       )),
     // Debian
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
     debian.Keys.version := "0.1",
-    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name, defaultsMapping,
-      libMappings, confMappings, scriptMappings, launcherMapping, initdMapping,
+    debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name,
       preInstall, postInstall, preRemove, postRemove) map (
-      (pkgSrc, pkgName, etcDefault, libs, confs, scripts, launcher, initd, preinst, postinst, prerm, postrm) => Seq(
+      (pkgSrc, pkgName, preinst, postinst, prerm, postrm) => Seq(
         // http://lintian.debian.org/tags/no-copyright-file.html
         pkgMap((pkgSrc / "copyright") -> ("/usr/share/doc/" + pkgName + "/copyright")),
         pkgMap((pkgSrc / "changelog") -> ("/usr/share/doc/" + pkgName + "/changelog.gz"), gzipped = true) asDocs(),
