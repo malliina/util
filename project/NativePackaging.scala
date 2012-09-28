@@ -32,8 +32,7 @@ object NativePackaging {
         pkgMaps(confs ++ Seq((pkgSrc / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)), isConfig = true),
         pkgMap((pkgSrc / "logs") -> logDir.toString, perms = "0755"),
         pkgMap(jarFile.toPath -> ((home / (pkgName + ".jar")).toString))
-      )
-      ),
+      )),
     // Debian
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
     debian.Keys.version := "0.1",

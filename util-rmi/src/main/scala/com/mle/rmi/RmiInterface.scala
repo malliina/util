@@ -1,3 +1,5 @@
+package com.mle.rmi
+
 import java.rmi.Remote
 
 /**

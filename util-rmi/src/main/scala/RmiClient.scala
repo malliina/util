@@ -1,6 +1,0 @@
-/**
- * @author Mle
- */
-class RmiClient {
-
-}

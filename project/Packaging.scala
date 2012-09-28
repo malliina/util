@@ -81,7 +81,7 @@ object Packaging extends Plugin {
     postInstall <<= (controlDir)(_ / "postinstall.sh"),
     preRemove <<= (controlDir)(_ / "preuninstall.sh"),
     postRemove <<= (controlDir)(_ / "postuninstall.sh"),
-    distribDir <<= (basePath)(_ / outDir),
+    distribDir <<= (basePath)(b => b / outDir),
     configPath <<= (basePath)(b => Some((b / confDir))),
     scriptPath <<= (basePath)(b => Some((b / scriptDir))),
     configOutputPath <<= (distribDir)(d => Some((d / confDir))),

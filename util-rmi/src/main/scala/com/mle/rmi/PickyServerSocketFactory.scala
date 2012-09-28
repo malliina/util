@@ -1,3 +1,5 @@
+package com.mle.rmi
+
 import java.net.InetAddress
 import javax.net.ssl.{SSLServerSocket, SSLServerSocketFactory}
 import javax.rmi.ssl.SslRMIServerSocketFactory

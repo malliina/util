@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils
  * @author mle
  */
 object FileUtilities extends Log {
-  var basePath = Paths get sys.props.getOrElse("app.home", sys.props("user.dir"))
+  var basePath = Paths get sys.props.getOrElse("app.home", sys.props.getOrElse("user.dir", throw new Exception("Unable to determine home directory")))
 
   def pathTo(location: String) = basePath / location
 
@@ -94,9 +94,11 @@ object FileUtilities extends Log {
     if (!Files.exists(destFile)) {
       val url = Util resource resource
       val bytes = IOUtils.toByteArray(url)
+      Files.createDirectories(destFile.getParent)
       Some(Files.write(destFile, bytes))
+    } else {
+      None
     }
-    None
   }
 
 }

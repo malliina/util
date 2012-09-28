@@ -1,3 +1,5 @@
+package com.mle.rmi
+
 import javax.rmi.ssl.SslRMIClientSocketFactory
 
 /**
