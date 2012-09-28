@@ -1,16 +1,21 @@
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager._
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 import linux.LinuxPackageMapping
 import sbt.Keys._
 import sbt._
 import Packaging._
-import sun.tools.jar.resources.jar
+import Implicits._
 
 object NativePackaging {
-  implicit def p2f(path: Path) = path.toFile
-
-  val defaultPackageSettings = Seq(
+  val defaultNativeProject = Seq(
+    // Flat copy of libs to /lib on destination system
+    libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
+      libFiles.map(file => file -> (destDir / file.getFileName).toString)
+    }),
+    confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
+    scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
+    confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     // Linux
     // http://lintian.debian.org/tags/maintainer-address-missing.html
     linux.Keys.maintainer := "Michael Skogberg <malliina123@gmail.com>",
@@ -18,7 +23,7 @@ object NativePackaging {
     linux.Keys.packageDescription := "This is the description of the package.",
     //    name := "wicket",
     linux.Keys.linuxPackageMappings in Linux <++= (
-      unixHome, pkgSrcHome, name, appJar, libMappings, confMappings,
+      unixHome, pkgSrcHome, name, packageKey, libMappings, confMappings,
       scriptMappings, unixLogDir
       ) map (
       (home, pkgSrc, pkgName, jarFile, libs, confs, scripts, logDir) => Seq(
@@ -26,8 +31,9 @@ object NativePackaging {
         pkgMaps(libs),
         pkgMaps(confs ++ Seq((pkgSrc / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)), isConfig = true),
         pkgMap((pkgSrc / "logs") -> logDir.toString, perms = "0755"),
-        pkgMap(jarFile -> ((home / (pkgName + ".jar")).toString))
-      )),
+        pkgMap(jarFile.toPath -> ((home / (pkgName + ".jar")).toString))
+      )
+      ),
     // Debian
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
     debian.Keys.version := "0.1",
@@ -87,4 +93,12 @@ object NativePackaging {
       println("file: " + file + ", dest: " + dest)
     })
   }
+
+  def rebase(file: Path, srcBase: Path, destBase: Path) = destBase resolve (srcBase relativize file)
+
+  def rebase(files: Seq[Path], srcBase: Path, destBase: Path): Seq[(Path, String)] =
+    files map (file => file -> rebase(file, srcBase, destBase).toString)
+
+  def rebase(files: Seq[Path], maybeSrcBase: Option[Path], destBase: Path): Seq[(Path, String)] =
+    maybeSrcBase.map(srcBase => rebase(files, srcBase, destBase)).getOrElse(Seq.empty[(Path, String)])
 }

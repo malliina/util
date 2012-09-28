@@ -5,6 +5,7 @@ import com.mle.util.FileUtilities
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager._
 import linux.LinuxPackageMapping
+import Implicits._
 
 /**
  * Builds packages containing all the jars, libs, etc. Based on
@@ -13,12 +14,6 @@ import linux.LinuxPackageMapping
  * @author Mle
  */
 object Packaging extends Plugin {
-  implicit def path2path(path: Path) = new {
-    def /(next: String) = path resolve next
-
-    def /(next: Path) = path resolve next
-  }
-
   // Relative to the project
   val outDir = "distrib"
   val confDir = "conf"
@@ -35,7 +30,7 @@ object Packaging extends Plugin {
   val configOutputPath = SettingKey[Option[Path]]("config-output-path", "Output location of config files (if any)")
   val scriptPath = SettingKey[Option[Path]]("script-path", "Location of scripts (if any)")
   val scriptOutPath = SettingKey[Option[Path]]("script-output-path", "Output location of scripts (if any)")
-  // Native
+  // Native settings
   val unixHome = SettingKey[Path]("unix-home", "Home dir on unix")
   val unixLibHome = SettingKey[Path]("unix-lib-home", "Lib dir on unix")
   val unixConfHome = SettingKey[Path]("unix-conf-home", "Conf dir on unix")
@@ -72,28 +67,24 @@ object Packaging extends Plugin {
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
+    basePath <<= (baseDirectory)(_.toPath),
+    // Standard directory layout
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
     unixLibHome <<= (unixHome)(_ / "lib"),
     unixConfHome <<= (unixHome)(_ / "conf"),
     unixScriptHome <<= (unixHome)(_ / "scripts"),
     unixLogDir <<= (unixHome)(_ / "logs"),
-    pkgSrcHome <<= (basePath)(_ / "src/pkg"),
+    pkgSrcHome <<= (basePath)(_ / "src" / "pkg"),
+    // rpm/deb postinst control files
     controlDir <<= (pkgSrcHome)(_ / "control"),
     preInstall <<= (controlDir)(_ / "preinstall.sh"),
     postInstall <<= (controlDir)(_ / "postinstall.sh"),
     preRemove <<= (controlDir)(_ / "preuninstall.sh"),
     postRemove <<= (controlDir)(_ / "postuninstall.sh"),
-    libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
-      libFiles.map(file => file -> (destDir / file.getFileName).toString)
-    }),
-    confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
-    scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
-    confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
-    basePath <<= (baseDirectory)(b => b.toPath),
-    distribDir <<= (basePath)(b => (b resolve outDir)),
-    configPath <<= (basePath)(b => Some((b resolve confDir))),
-    scriptPath <<= (basePath)(b => Some((b resolve scriptDir))),
-    configOutputPath <<= (distribDir)(d => Some((d resolve confDir))),
+    distribDir <<= (basePath)(_ / outDir),
+    configPath <<= (basePath)(b => Some((b / confDir))),
+    scriptPath <<= (basePath)(b => Some((b / scriptDir))),
+    configOutputPath <<= (distribDir)(d => Some((d / confDir))),
     configFiles <<= filesIn(configPath),
     scriptFiles <<= filesIn(scriptPath),
     appJar <<= (exportedProducts in Compile, name) map ((jars: Classpath, pkgName) => jars.files.head.toPath),
@@ -160,21 +151,22 @@ object Packaging extends Plugin {
       zipFile
     }),
     debFiles <<= (debian.Keys.linuxPackageMappings in Debian, name) map ((mappings, pkgName) => {
-      printMappingDestinations(mappings)
+      printMappings(mappings)
     }),
     rpmFiles <<= (rpm.Keys.linuxPackageMappings in Rpm, name) map ((mappings, pkgName) => {
-      printMappingDestinations(mappings)
+      printMappings(mappings)
     })
   )
 
-  def printMappingDestinations(mappings: Seq[LinuxPackageMapping]) = {
+  def printMappings(mappings: Seq[LinuxPackageMapping]) = {
     mappings.foreach(mapping => {
       mapping.mappings.foreach(pair => {
         val (file, dest) = pair
-        val fileType = if (file.isFile) "file" else {
+        val fileType = if (file.isFile) "file"
+        else {
           if (file.isDirectory) "dir" else "UNKNOWN"
         }
-        println(fileType + file + ", dest: " + dest)
+        println(fileType + ": " + file + ", dest: " + dest)
       })
     })
     val ret = mappings.flatMap(_.mappings.map(_._2))
@@ -183,10 +175,10 @@ object Packaging extends Plugin {
   }
 
   def launcher(appDir: Path,
-               files: Types.Id[Seq[Path]],
+               files: Seq[Path],
                appName: String,
                extension: String,
-               appFiles: Types.Id[Seq[Path]]) = {
+               appFiles: Seq[Path]) = {
     val launcherFilename = appName.toLowerCase + extension
     val launcherDestination = appDir resolve launcherFilename
     val maybeLauncherFile = files.find(_.getFileName.toString == launcherFilename)
@@ -207,7 +199,10 @@ object Packaging extends Plugin {
     ) map ((base, filez, dest) => FileUtilities.copy(base, filez.toSet, dest).toSeq)
 
   def filesIn(dir: SettingKey[Option[Path]]): Project.Initialize[Task[Seq[Path]]] = (dir, name).map((path: Option[Path], pkgName) => {
-    path.map(p => if (Files isDirectory p) FileUtilities.listPaths(p) else Seq.empty[Path]).getOrElse(Seq.empty[Path])
+    path.map(p =>
+      if (Files isDirectory p) FileUtilities.listPaths(p)
+      else Seq.empty[Path]
+    ).getOrElse(Seq.empty[Path])
   })
 
   /**
@@ -218,12 +213,4 @@ object Packaging extends Plugin {
       name.slice(0, name indexOf section) + ".jar"
     else
       name
-
-  def rebase(file: Path, srcBase: Path, destBase: Path) = destBase resolve (srcBase relativize file)
-
-  def rebase(files: Seq[Path], srcBase: Path, destBase: Path): Seq[(Path, String)] =
-    files map (file => file -> rebase(file, srcBase, destBase).toString)
-
-  def rebase(files: Seq[Path], maybeSrcBase: Option[Path], destBase: Path): Seq[(Path, String)] =
-    maybeSrcBase.map(srcBase => rebase(files, srcBase, destBase)).getOrElse(Seq.empty[(Path, String)])
 }

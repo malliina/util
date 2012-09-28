@@ -21,7 +21,7 @@ object BuildBuild extends Build {
     addSbtPlugin("play" % "sbt-plugin" % "2.1-09092012") //"2.1-09092012"),
   )
   lazy val root = Project("plugins", file("."))
-    .dependsOn(nativePackager)
-  lazy val nativePackager = uri("git://github.com/Dremora/sbt-native-packager.git")
+//    .dependsOn(nativePackager)
+//  lazy val nativePackager = uri("git://github.com/Dremora/sbt-native-packager.git")
 
 }

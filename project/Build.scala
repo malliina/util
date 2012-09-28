@@ -17,7 +17,7 @@ object GitBuild extends Build {
     scalaVersion := "2.9.2",
     version := "0.1-SNAPSHOT",
     //      resolvers := additionalRepos,
-    exportJars := true,
+//    exportJars := true,
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
@@ -27,7 +27,7 @@ object GitBuild extends Build {
     webSettings ++
     PackagerPlugin.packagerSettings ++
     Packaging.newSettings ++
-    NativePackaging.defaultPackageSettings
+    NativePackaging.defaultNativeProject
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("common-util")
     .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO))
