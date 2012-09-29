@@ -16,8 +16,6 @@ object GitBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     scalaVersion := "2.9.2",
     version := "0.1-SNAPSHOT",
-    //      resolvers := additionalRepos,
-//    exportJars := true,
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
@@ -36,7 +34,7 @@ object GitBuild extends Build {
   lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
     .dependsOn(util, utilActor)
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
-    .dependsOn(util, utilActor)
+    .dependsOn(util, utilActor, rmi)
     .settings(libraryDependencies ++= webDeps ++ wiQuery)
   lazy val rmi = myProject("util-rmi")
     .dependsOn(util)

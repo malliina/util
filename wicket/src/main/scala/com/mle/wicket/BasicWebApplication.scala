@@ -1,7 +1,6 @@
 package com.mle.wicket
 
-import markup.Pages.{MessagePage, SortPage, SettingsPage}
-import markup.{BootstrapNav => BootstrapPage, Home}
+import markup.Pages._
 import org.apache.wicket.protocol.http.WebApplication
 
 /**
@@ -14,12 +13,13 @@ import org.apache.wicket.protocol.http.WebApplication
  * @author Mle
  */
 class BasicWebApplication extends Bootstrapping with PageMounting {
-  def getHomePage = classOf[Home]
+  def getHomePage = classOf[SettingsPage]
 
   override def init() {
     super.init()
-    mount(classOf[Home])
+    mount(classOf[HomePage])
     mount(classOf[SettingsPage])
+    mount(classOf[FluidSettingsPage])
     mount(classOf[MessagePage])
     mount(classOf[SortPage])
   }

@@ -10,7 +10,11 @@ import org.apache.commons.io.IOUtils
  * @author mle
  */
 object FileUtilities extends Log {
-  var basePath = Paths get sys.props.getOrElse("app.home", sys.props.getOrElse("user.dir", throw new Exception("Unable to determine home directory")))
+
+  val userDir = sys.props("user.dir")
+  var basePath = Paths get sys.props.getOrElse("app.home", userDir)
+
+  //  var basePath = Paths get sys.props.getOrElse("app.home", sys.props.getOrElse("user.dir", throw new Exception("Unable to determine home directory")))
 
   def pathTo(location: String) = basePath / location
 

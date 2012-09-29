@@ -7,11 +7,15 @@ package com.mle.wicket.markup
  */
 object Pages {
 
+  class HomePage extends BootstrapPage(new Home(_))
+
   class WebSocketsPage extends BootstrapPage(new WebSockets(_))
 
   class AtmospherePage extends BootstrapPage(new Atmosphere(_))
 
   class SettingsPage extends BootstrapPage(new Settings(_))
+
+  class FluidSettingsPage extends BootstrapPage(new FluidSettings(_))
 
   class SortPage extends BootstrapPage(new SortPanel(_))
 

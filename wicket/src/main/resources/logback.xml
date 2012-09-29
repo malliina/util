@@ -6,10 +6,11 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <!-- Silence verbose Atmosphere logging. additivity=false means "don't propagate up" -->
+    <logger name="org.apache.wicket.atmosphere.AtmosphereBehavior" additivity="false"/>
+    <!--<logger name="org.atmosphere" additivity="false"/>-->
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
-    <!-- Silence verbose Atmosphere logging. additivity=false means "don't propagate up" -->
-    <logger name="org.apache.wicket.atmosphere.AtmosphereBehavior" additivity="false">
-    </logger>
 </configuration>

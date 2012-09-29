@@ -27,8 +27,8 @@ object RmiUtil {
 
   def initMisc() {
     sys.props("java.security.policy") = Util.resource("security/server.policy").toURI.toString
-    if (System.getSecurityManager == null) {
-      System.setSecurityManager(new SecurityManager)
-    }
+//    if (System.getSecurityManager == null) {
+//      System.setSecurityManager(new SecurityManager)
+//    }
   }
 }

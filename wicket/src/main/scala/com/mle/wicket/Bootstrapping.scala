@@ -2,22 +2,23 @@ package com.mle.wicket
 
 import de.agilecoders.wicket.settings.{DefaultThemeProvider, BootstrapSettings}
 import de.agilecoders.wicket.Bootstrap
-import markup.Home
-import markup.Pages.{MessagePage, SettingsPage, SortPage}
+import markup.Pages._
 import org.apache.wicket.protocol.http.WebApplication
 import collection.JavaConversions._
 import org.apache.wicket.Page
 import org.apache.wicket.markup.html.WebPage
+import com.mle.util.Log
 
 /**
  * @author Mle
  */
-trait Bootstrapping extends WebApplication {
+trait Bootstrapping extends WebApplication with Log {
   var themes: Seq[String] = Nil
   private val defaultTabs = buildTabs(
-    "Home" -> classOf[Home],
+    "Home" -> classOf[HomePage],
     "Sorting" -> classOf[SortPage],
     "Settings" -> classOf[SettingsPage],
+    "Fluid Settings" -> classOf[FluidSettingsPage],
     "MOTD" -> classOf[MessagePage]
   )
 
@@ -26,6 +27,8 @@ trait Bootstrapping extends WebApplication {
   override def init() {
     super.init()
     val settings = new BootstrapSettings()
+//    settings.
+//    log info "Using responsive CSS: " + settings.useResponsiveCss()
     settings minify true // use minimized version of all bootstrap references
     themes = initThemes(settings)
     Bootstrap.install(this, settings)

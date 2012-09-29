@@ -11,6 +11,7 @@ import org.atmosphere.websocket.protocol.EchoProtocol
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.nio.SelectChannelConnector
 import org.eclipse.jetty.servlet._
+import collection.JavaConversions._
 
 /**
  * https://cwiki.apache.org/WICKET/wicket-without-webxml-embedded-jetty.html
@@ -32,6 +33,7 @@ object JettyUtil extends Log {
     context addServlet(classOf[DefaultServlet], path)
   }
 
+
   /**
    * Adds a Wicket app with WebSockets enabled.
    * @param webApp
@@ -42,16 +44,24 @@ object JettyUtil extends Log {
     addWicket(webApp, path, filter = classOf[Jetty7WebSocketFilter])
   }
 
-  def addAtmosphere[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) {
+  def addAtmosphere[T <: WebApplication](webApp: Class[T], path: String)(implicit context: ServletContextHandler) = {
     log info "Mapping Atmosphere app to: " + path
-    val holder = new ServletHolder(newAtmosphereServlet(path))
+    val atmoServlet = newAtmosphereServlet(path)
+    val holder = new ServletHolder(atmoServlet)
     addWicketParameters(holder, webApp, path)
     addAtmosphereParameters(holder)
     context addServlet(holder, path)
+    atmoServlet
+  }
+
+  private def addWicketParameters[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {
+    holder setInitParameter(ContextParamWebApplicationFactory.APP_CLASS_PARAM, app.getName)
+    holder setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, path)
+    holder
   }
 
   def addAtmosphereParameters(holder: ServletHolder) {
-    holder setInitParameter("org.atmosphere.useWebSocket", "false")// if true, ie works but firefox doesn't
+    holder setInitParameter("org.atmosphere.useWebSocket", "false") // if true, ie works but firefox doesn't
     holder setInitParameter("org.atmosphere.useNative", "true")
     // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
     holder setInitParameter("org.atmosphere.websocket.WebSocketProtocol", classOf[EchoProtocol].getName)
@@ -61,7 +71,15 @@ object JettyUtil extends Log {
   }
 
   def newAtmosphereServlet(path: String) = {
-    val servlet = new AtmosphereServlet(true)
+    val servlet = new AtmosphereServlet(true) {
+      /**
+       * Bugfix: Kills some [[java.util.concurrent.ExecutorService]] that's otherwise left open.
+       */
+      override def destroy() {
+        super.destroy()
+        framework().getAtmosphereConfig.handlers().map(_._2.broadcaster.destroy())
+      }
+    }
     /**
      * Codified atmosphere.xml.
      * AtmosphereServlet automatically looks for atmosphere.xml or annotated handlers in WEB-INF/classes
@@ -72,6 +90,7 @@ object JettyUtil extends Log {
     handler setFilterClassName classOf[WicketFilter].getName
     handler setServletClassName classOf[AtmosphereServlet].getName
     servlet.framework().addAtmosphereHandler(path, handler)
+    //    servlet.framework().getAtmosphereHandlers.map(_._2).foreach(_.broadcaster.getBroadcasterConfig.destroy())
     servlet
   }
 
@@ -86,13 +105,8 @@ object JettyUtil extends Log {
     val pathSpecs = contextHandler.getServletHandler.getServletMappings.flatMap(_.getPathSpecs).mkString(", ")
     server.start()
     val host = Option(connector.getHost) getOrElse "0.0.0.0"
+    //    val protocol=if (connector.isInstanceOf[SelectChannelConnector])"http" else "https"
     log info "Server started on: http://" + host + ":" + connector.getPort + ", paths: " + pathSpecs
     server
-  }
-
-  private def addWicketParameters[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {
-    holder setInitParameter(ContextParamWebApplicationFactory.APP_CLASS_PARAM, app.getName)
-    holder setInitParameter(WicketFilter.FILTER_MAPPING_PARAM, path)
-    holder
   }
 }

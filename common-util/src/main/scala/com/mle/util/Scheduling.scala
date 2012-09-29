@@ -31,4 +31,8 @@ object Scheduling extends Log {
       log warn("Execution failed", e)
       throw e
   }
+
+  def shutdown() {
+    service.shutdownNow()
+  }
 }

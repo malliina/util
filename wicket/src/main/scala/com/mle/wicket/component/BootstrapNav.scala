@@ -1,17 +1,17 @@
-package com.mle.wicket.markup
+package com.mle.wicket.component
 
-import de.agilecoders.wicket.markup.html.bootstrap.navbar.{NavbarDropDownButton, NavbarButton, Navbar}
+import com.mle.wicket.{BasicWebApplication, Bootstrapping}
+import org.apache.wicket.{Page, MarkupContainer}
+import org.apache.wicket.protocol.http.WebApplication
+import com.mle.util.Log
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.{NavbarButton, NavbarDropDownButton, Navbar}
 import com.mle.wicket.model.ReadOnlyModel
 import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ButtonPosition
 import org.apache.wicket.model.Model
-import org.apache.wicket.{Page, MarkupContainer}
-import de.agilecoders.wicket.Bootstrap
-import org.apache.wicket.ajax.markup.html.AjaxLink
 import org.apache.wicket.ajax.AjaxRequestTarget
+import org.apache.wicket.ajax.markup.html.AjaxLink
+import de.agilecoders.wicket.Bootstrap
 import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonBehavior, ButtonType}
-import com.mle.util.Log
-import com.mle.wicket.{Bootstrapping, BasicWebApplication}
-import org.apache.wicket.protocol.http.WebApplication
 
 /**
  * test: tooltibhehavior, popoverbehavior

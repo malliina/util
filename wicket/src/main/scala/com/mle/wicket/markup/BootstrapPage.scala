@@ -2,6 +2,7 @@ package com.mle.wicket.markup
 
 import org.apache.wicket.markup.html.WebPage
 import org.apache.wicket.markup.html.panel.Panel
+import com.mle.wicket.component.BootstrapNav
 
 /**
  * A page that wraps a panel.
