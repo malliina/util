@@ -1,8 +1,54 @@
 <html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<wicket:head>
+    <script type="text/javascript" src="static/random.js"></script>
+</wicket:head>
 <wicket:panel>
     <div class="row">
-        <div class="span4"><label>Log level: <select wicket:id="logLevel"></select></label></div>
-        <div class="span4">This is a story of Michael and Michael's kingdom. It all <span class="lead">started out really well</span>.
+        <div class="span4">
+            <h3>Buttons</h3>
+
+            <div class="row">
+                <div class="span4">
+                    <div class="btn-group">
+                        <a id="buu" class="btn">B1</a>
+                        <a class="btn">B2</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="span4">
+                    <div class="btn-group">
+                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            HTML Selector <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><i class="icon-music"></i> Iron Maiden</a></li>
+                            <li><a href="#"><i class="icon-magnet"></i> Magnet</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="span4">
+                    <h3>Tooltips</h3>
+                    <span wicket:id="testLabel"></span>
+                    <span wicket:id="toolWmc"><img src="static/help22.png"/></span>
+                    <a href="#" id="link" data-original-title="Das tooltip">Hover me for a
+                        tooltip</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="span4"><h3>Quotes</h3>
+                    <blockquote>
+                        <p>Oh God, aaaaaaaaaaaaaaaaaaaaaarrr!!</p>
+                        <small>King M</small>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            <h3>The story</h3>This is a story of Michael and Michael's kingdom. It all <span
+                class="lead">started out really well</span>.
             Read on, because it is very <strong>important</strong>. There's
             <em>no need to stress</em>, but you are advised not to go <abbr class="initialism"
                                                                             title="Away From Keyboard">AFK</abbr>.
@@ -12,17 +58,92 @@
                 </div>
             </div>
         </div>
-        <div class="span2">Yoi</div>
-        <div class="span2">Yoi
+        <div class="span4">
+            <h3>Settings</h3>
+            <label><i class="icon-signal"></i> Log level: <select wicket:id="logLevel"></select></label>
+
+            <p>This is a test of how much we can write and how it looks close to the edges of the layout.</p>
+
             <div class="row">
-                <div class="span1">Oooh</div>
-                <div class="span1">Oooh</div>
-            </div>
-            <div class="row">
-                <div class="span1">Oooh</div>
-                <div class="span1">Oooh</div>
+                <div class="span4">
+                    <a href="#" id="vistoggle">Show/hide</a>
+                    <span id="mytext">Hello, world!</span>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="row">
+        <div class="span12">
+            <h3>Tables</h3>
+            <table class="table table-condensed table-striped table-hover">
+                <caption>Staff</caption>
+                <thead>
+                <tr>
+                    <th colspan="2">Personal Information</th>
+                    <th>Since 1950</th>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Adriana</td>
+                    <td>First Lady</td>
+                    <td>Alive</td>
+                </tr>
+                <tr>
+                    <td>Marisa</td>
+                    <td>Second Lady</td>
+                    <td>Alive</td>
+                </tr>
+                <tr>
+                    <td>Miranda</td>
+                    <td>Former First Lady</td>
+                    <td>Banished</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span12"><h3>Forms</h3>
+
+            <div class="row">
+                <div class="span4">
+                    <form class="form-vertical">
+                        <fieldset>
+                            <legend>Give feedback</legend>
+                            <div class="control-group"><label class="control-label" for="textinput">Your input,
+                                please
+                                sir</label>
+
+                                <div class="controls"><input type="text" id="textinput" placeholder="Yo">
+
+                                    <p class="help-block">Praise the King</p>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Submit feedback</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+
+                <div class="span4">
+                    <form class="well form-search">
+                        <fieldset>
+                            <legend>Search</legend>
+                            <input type="text" class="input-small search-query">
+                            <button type="submit" class="btn"><i class="icon-search"></i> Search</button>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
 </wicket:panel>
 </html>

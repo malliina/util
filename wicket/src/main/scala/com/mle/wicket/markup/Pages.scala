@@ -15,8 +15,6 @@ object Pages {
 
   class SettingsPage extends BootstrapPage(new Settings(_))
 
-  class FluidSettingsPage extends BootstrapPage(new FluidSettings(_))
-
   class SortPage extends BootstrapPage(new SortPanel(_))
 
   class MessagePage extends BootstrapPage(new MessagePanel(_))

@@ -3,6 +3,8 @@ package com.mle.wicket.markup
 import org.apache.wicket.markup.html.WebPage
 import org.apache.wicket.markup.html.panel.Panel
 import com.mle.wicket.component.BootstrapNav
+import org.apache.wicket.markup.head.IHeaderResponse
+import de.agilecoders.wicket.Bootstrap
 
 /**
  * A page that wraps a panel.
@@ -16,4 +18,9 @@ import com.mle.wicket.component.BootstrapNav
 abstract class BootstrapPage(panelBuilder: String => Panel) extends WebPage with BootstrapNav {
   val panelId = "panel"
   add(panelBuilder(panelId))
+
+  override def renderHead(response: IHeaderResponse) {
+    super.renderHead(response)
+    Bootstrap.renderHead(response)
+  }
 }

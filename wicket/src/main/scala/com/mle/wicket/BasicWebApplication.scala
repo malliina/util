@@ -1,6 +1,7 @@
 package com.mle.wicket
 
 import markup.Pages._
+import markup.{BootstrapPanelPage, SoloPage}
 import org.apache.wicket.protocol.http.WebApplication
 
 /**
@@ -19,9 +20,10 @@ class BasicWebApplication extends Bootstrapping with PageMounting {
     super.init()
     mount(classOf[HomePage])
     mount(classOf[SettingsPage])
-    mount(classOf[FluidSettingsPage])
+    mount(classOf[SoloPage])
     mount(classOf[MessagePage])
     mount(classOf[SortPage])
+    mount(classOf[BootstrapPanelPage])
   }
 }
 

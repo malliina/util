@@ -12,6 +12,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget
 import org.apache.wicket.ajax.markup.html.AjaxLink
 import de.agilecoders.wicket.Bootstrap
 import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonBehavior, ButtonType}
+import de.agilecoders.wicket.markup.html.bootstrap.image.{Icon, IconType}
 
 /**
  * test: tooltibhehavior, popoverbehavior
@@ -22,7 +23,7 @@ trait BootstrapNav extends MarkupContainer with Log {
   navbar.fluid()
   navbar.brandName(ReadOnlyModel("My app"))
   navbar.addButton(ButtonPosition.LEFT,
-    BasicWebApplication.get.tabs.map(tab => navButton(tab.pageClass, tab.title)): _*
+    BasicWebApplication.get.tabs.map(tab => navButton(tab.pageClass, tab.title, tab.icon)): _*
   )
   navbar.addButton(ButtonPosition.RIGHT,
     new NavbarDropDownButton("button", Model.of("Themes"))
@@ -30,8 +31,10 @@ trait BootstrapNav extends MarkupContainer with Log {
   )
   add(navbar)
 
-  def navButton[T <: Page](pageClass: Class[T], label: String) = {
-    new NavbarButton(pageClass, Model.of(label))
+  def navButton[T <: Page](pageClass: Class[T], label: String, iconType: Option[IconType]) = {
+    val button = new NavbarButton(pageClass, Model.of(label))
+    iconType foreach (iType => button.setIcon(new Icon(iType)))
+    button
   }
 
   def themeDropDownButton(themeName: String) = dropDownButton(themeName)(target => {
@@ -54,6 +57,7 @@ trait BootstrapNav extends MarkupContainer with Log {
   }
 
   def bootstrapSettings = Bootstrap.getSettings(getApplication)
+
 }
 
 object BootstrapNav {

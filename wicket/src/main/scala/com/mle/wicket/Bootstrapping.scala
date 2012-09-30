@@ -8,6 +8,7 @@ import collection.JavaConversions._
 import org.apache.wicket.Page
 import org.apache.wicket.markup.html.WebPage
 import com.mle.util.Log
+import de.agilecoders.wicket.markup.html.bootstrap.image.IconType
 
 /**
  * @author Mle
@@ -15,11 +16,10 @@ import com.mle.util.Log
 trait Bootstrapping extends WebApplication with Log {
   var themes: Seq[String] = Nil
   private val defaultTabs = buildTabs(
-    "Home" -> classOf[HomePage],
-    "Sorting" -> classOf[SortPage],
-    "Settings" -> classOf[SettingsPage],
-    "Fluid Settings" -> classOf[FluidSettingsPage],
-    "MOTD" -> classOf[MessagePage]
+    ("Home", classOf[HomePage], Some(IconType.Home)),
+    ("Sorting", classOf[SortPage], None),
+    ("Settings", classOf[SettingsPage], Some(IconType.Cog)),
+    ("MOTD", classOf[MessagePage], None)
   )
 
   def tabs: Seq[BootTab[_ <: WebPage]] = defaultTabs
@@ -27,8 +27,8 @@ trait Bootstrapping extends WebApplication with Log {
   override def init() {
     super.init()
     val settings = new BootstrapSettings()
-//    settings.
-//    log info "Using responsive CSS: " + settings.useResponsiveCss()
+    //    settings.
+    //    log info "Using responsive CSS: " + settings.useResponsiveCss()
     settings minify true // use minimized version of all bootstrap references
     themes = initThemes(settings)
     Bootstrap.install(this, settings)
@@ -42,10 +42,10 @@ trait Bootstrapping extends WebApplication with Log {
     themeNames
   }
 
-  def buildTabs(tabs: (String, Class[_ <: WebPage])*) = tabs.map(pair => {
-    val (title, clazz) = pair
-    BootTab(title, clazz)
+  def buildTabs(tabs: (String, Class[_ <: WebPage], Option[IconType])*) = tabs.map(pair => {
+    val (title, clazz, icon) = pair
+    BootTab(title, clazz, icon)
   })
 }
 
-case class BootTab[T <: Page](title: String, pageClass: Class[T])
+case class BootTab[T <: Page](title: String, pageClass: Class[T], icon: Option[IconType] = None)

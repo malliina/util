@@ -1,6 +1,6 @@
 package com.mle.wicket
 
-import com.mle.util.Log
+import com.mle.util.{Util, Log}
 import java.util.EnumSet
 import javax.servlet.{DispatcherType, Filter}
 import org.apache.wicket.protocol.http._
@@ -52,6 +52,25 @@ object JettyUtil extends Log {
     addAtmosphereParameters(holder)
     context addServlet(holder, path)
     atmoServlet
+  }
+
+  /**
+   * Serves the files located at the given resource path from the specified web path.
+   *
+   * @param resourceDir a directory containing static files
+   * @param webPath the path spec
+   * @param context context for the servlet
+   * @return the static servlet
+   */
+  def serveStatic(resourceDir: String, webPath: String = "/*")(implicit context: ServletContextHandler) = {
+    val staticUrl = Util.resource(resourceDir).toExternalForm
+    log info "Mapping static files in: " + staticUrl + "to: " + webPath
+    val resourceServlet = new ServletHolder(classOf[DefaultServlet])
+    resourceServlet.setInitParameter("dirAllowed", "true")
+    resourceServlet.setInitParameter("resourceBase", staticUrl)
+    resourceServlet.setInitParameter("pathInfoOnly", "true")
+    context.addServlet(resourceServlet, webPath)
+    resourceServlet
   }
 
   private def addWicketParameters[T <: Holder[_], U <: WebApplication](holder: T, app: Class[U], path: String): T = {

@@ -51,5 +51,4 @@ jQuery(function ($) {
     $('#disconnect').click(function () {
         Wicket.WebSocket.close();
     });
-
 });
