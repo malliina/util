@@ -1,18 +1,18 @@
-package com.mle.wicket.component
+package com.mle.wicket.component.bootstrap
 
+import com.mle.wicket.model.ReadOnlyModel
 import com.mle.wicket.{BasicWebApplication, Bootstrapping}
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ButtonPosition
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.{NavbarButton, Navbar, NavbarDropDownButton}
 import org.apache.wicket.{Page, MarkupContainer}
+import org.apache.wicket.model.Model
 import org.apache.wicket.protocol.http.WebApplication
 import com.mle.util.Log
-import de.agilecoders.wicket.markup.html.bootstrap.navbar.{NavbarButton, NavbarDropDownButton, Navbar}
-import com.mle.wicket.model.ReadOnlyModel
-import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ButtonPosition
-import org.apache.wicket.model.Model
+import de.agilecoders.wicket.markup.html.bootstrap.image.{Icon, IconType}
 import org.apache.wicket.ajax.AjaxRequestTarget
 import org.apache.wicket.ajax.markup.html.AjaxLink
+import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonType, ButtonBehavior}
 import de.agilecoders.wicket.Bootstrap
-import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonBehavior, ButtonType}
-import de.agilecoders.wicket.markup.html.bootstrap.image.{Icon, IconType}
 
 /**
  * test: tooltibhehavior, popoverbehavior
@@ -26,8 +26,8 @@ trait BootstrapNav extends MarkupContainer with Log {
     BasicWebApplication.get.tabs.map(tab => navButton(tab.pageClass, tab.title, tab.icon)): _*
   )
   navbar.addButton(ButtonPosition.RIGHT,
-    new NavbarDropDownButton("button", Model.of("Themes"))
-      .addButtons(BootstrapNav.themes.map(themeDropDownButton): _*)
+    new NavbarDropDownButton("button", Model.of("BootstrapThemes"))
+      .addButtons(BootstrapNav.themes.themeNames.map(themeDropDownButton): _*)
   )
   add(navbar)
 
@@ -62,5 +62,5 @@ trait BootstrapNav extends MarkupContainer with Log {
 
 object BootstrapNav {
   val app = WebApplication.get().asInstanceOf[Bootstrapping]
-  val themes = app.themes
+  val themes = app.themeService
 }

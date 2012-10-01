@@ -12,6 +12,7 @@ import org.apache.wicket.markup.html.basic.Label
 import de.agilecoders.wicket.markup.html.bootstrap.components.TooltipBehavior
 import org.apache.wicket.markup.html.WebMarkupContainer
 import org.apache.wicket.markup.head.IHeaderResponse
+import com.mle.wicket.component.bootstrap.ThemeDropDown
 
 /**
  * @author Mle
@@ -32,6 +33,10 @@ class Settings(id: String) extends Panel(id) with Log {
   val toolWmc = new WebMarkupContainer("toolWmc")
   add(toolWmc)
   toolWmc add toolTip
+
+  val themeChoice = new ThemeDropDown("themes")
+  add(themeChoice)
+
 
   override def renderHead(response: IHeaderResponse) {
     super.renderHead(response)

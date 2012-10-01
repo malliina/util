@@ -17,6 +17,6 @@ object Pages {
 
   class SortPage extends BootstrapPage(new SortPanel(_))
 
-  class MessagePage extends BootstrapPage(new MessagePanel(_))
+  class MessagePage extends BootstrapPage(new SubTabs(_))
 
 }

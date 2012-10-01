@@ -1,10 +1,10 @@
 package com.mle.wicket
 
-import de.agilecoders.wicket.settings.{DefaultThemeProvider, BootstrapSettings}
+import bootstrap.BootstrapThemes
+import de.agilecoders.wicket.settings.BootstrapSettings
 import de.agilecoders.wicket.Bootstrap
 import markup.Pages._
 import org.apache.wicket.protocol.http.WebApplication
-import collection.JavaConversions._
 import org.apache.wicket.Page
 import org.apache.wicket.markup.html.WebPage
 import com.mle.util.Log
@@ -14,7 +14,7 @@ import de.agilecoders.wicket.markup.html.bootstrap.image.IconType
  * @author Mle
  */
 trait Bootstrapping extends WebApplication with Log {
-  var themes: Seq[String] = Nil
+  var themeService: BootstrapThemes = null
   private val defaultTabs = buildTabs(
     ("Home", classOf[HomePage], Some(IconType.Home)),
     ("Sorting", classOf[SortPage], None),
@@ -27,19 +27,10 @@ trait Bootstrapping extends WebApplication with Log {
   override def init() {
     super.init()
     val settings = new BootstrapSettings()
-    //    settings.
     //    log info "Using responsive CSS: " + settings.useResponsiveCss()
     settings minify true // use minimized version of all bootstrap references
-    themes = initThemes(settings)
     Bootstrap.install(this, settings)
-  }
-
-  private def initThemes(settings: BootstrapSettings) = {
-    // default theme
-    val themeProvider = settings.getThemeProvider.asInstanceOf[DefaultThemeProvider]
-    val themeNames = settings.getThemeProvider.available().map(_.name())
-    themeNames.find(_ == "readable").foreach(themeProvider.defaultTheme)
-    themeNames
+    themeService = new BootstrapThemes(settings)
   }
 
   def buildTabs(tabs: (String, Class[_ <: WebPage], Option[IconType])*) = tabs.map(pair => {

@@ -13,3 +13,7 @@ class STab(title: IModel[String], panelBuilder: String => Panel) extends Abstrac
 
   def getPanel(panelId: String) = panelBuilder(panelId)
 }
+
+object STab {
+  def apply(title: String, panelBuilder: String => Panel) = new STab(title, panelBuilder)
+}
