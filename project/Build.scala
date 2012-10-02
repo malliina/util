@@ -38,6 +38,8 @@ object GitBuild extends Build {
     .settings(libraryDependencies ++= webDeps ++ wiQuery)
   lazy val rmi = myProject("util-rmi")
     .dependsOn(util)
+  lazy val auth = myProject("util-auth")
+    .dependsOn(util)
 
   //  IzPack.variables in IzPack.Config <+= name {
   //    name => ("projectName", "My test project")
