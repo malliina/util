@@ -6,19 +6,13 @@ import javax.naming.Context
 import com.sun.jndi.ldap.LdapCtxFactory
 import collection.JavaConversions._
 import com.mle.util.Log
+import com.mle.auth.Authenticator
 
 
 /**
  * @author Mle
  */
-trait LDAPConnectionProvider extends Log {
-  def uri: String
-
-  def userDnSuffix: String
-
-  def userDnPrefix: String
-
-  def toDN(username: String) = userDnPrefix + username + userDnSuffix
+class LDAPAuthenticator(uri: String, userInfo: DnBuilder) extends Authenticator[InitialDirContext] with Log {
 
   /**
    *
@@ -29,21 +23,23 @@ trait LDAPConnectionProvider extends Log {
    * @throws javax.naming.InvalidNameException if some parameter is incorrect (invalid DN)
    * @throws javax.naming.AuthenticationException if the credentials are incorrect
    */
-  def login(username: String, password: String) = {
+  override def authenticate(username: String, password: String) = {
     val props = new Properties()
     props(Context.SECURITY_AUTHENTICATION) = "simple"
     props(Context.INITIAL_CONTEXT_FACTORY) = classOf[LdapCtxFactory].getName
     props(Context.PROVIDER_URL) = uri
     props(Context.REFERRAL) = "ignore"
-    props(Context.SECURITY_PRINCIPAL) = toDN(username)
+    props(Context.SECURITY_PRINCIPAL) = userInfo.toDN(username)
     props(Context.SECURITY_CREDENTIALS) = password
     val ret = new InitialDirContext(props)
     log info "Connected to " + props(Context.PROVIDER_URL) + " with user DN: " + props(Context.SECURITY_PRINCIPAL)
     ret
   }
-  def attribute(name:String,ctx:InitialDirContext)={
-    toDN(name)
+
+  def attribute(name: String, ctx: InitialDirContext) = {
+    userInfo.toDN(name)
   }
+
   def attributez(attributeName: String, ctx: InitialDirContext) = {
     val searchControls = new SearchControls()
     searchControls setSearchScope SearchControls.SUBTREE_SCOPE
