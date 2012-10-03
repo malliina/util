@@ -5,9 +5,9 @@ import com.mle.util.Log
 /**
  * @author Mle
  */
-object LDAPTest2 extends Log {
+object MyLdapTests extends Log {
   def main(args: Array[String]) {
-    val schema = LdapSchema("ldap://10.0.0.33:389",
+    val schema = LdapDirInfo("ldap://10.0.0.33:389",
       DnBuilder("cn", "dc=mle,dc=com"),
       DnBuilder("uid", "ou=People,dc=mle,dc=com"),
       DnBuilder("ou", "ou=Groups,dc=mle,dc=com")

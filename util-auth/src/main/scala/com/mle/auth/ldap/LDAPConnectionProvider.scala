@@ -6,7 +6,7 @@ import javax.naming.directory.InitialDirContext
 /**
  * @author Mle
  */
-trait TempName extends ConnectionProvider[InitialDirContext] {
+trait LDAPConnectionProvider extends ConnectionProvider[InitialDirContext] {
   def user: String
 
   def password: String

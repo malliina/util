@@ -10,7 +10,7 @@ import collection.JavaConversions._
 /**
  * @author Mle
  */
-class LDAPUserManager(connectionProvider: TempName, userInfo: DnBuilder, groupInfo: DnBuilder) extends UserManager with Log {
+class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnBuilder, groupInfo: DnBuilder) extends UserManager with Log {
   def withContext[T](code: InitialDirContext => T) = resource(connectionProvider.connection)(code)
 
   def newAttrs(keyValues: (String, String)*) = {
@@ -72,10 +72,10 @@ class LDAPUserManager(connectionProvider: TempName, userInfo: DnBuilder, groupIn
 }
 
 object LDAPUserManager {
-  def apply(schema: LdapSchema,
+  def apply(schema: LdapDirInfo,
             adminUser: String,
             adminPassword: String) = {
-    val connProvider = new TempName {
+    val connProvider = new LDAPConnectionProvider {
       val user = adminUser
 
       val password = adminPassword
