@@ -4,6 +4,8 @@ import com.mle.auth.ConnectionProvider
 import javax.naming.directory.InitialDirContext
 
 /**
+ * TODO: Connection pooling
+ *
  * @author Mle
  */
 trait LDAPConnectionProvider extends ConnectionProvider[InitialDirContext] {

@@ -13,7 +13,11 @@ object MyLdapTests extends Log {
       DnBuilder("ou", "ou=Groups,dc=mle,dc=com")
     )
     val manager = LDAPUserManager(schema, "admin", "admin")
+    manager.addUser("temp", "temp")
     manager.users foreach println
+    manager.removeUser("temp")
+    manager.users foreach println
+
     //    resource(johnsConnProvider.connection)(context => {
     //      val testAttrs = context.getAttributes(UserLdapAuthenticator.toDN(user))
     //      log info "Attrs: " + testAttrs.getAll.map(_.get()).mkString(", ")
