@@ -1,6 +1,8 @@
 <html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
 <wicket:head>
     <script type="text/javascript" src="static/random.js"></script>
+    <script type="text/javascript" src="static/colResizable-1.3.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/my.css"/>
 </wicket:head>
 <wicket:panel>
     <div class="row">
@@ -11,7 +13,7 @@
                 <div class="span4">
                     <div class="btn-group">
                         <a id="buu" class="btn">B1</a>
-                        <a class="btn">B2</a>
+                        <a id="but2" class="btn">B2</a>
                     </div>
                 </div>
             </div>
@@ -62,6 +64,7 @@
             <h3>Settings</h3>
             <label><i class="icon-signal"></i> Log level: <select wicket:id="logLevel"></select></label>
             <label>Theme: <select wicket:id="themes"></select></label>
+
             <div class="row">
                 <div class="span4">
                 </div>
@@ -81,13 +84,36 @@
     <div class="row">
         <div class="span12">
             <h3>Tables</h3>
-            <table class="table table-condensed table-striped table-hover">
+            <table class="table table-condensed table-striped table-hover colresizable" id="dragme">
                 <caption>Staff</caption>
                 <thead>
                 <tr>
-                    <th colspan="2">Personal Information</th>
-                    <th>Since 1950</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Status</th>
                 </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Adriana</td>
+                    <td>First Lady</td>
+                    <td>Alive</td>
+                </tr>
+                <tr>
+                    <td>Marisa</td>
+                    <td>Second Lady</td>
+                    <td>Alive</td>
+                </tr>
+                <tr class="error">
+                    <td>Miranda</td>
+                    <td>Former First Lady</td>
+                    <td>Banished</td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table table-condensed table-striped table-hover resizable">
+                <caption>Staff</caption>
+                <thead>
                 <tr>
                     <th>Name</th>
                     <th>Rank</th>

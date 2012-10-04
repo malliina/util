@@ -64,7 +64,7 @@ object JettyUtil extends Log {
    */
   def serveStatic(resourceDir: String, webPath: String = "/*")(implicit context: ServletContextHandler) = {
     val staticUrl = Util.resource(resourceDir).toExternalForm
-    log info "Mapping static files in: " + staticUrl + "to: " + webPath
+    log info "Mapping static files in: " + staticUrl + " to: " + webPath
     val resourceServlet = new ServletHolder(classOf[DefaultServlet])
     resourceServlet.setInitParameter("dirAllowed", "true")
     resourceServlet.setInitParameter("resourceBase", staticUrl)
@@ -80,7 +80,7 @@ object JettyUtil extends Log {
   }
 
   def addAtmosphereParameters(holder: ServletHolder) {
-    holder setInitParameter("org.atmosphere.useWebSocket", "false") // if true, ie works but firefox doesn't
+    holder setInitParameter("org.atmosphere.useWebSocket", "true") // if true, ie works but firefox doesn't
     holder setInitParameter("org.atmosphere.useNative", "true")
     // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
     holder setInitParameter("org.atmosphere.websocket.WebSocketProtocol", classOf[EchoProtocol].getName)
@@ -123,7 +123,7 @@ object JettyUtil extends Log {
     server setHandler contextHandler
     val pathSpecs = contextHandler.getServletHandler.getServletMappings.flatMap(_.getPathSpecs).mkString(", ")
     server.start()
-    val host = Option(connector.getHost) getOrElse "0.0.0.0"
+    val host = Option(connector getHost) getOrElse "0.0.0.0"
     //    val protocol=if (connector.isInstanceOf[SelectChannelConnector])"http" else "https"
     log info "Server started on: http://" + host + ":" + connector.getPort + ", paths: " + pathSpecs
     server

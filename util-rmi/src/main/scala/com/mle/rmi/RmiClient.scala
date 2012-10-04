@@ -26,6 +26,10 @@ class RmiClient extends Log {
 object RmiClient {
   RmiUtil.initSecurity()
 
+  def launchClient() {
+    new RmiClient
+  }
+
   def main(args: Array[String]) {
     if (args.size < 1)
       throw new Exception("Please specify the command as the first parameter")
@@ -34,7 +38,7 @@ object RmiClient {
       case "start" =>
         new RmiServer()
       case "stop" =>
-        new RmiClient
+        launchClient()
     }
   }
 }

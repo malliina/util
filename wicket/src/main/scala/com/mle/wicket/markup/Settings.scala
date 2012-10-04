@@ -19,7 +19,6 @@ import com.mle.wicket.component.bootstrap.ThemeDropDown
  */
 
 class Settings(id: String) extends Panel(id) with Log {
-  log info "Loading settings"
   val levels = Seq(Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR, Level.OFF)
   val levelDropDown = new DropDownChoice("logLevel", RWModel[Level](AppUtils.getLogLevel, AppUtils.setLogLevel(_)), levels)
   levelDropDown add new OnChangeAjaxFormBehavior()
