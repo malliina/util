@@ -35,7 +35,7 @@ abstract class KingActor[T] extends Actor with Log {
     }
   }
 
-  def onConnect(clientAddress: T): Int = {
+  protected def onConnect(clientAddress: T): Int = {
     val clientActor = clientBuilder(clientAddress)
     clientActor.start()
     connections += clientActor
@@ -44,7 +44,7 @@ abstract class KingActor[T] extends Actor with Log {
     conns
   }
 
-  def onDisconnect(clientAddress: T): Int = {
+  protected def onDisconnect(clientAddress: T): Int = {
     connections.find(_.address == clientAddress).foreach(clientActor => {
       connections -= clientActor
       clientActor ! Stop

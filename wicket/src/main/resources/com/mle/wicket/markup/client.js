@@ -44,7 +44,11 @@ jQuery(function ($) {
     });
 
     $('#send').click(function () {
-        Wicket.WebSocket.send($('#message').val());
+        Wicket.WebSocket.send("U" + $('#message').val());
+        $("#message").val('');
+    });
+    $('#broadcast').click(function () {
+        Wicket.WebSocket.send("B" + $('#message').val());
         $("#message").val('');
     });
 

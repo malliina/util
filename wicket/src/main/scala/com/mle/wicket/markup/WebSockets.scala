@@ -10,6 +10,7 @@ import org.apache.wicket.protocol.ws.api.{WicketWebSocketJQueryResourceReference
 import org.apache.wicket.markup.head.{JavaScriptHeaderItem, IHeaderResponse}
 import org.apache.wicket.request.resource.PackageResourceReference
 import collection.JavaConversions._
+import com.mle.actor.Messages.Broadcast
 
 /**
  * @author Mle
@@ -45,10 +46,23 @@ class WebSockets(id: String) extends Panel(id) with Log {
     }
 
     override def onMessage(handler: WebSocketRequestHandler, message: TextMessage) {
-      log info "Got message: " + message.getText
-      val pushMsg = JsonUtils.toJson("This is a reply to: " + message.getText)
-      handler push pushMsg
-      log info "Pushed this response: " + pushMsg
+      val messageText: Seq[Char] = message.getText
+      log info "Got message: " + messageText
+
+      messageText match {
+        case Seq('B', msg@_*) =>
+          // Broadcast
+          //          val srcIP = RequestCycle.get().getRequest.asInstanceOf[WebSocketRequest].getContainerRequest.asInstanceOf[HttpServletRequest].getRemoteAddr
+          WsActors.king ! Broadcast(JsonUtils.toJson(msg.toString()))
+        case Seq('U', msg@_*) =>
+          // Unicast
+          val pushMsg = JsonUtils.toJson("This is a reply to: " + msg)
+          handler push pushMsg
+          log info "Pushed this response: " + pushMsg
+        case anythingElse =>
+          // Unknown message type
+          log warn "Got unknown message type: " + anythingElse
+      }
     }
   })
 
