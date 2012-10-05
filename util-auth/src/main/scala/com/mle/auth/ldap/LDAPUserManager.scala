@@ -1,7 +1,7 @@
 package com.mle.auth.ldap
 
 import com.mle.auth.UserManager
-import javax.naming.directory.{InitialDirContext, BasicAttributes, BasicAttribute}
+import javax.naming.directory._
 import com.mle.util.Util._
 import com.mle.util.Log
 import collection.JavaConversions._
@@ -13,7 +13,7 @@ import collection.JavaConversions._
 class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnBuilder, groupInfo: DnBuilder) extends UserManager with Log {
   def withContext[T](code: InitialDirContext => T) = resource(connectionProvider.connection)(code)
 
-  def newAttrs(keyValues: (String, String)*) = {
+  private def newAttrs(keyValues: (String, String)*) = {
     val attrs = new BasicAttributes()
     keyValues foreach (kv => {
       val (key, value) = kv
@@ -58,7 +58,10 @@ class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnBu
     log info "Removed group: " + group + ", DN: " + dn
   }
 
-  def assign(user: String, group: String) {}
+  def assign(user: String, group: String) {
+    val mods = Array(new ModificationItem(DirContext.ADD_ATTRIBUTE, new BasicAttribute("member", userInfo.toDN(user))))
+    withContext(_.modifyAttributes(groupInfo.toDN(group), mods))
+  }
 
   def revoke(user: String, group: String) {}
 
@@ -68,7 +71,11 @@ class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnBu
 
   def users(group: String) = null
 
-  def users = withContext(_.list(userInfo.branch).map(_.getName.stripPrefix(userInfo.key + "="))).toSeq
+  def users = list(userInfo.branch, userInfo.key)
+
+  def groups = list(groupInfo.branch, groupInfo.key)
+
+  private def list(branch: String, keyPrefix: String) = withContext(_.list(branch).map(_.getName.stripPrefix(keyPrefix + "="))).toSeq
 }
 
 object LDAPUserManager {

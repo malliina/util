@@ -13,10 +13,10 @@ object MyLdapTests extends Log {
       DnBuilder("ou", "ou=Groups,dc=mle,dc=com")
     )
     val manager = LDAPUserManager(schema, "admin", "admin")
-    manager.addUser("temp", "temp")
-    manager.users foreach println
-    manager.removeUser("temp")
-    manager.users foreach println
+    //    testUserAddRemove(manager)
+    testGroups(manager)
+
+
 
     //    resource(johnsConnProvider.connection)(context => {
     //      val testAttrs = context.getAttributes(UserLdapAuthenticator.toDN(user))
@@ -32,5 +32,25 @@ object MyLdapTests extends Log {
     //      val attrs = answer.flatMap(_.getAttributes.getAll.map(_.get()))
     //      log info "" + attrs.mkString(", ")
     //    })
+  }
+
+  def testGroups(manager: LDAPUserManager) {
+    logSeq("Groups", manager.groups)
+    manager.assign("john", "admins")
+    logSeq("Groups", manager.groups)
+  }
+
+  def testUserAddRemove(manager: LDAPUserManager) {
+    val usersBefore = manager.users
+    manager.addUser("temp", "temp")
+    logSeq("Users", manager.users)
+    manager.removeUser("temp")
+    val usersAfter = manager.users
+    logSeq("Users ", manager.users)
+    assert(usersBefore == usersAfter)
+  }
+
+  def logSeq[T](title: String, items: Seq[T]) {
+    log info title + ": " + items.mkString(", ")
   }
 }
