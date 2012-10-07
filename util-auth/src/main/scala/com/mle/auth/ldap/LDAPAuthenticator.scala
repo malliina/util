@@ -12,7 +12,7 @@ import com.mle.auth.Authenticator
 /**
  * @author Mle
  */
-class LDAPAuthenticator(uri: String, userInfo: DnBuilder) extends Authenticator[InitialDirContext] with Log {
+class LDAPAuthenticator(uri: String, userInfo: DnInfo) extends Authenticator[InitialDirContext] with Log {
 
   /**
    *

@@ -21,6 +21,10 @@ trait UserManager {
    */
   def removeUser(user: String)
 
+  def addGroup(group: String)
+
+  def removeGroup(group: String)
+
   /**
    *
    * @param user
