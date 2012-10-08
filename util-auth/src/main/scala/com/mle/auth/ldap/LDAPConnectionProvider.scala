@@ -13,11 +13,12 @@ trait LDAPConnectionProvider extends ConnectionProvider[InitialDirContext] {
 
   def password: String
 
-  def authenticator: LDAPAuthenticator
+  def authenticator: SimpleLdapAuthenticator
 
   /**
    *
    * @return a new connection object
+   * @throws NamingSecurityException
    */
   def connection = authenticator.authenticate(user, password)
 }

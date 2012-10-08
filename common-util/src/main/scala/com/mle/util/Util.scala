@@ -9,6 +9,10 @@ import com.mle.exception.ResourceNotFoundException
  * @author Mle
  */
 object Util {
+  def sslDebug() {
+    sys.props("javax.net.debug") = "ssl"
+  }
+
   /**
    * @see <a href="http://stackoverflow.com/a/4608061">http://stackoverflow.com/a/4608061</a>
    * @param filename the file to write to

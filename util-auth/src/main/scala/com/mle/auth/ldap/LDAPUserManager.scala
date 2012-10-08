@@ -31,6 +31,12 @@ class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnIn
     attr
   }
 
+  /**
+   *
+   * @param user
+   * @param password
+   * @throws NameAlreadyBoundException
+   */
   override def addUser(user: String, password: String) {
     // inetOrgPerson requires sn,cn
     val userAttrs = attributes(
@@ -70,7 +76,10 @@ class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnIn
   }
 
   override def assign(user: String, group: String) {
-    modifyGroup(DirContext.ADD_ATTRIBUTE, user, group)
+    if (existsUser(user))
+      modifyGroup(DirContext.ADD_ATTRIBUTE, user, group)
+    else
+      throw new Exception("User doesn't exist: " + user)
   }
 
   override def revoke(user: String, group: String) {
@@ -95,6 +104,8 @@ class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnIn
       .getOrElse(Seq.empty)
   }
 
+  def existsUser(user: String) = users contains user
+
   def users = list(userInfo.branch, userInfo.key)
 
   def groups = list(groupInfo.branch, groupInfo.key)
@@ -112,7 +123,7 @@ object LDAPUserManager {
 
       val password = adminPassword
 
-      val authenticator = new LDAPAuthenticator(schema.uri, schema.adminInfo)
+      val authenticator = new SimpleLdapAuthenticator(schema.uri, schema.adminInfo)
     }
     new LoggingLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
   }
