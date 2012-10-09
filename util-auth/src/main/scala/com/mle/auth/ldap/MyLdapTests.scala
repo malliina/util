@@ -1,6 +1,6 @@
 package com.mle.auth.ldap
 
-import com.mle.util.{FileUtilities, Log}
+import com.mle.util.{Util, FileUtilities, Log}
 import javax.naming.directory.InitialDirContext
 
 /**
@@ -9,10 +9,12 @@ import javax.naming.directory.InitialDirContext
 object MyLdapTests extends Log {
   def main(args: Array[String]) {
     val truststore = "conf/security/ca-cert.jks"
-    val truststorePath = FileUtilities.pathTo(truststore).toAbsolutePath.toString
+    val truststorePath = Util.resource(truststore).getFile
     log info "Truststore: " + truststorePath
     sys.props("javax.net.ssl.trustStore") = truststorePath
     sys.props("javax.net.ssl.trustStorePassword") = "eternal"
+    Util.sslDebug()
+
     val schema = LdapDirInfo("ldap://ubuntu.mle.com:389",
       DnInfo("cn", "dc=mle,dc=com"),
       DnInfo("uid", "ou=People,dc=mle,dc=com"),
@@ -42,7 +44,7 @@ object MyLdapTests extends Log {
     logSeq("Users in group admins", manager.users("admins"))
     manager.assign("john", "admins")
     logSeq("Users in group admins", manager.users("admins"))
-
+    manager.removeUser("john")
   }
 
   def testUserAddRemove(manager: LDAPUserManager) {
