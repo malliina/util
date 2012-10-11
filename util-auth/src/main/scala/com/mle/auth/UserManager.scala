@@ -21,6 +21,14 @@ trait UserManager {
    */
   def removeUser(user: String)
 
+  /**
+   *
+   * @param user
+   * @param newPassword
+   * @throws Exception if the user doesn't exist or if the new password defies any policy
+   */
+  def setPassword(user: String, newPassword: String)
+
   def addGroup(group: String)
 
   def removeGroup(group: String)

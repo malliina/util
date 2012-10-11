@@ -28,7 +28,7 @@ object GitBuild extends Build {
     NativePackaging.defaultNativeProject
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("common-util")
-    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO))
+    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest))
   lazy val utilActor = myProject("util-actor")
     .dependsOn(util)
   lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)

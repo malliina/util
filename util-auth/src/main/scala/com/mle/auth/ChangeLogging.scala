@@ -1,6 +1,5 @@
-package com.mle.auth.ldap
+package com.mle.auth
 
-import com.mle.auth.UserManager
 import com.mle.util.Log
 
 /**
@@ -35,5 +34,10 @@ trait ChangeLogging extends UserManager with Log {
   abstract override def revoke(user: String, group: String) {
     super.revoke(user, group)
     log info "Removed user: " + user + " from group: " + group
+  }
+
+  abstract override def setPassword(user: String, newPassword: String) {
+    super.setPassword(user, newPassword)
+    log info "Password changed for user: " + user
   }
 }

@@ -28,4 +28,5 @@ object Dependencies {
   val wiQueryUi = "org.odlabs.wiquery" % "wiquery-jquery-ui" % wicketVersion
   val wiQuery = Seq(wiQueryCore, wiQueryUi)
   val commonsIO = "commons-io" % "commons-io" % "2.4"
+  val scalaTest = "org.scalatest" %% "scalatest" % "1.8" % "test"
 }

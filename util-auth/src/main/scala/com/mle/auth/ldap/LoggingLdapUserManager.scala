@@ -1,5 +1,7 @@
 package com.mle.auth.ldap
 
+import com.mle.auth.ChangeLogging
+
 /**
  * @author Mle
  */

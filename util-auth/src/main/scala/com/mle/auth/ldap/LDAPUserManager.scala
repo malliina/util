@@ -9,7 +9,7 @@ import collection.JavaConversions._
 /**
  * @author Mle
  */
-class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnInfo, groupInfo: DnInfo)
+class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userInfo: DnInfo, groupInfo: DnInfo)
   extends UserManager {
   val groupMemberClass = "groupOfUniqueNames"
   val memberAttribute = "uniqueMember"
@@ -70,9 +70,14 @@ class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnIn
     withContext(_.unbind(dn))
   }
 
+  private def arrayModification(modAttribute: Int, kv: (String, String)) = {
+    val (key, value) = kv
+    Array(new ModificationItem(modAttribute, attribute(key, value)))
+  }
+
   private def modifyGroup(modAttribute: Int, user: String, group: String) {
-    val mods = Array(new ModificationItem(modAttribute, attribute(memberAttribute, userInfo.toDN(user))))
-    withContext(_.modifyAttributes(groupInfo.toDN(group), mods))
+    val mod = arrayModification(modAttribute, memberAttribute -> userInfo.toDN((user)))
+    withContext(_.modifyAttributes(groupInfo.toDN(group), mod))
   }
 
   override def assign(user: String, group: String) {
@@ -112,6 +117,11 @@ class LDAPUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnIn
 
   private def list(branch: String, keyPrefix: String) = withContext(_.list(branch)
     .map(_.getName.stripPrefix(keyPrefix + "="))).toSeq
+
+  def setPassword(user: String, newPassword: String) {
+    val mod = arrayModification(DirContext.REPLACE_ATTRIBUTE, "userPassword" -> newPassword)
+    withContext(_.modifyAttributes(userInfo.toDN((user)), mod))
+  }
 }
 
 object LDAPUserManager {

@@ -87,4 +87,9 @@ openssl req -newkey rsa:2048 -days 3600 -nodes -keyout server-key.pem -out serve
 openssl rsa -in server-key.pem -out server-key.pem
 openssl x509 -req -in server-req.pem -days 3600 -CA ca-cert.pem -CAkey ca-key.pem -set_serial 01 -out server-cert.pem
 
+openssl pkcs12 -export -in server-cert.pem -inkey server-key.pem -out server.p12
+keytool -importkeystore -srckeystore server.p12 -srcstoretype PKCS12 -deststoretype JKS -destkeystore server.jks
+
+You must specify a passphrase/Export password when prompted
+
 https://help.ubuntu.com/12.04/serverguide/openldap-server.html#openldap-tls

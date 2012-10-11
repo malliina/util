@@ -12,7 +12,7 @@ import com.mle.auth.Authenticator
 /**
  * @author Mle
  */
-class SimpleLdapAuthenticator(uri: String, userInfo: DnInfo, authMechanism: String = "simple")
+class SimpleLdapAuthenticator(val uri: String, userInfo: DnInfo, authMechanism: String = "simple")
   extends Authenticator[InitialDirContext] with Log {
 
   /**
