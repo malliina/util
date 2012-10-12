@@ -6,7 +6,7 @@ import com.mle.auth.UserManager
  *
  * @author mle
  */
-class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager {
+class JdbcUserManager2(connProvider: SQLConnectionProvider) extends UserManager {
   /**
    *
    * @param user
