@@ -40,7 +40,7 @@ object GitBuild extends Build {
     .dependsOn(util)
   lazy val auth = myProject("util-auth")
     .dependsOn(util)
-    .settings(libraryDependencies += mysql)
+    .settings(libraryDependencies ++= Seq(tomcatJdbc, mysql))
 
   //  IzPack.variables in IzPack.Config <+= name {
   //    name => ("projectName", "My test project")

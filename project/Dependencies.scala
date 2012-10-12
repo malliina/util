@@ -30,4 +30,5 @@ object Dependencies {
   val commonsIO = "commons-io" % "commons-io" % "2.4"
   val scalaTest = "org.scalatest" %% "scalatest" % "1.8" % "test"
   val mysql = "mysql" % "mysql-connector-java" % "5.1.21"
+  val tomcatJdbc = "org.apache.tomcat" % "tomcat-jdbc" % "7.0.30"
 }

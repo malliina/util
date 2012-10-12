@@ -12,7 +12,7 @@ object BuildBuild extends Build {
 
   // "build.sbt" goes here
   override lazy val settings = super.settings ++ Seq(
-    sbtVersion := "0.12",
+    sbtVersion := "0.12.1",
     scalaVersion := "2.9.2",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/", // for play plugin
@@ -21,7 +21,7 @@ object BuildBuild extends Build {
     addSbtPlugin("play" % "sbt-plugin" % "2.1-09092012") //"2.1-09092012"),
   )
   lazy val root = Project("plugins", file("."))
-//    .dependsOn(nativePackager)
-//  lazy val nativePackager = uri("git://github.com/Dremora/sbt-native-packager.git")
+  //    .dependsOn(nativePackager)
+  //  lazy val nativePackager = uri("git://github.com/Dremora/sbt-native-packager.git")
 
 }
