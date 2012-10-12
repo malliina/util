@@ -29,4 +29,5 @@ object Dependencies {
   val wiQuery = Seq(wiQueryCore, wiQueryUi)
   val commonsIO = "commons-io" % "commons-io" % "2.4"
   val scalaTest = "org.scalatest" %% "scalatest" % "1.8" % "test"
+  val mysql = "mysql" % "mysql-connector-java" % "5.1.21"
 }
