@@ -1,0 +1,9 @@
+GRANT ALL PRIVILEGES ON test.* TO 'root'@'localhost' IDENTIFIED BY 'goodsecret'
+REQUIRE SUBJECT '/C=EE/ST=Some-State/L=Tallinn/O=MySQL demo client certificate/CN=Tonu Samuel/emailAddress=tonu@example.com'
+  AND ISSUER '/C=FI/ST=Some-State/L=Helsinki/O=MySQL Finland AB/CN=Tonu Samuel/emailAddress=tonu@example.com'
+
+GRANT ALL PRIVILEGES ON *.* TO 'mlessl'@'10.0.0.%' IDENTIFIED BY 'mlessl'
+  REQUIRE SUBJECT '/C=FI/ST=Some-State/L=Helsinki/O=Hell/CN=client.cert'
+    AND ISSUER '/C=FI/ST=Some-State/L=Helsinki/O=Hell/OU=Home/CN=ca.mle.com'
+
+  CN=client.cert, O=Hell, L=Helsinki, ST=Some-State, C=FI

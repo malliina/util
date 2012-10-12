@@ -1,6 +1,6 @@
 package com.mle.util
 
-import java.io.{Closeable, FileWriter, BufferedWriter, PrintWriter}
+import java.io.{FileWriter, BufferedWriter, PrintWriter}
 import java.net.URL
 import com.mle.exception.ResourceNotFoundException
 
@@ -41,7 +41,7 @@ object Util {
   /**
    * @see [[com.mle.util.Util]]#resource
    */
-  def using[T <: Closeable, U](resource: T)(op: T => U): U =
+  def using[T <: AutoCloseable, U](resource: T)(op: T => U): U =
     try {
       op(resource)
     } finally {
@@ -70,4 +70,10 @@ object Util {
 
   def resource(path: String): URL = Option(getClass.getClassLoader.getResource(path))
     .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: " + path))
+
+  def resourceUri(path: String) = resource(path).toURI
+
+  def props(path: String) = io.Source.fromURI(resourceUri(path)).getLines()
+    .map(line => line.split("="))
+    .map(arr => arr(0) -> arr(1)).toMap
 }

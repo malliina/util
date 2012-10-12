@@ -19,12 +19,13 @@ object MyLdapTests extends Log {
     setProperty("javax.net.ssl.keyStore", "conf/security/client.jks")
     sys.props("javax.net.ssl.keyStorePassword") = "eternal"
 
-    val schema = LdapDirInfo("ldaps://10.0.0.33:636",
+    val ldapProps = Util.props("conf/security/auth.test")
+    val schema = LdapDirInfo(ldapProps("ldap.uri"),
       DnInfo("cn", "dc=mle,dc=com"),
       DnInfo("uid", "ou=People,dc=mle,dc=com"),
       DnInfo("cn", "ou=Groups,dc=mle,dc=com")
     )
-    val manager = LDAPUserManager(schema, "admin", "admin")
+    val manager = LDAPUserManager(schema, ldapProps("ldap.user"), ldapProps("ldap.pass"))
     //    log info "" + authMechanisms(schema.uri)
     //    testUserAddRemove(manager)
     testGroups(manager)
@@ -45,7 +46,7 @@ object MyLdapTests extends Log {
     try {
       auth authenticate("miranda", "miranda")
     } catch {
-      case e: Exception => log info "Auth failed with wrong password. Message: "+e.getMessage
+      case e: Exception => log info "Auth failed with wrong password. Message: " + e.getMessage
     }
     manager setPassword("miranda", "miranda")
     auth authenticate("miranda", "miranda")
