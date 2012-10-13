@@ -3,6 +3,7 @@ package com.mle.util
 import java.io.{FileWriter, BufferedWriter, PrintWriter}
 import java.net.URL
 import com.mle.exception.ResourceNotFoundException
+import java.nio.file.Files
 
 /**
  * Utility methods.
@@ -73,7 +74,15 @@ object Util {
 
   def resourceUri(path: String) = resource(path).toURI
 
-  def props(path: String) = io.Source.fromURI(resourceUri(path)).getLines()
-    .map(line => line.split("="))
+  def uri(path: String) = {
+    val maybeFile = FileUtilities.pathTo(path)
+    if (Files.exists(maybeFile))
+      maybeFile.toUri
+    else
+      resourceUri(path)
+  }
+
+  def props(path: String) = io.Source.fromURI(uri(path)).getLines()
+    .map(line => line.split("=", 2))
     .map(arr => arr(0) -> arr(1)).toMap
 }

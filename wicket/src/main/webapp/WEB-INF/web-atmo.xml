@@ -14,7 +14,7 @@
         <servlet-class>org.atmosphere.cpr.AtmosphereServlet</servlet-class>
         <init-param>
             <param-name>applicationClassName</param-name>
-            <param-value>com.mle.wicket.javastuff.AtmosphereApplication</param-value>
+            <param-value>com.mle.wicket.AtmosphereApplication</param-value>
         </init-param>
         <init-param>
             <param-name>org.atmosphere.useWebSocket</param-name>

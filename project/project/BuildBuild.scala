@@ -16,9 +16,9 @@ object BuildBuild extends Build {
     scalaVersion := "2.9.2",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/", // for play plugin
-    libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.12.0-0.2.11.1")), //(v + "-0.2.11.1")),
-    //    addSbtPlugin("com.typesafe" % "sbt-native-packager" % "0.4.4"),
-    addSbtPlugin("play" % "sbt-plugin" % "2.1-09092012") //"2.1-09092012"),
+    libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.12.0-0.2.11.1")),
+    addSbtPlugin("play" % "sbt-plugin" % "2.1-09092012"),
+    addSbtPlugin("eu.getintheloop" %% "sbt-cloudbees-plugin" % "0.4.1")
   )
   lazy val root = Project("plugins", file("."))
   //    .dependsOn(nativePackager)
