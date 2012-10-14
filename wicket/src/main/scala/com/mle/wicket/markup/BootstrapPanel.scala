@@ -18,7 +18,7 @@ import com.mle.wicket.component.bootstrap.ThemeDropDown
  * @author Mle
  */
 
-class Settings(id: String) extends Panel(id) with Log {
+class BootstrapPanel(id: String) extends Panel(id) with Log {
   val levels = Seq(Level.TRACE, Level.DEBUG, Level.INFO, Level.WARN, Level.ERROR, Level.OFF)
   val levelDropDown = new DropDownChoice("logLevel", RWModel[Level](AppUtils.getLogLevel, AppUtils.setLogLevel(_)), levels)
   levelDropDown add new OnChangeAjaxFormBehavior()
@@ -35,7 +35,6 @@ class Settings(id: String) extends Panel(id) with Log {
 
   val themeChoice = new ThemeDropDown("themes")
   add(themeChoice)
-
 
   override def renderHead(response: IHeaderResponse) {
     super.renderHead(response)

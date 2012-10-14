@@ -37,4 +37,8 @@ class SimpleLdapAuthenticator(val uri: String, userInfo: DnInfo, authMechanism: 
     log debug "Connected to " + props(Context.PROVIDER_URL) + " with user DN: " + props(Context.SECURITY_PRINCIPAL)
     ret
   }
+  def authMechanisms(uri: String) = {
+    val ctx = new InitialDirContext()
+    ctx.getAttributes(uri, Array("supportedSASLMechanisms"))
+  }
 }

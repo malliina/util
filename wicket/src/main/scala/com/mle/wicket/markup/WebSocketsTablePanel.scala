@@ -16,7 +16,7 @@ import com.mle.actor.Messages.Broadcast
  * @author Mle
  */
 
-class WebSockets(id: String) extends Panel(id) with Log {
+class WebSocketsTablePanel(id: String) extends Panel(id) with Log {
   val link = SAjaxLink("link")(target => {
     log info "Pressed link; pushing data to client..."
     val registry = new SimpleWebSocketConnectionRegistry
@@ -71,7 +71,7 @@ class WebSockets(id: String) extends Panel(id) with Log {
     response.render(JavaScriptHeaderItem.forReference(new ClientResourceReference))
   }
 
-  private class ClientResourceReference extends PackageResourceReference(classOf[WebSockets], "websockets.js") {
+  private class ClientResourceReference extends PackageResourceReference(classOf[WebSocketsTablePanel], "websocketstable.js") {
     override def getDependencies = Seq(JavaScriptHeaderItem.forReference(WicketWebSocketJQueryResourceReference.get()))
   }
 

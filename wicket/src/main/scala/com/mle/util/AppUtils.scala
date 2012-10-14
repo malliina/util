@@ -4,6 +4,8 @@ import ch.qos.logback.classic.Level
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
+ * TODO: Move this elsewhere
+ *
  * @author Mle
  */
 

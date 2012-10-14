@@ -1,0 +1,71 @@
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<wicket:head>
+    <script type="text/javascript" src="static/random.js"></script>
+    <script type="text/javascript" src="static/colResizable-1.3.min.js"></script>
+</wicket:head>
+<wicket:panel>
+    <div class="row">
+        <div class="span4">
+            <!-- See websockets.js -->
+            <fieldset id="connexion">
+                <legend>Connection</legend>
+                <button id="connect" class="btn">Connect</button>
+                <button id="disconnect" class="btn">Disconnect</button>
+            </fieldset>
+        </div>
+        <div class="span4">
+            <fieldset id="sender" class="control-group error">
+                <legend>Send to server</legend>
+                <input type="text" id="message" style="width:500px;"/>
+                <button id="send" class="btn btn-primary">Send</button>
+                <button id="broadcast" class="btn btn-danger">Broadcast</button>
+                <a wicket:id="link">Press me!</a>
+            </fieldset>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span8">
+            <fieldset id="sentMessages">
+                <legend>Messages sent by server</legend>
+                <label>Max rows: <select id="maxRows">
+                    <option>10</option>
+                    <option>20</option>
+                    <option>50</option>
+                    <option>100</option>
+                </select>
+                </label>
+                <table class="table table-condensed table-striped table-hover colresizable" id="testTable">
+                    <thead>
+                    <tr>
+                        <th>Message</th>
+                        <th>Version</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+        <!--<div class="span4">-->
+            <!--<table>-->
+                <!--<thead>-->
+                <!--<tr>-->
+                    <!--<th>Field 1</th>-->
+                    <!--<th>Field 2</th>-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                <!--<tr>-->
+                    <!--<td>Hoi1</td>-->
+                    <!--<td>Hhoho1</td>-->
+                <!--</tr>-->
+                <!--<tr>-->
+                    <!--<td>Hoi2</td>-->
+                    <!--<td>Hhoho2</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--</div>-->
+    </div>
+</wicket:panel>
+</html>

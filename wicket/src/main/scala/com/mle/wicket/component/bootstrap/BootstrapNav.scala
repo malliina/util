@@ -20,6 +20,7 @@ import de.agilecoders.wicket.Bootstrap
  */
 trait BootstrapNav extends MarkupContainer with Log {
   val navbar = new Navbar("navBar")
+//  navbar.set
   navbar.fluid()
   navbar.brandName(ReadOnlyModel("My app"))
   navbar.addButton(ButtonPosition.LEFT,

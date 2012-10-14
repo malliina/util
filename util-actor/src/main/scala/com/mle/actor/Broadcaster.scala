@@ -18,7 +18,7 @@ class Broadcaster(king: KingActor[_]) extends Actor with Log {
 
   def transformer: String => String = msg => msg
 
-  private def newBroadcaster = every(3 seconds) {
+  private def newBroadcaster = every(3.seconds) {
     broadcastCount += 1
     val msg = transformer("Broadcast nr: " + broadcastCount)
     log info msg

@@ -22,7 +22,10 @@ object GitBuild extends Build {
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
-    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt")
+    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt"),
+    // system properties seem to have no effect in tests unless fork is true,
+    // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
+    sbt.Keys.fork in Test := true
   )
   val beesConfig = MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
   lazy val wicketSettings = commonSettings ++
@@ -32,7 +35,7 @@ object GitBuild extends Build {
     NativePackaging.defaultNativeProject
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("common-util")
-    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest))
+    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson))
   lazy val utilActor = myProject("util-actor")
     .dependsOn(util)
   lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
@@ -41,21 +44,18 @@ object GitBuild extends Build {
     .dependsOn(util, utilActor, rmi)
     .settings(cloudBeesSettings: _*)
     .settings(
-    libraryDependencies ++= webDeps ++ wiQuery,
+    libraryDependencies ++= webDeps ++ wiQuery ++ Seq(jerkson),
     CloudBees.applicationId := Some("wicket"),
     CloudBees.apiKey := Some(beesConfig("bees.api.key")),
     CloudBees.apiSecret := Some(beesConfig("bees.api.secret")),
-    CloudBees.username := Some(beesConfig("bees.project.app.domain"))  ,
+    CloudBees.username := Some(beesConfig("bees.project.app.domain")),
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
   )
   lazy val rmi = myProject("util-rmi")
     .dependsOn(util)
   lazy val auth = myProject("util-auth")
     .dependsOn(util)
-    .settings(libraryDependencies ++= Seq(tomcatJdbc, mysql))
-  //  IzPack.variables in IzPack.Config <+= name {
-  //    name => ("projectName", "My test project")
-  //  }
-  //  IzPack.variables in IzPack.Config +=("author", "Michael Skogberg")
+    .settings(libraryDependencies ++= Seq(tomcatJdbc, mysql, scalaTest))
+
   def myProject(id: String) = Project(id, file(id), settings = commonSettings)
 }

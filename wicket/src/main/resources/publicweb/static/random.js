@@ -20,33 +20,10 @@ $(function () { //shorthand for document.ready
     // Table column resizers
     $(function () {
         $("table.colresizable").colResizable({
-            liveDrag: true,
-            hoverCursor: "col-resize",
-            dragCursor: "col-resize",
-            postbackSafe: true
+            liveDrag:true,
+            hoverCursor:"col-resize",
+            dragCursor:"col-resize",
+            postbackSafe:true
         });
-    });
-
-    var pressed = false, start, startX, startWidth;
-
-    $("table.resizable th").mousedown(function (e) {
-        start = $(this);
-        pressed = true;
-        startX = e.pageX;
-        startWidth = $(this).width();
-        $(start).addClass("resizing");
-    });
-
-    $(document).mousemove(function (e) {
-        if (pressed) {
-            $(start).width(startWidth + (e.pageX - startX));
-        }
-    });
-
-    $(document).mouseup(function () {
-        if (pressed) {
-            $(start).removeClass("resizing");
-            pressed = false;
-        }
     });
 });

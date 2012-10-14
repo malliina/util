@@ -1,3 +1,7 @@
 table th.resizing {
     cursor: col-resize;
 }
+
+.nobottom {
+    margin-bottom: 5px;
+}

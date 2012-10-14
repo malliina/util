@@ -18,7 +18,7 @@ trait Bootstrapping extends WebApplication with Log {
   private val defaultTabs = buildTabs(
     ("Home", classOf[HomePage], Some(IconType.Home)),
     ("Sorting", classOf[SortPage], None),
-    ("Settings", classOf[SettingsPage], Some(IconType.Cog)),
+    ("Bootstrap", classOf[SettingsPage], Some(IconType.Cog)),
     ("MOTD", classOf[MessagePage], None)
   )
 
