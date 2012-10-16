@@ -3,7 +3,7 @@ package com.mle.auth
 import org.scalatest.FunSuite
 
 /**
- *
+ * Duplicated in jdbc/auth modules, needs fixing.
  * @author mle
  */
 abstract class UserManagementTests extends FunSuite {
