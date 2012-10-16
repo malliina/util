@@ -1,6 +1,6 @@
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager._
-import java.nio.file.{Files, Path}
+import java.nio.file.Path
 import linux.LinuxPackageMapping
 import sbt.Keys._
 import sbt._
@@ -8,7 +8,7 @@ import Packaging._
 import Implicits._
 
 object NativePackaging {
-  val defaultNativeProject = Seq(
+  val linuxSettings: Seq[Setting[_]] = Seq(
     // Flat copy of libs to /lib on destination system
     libMappings <<= (libs, unixLibHome) map ((libFiles, destDir) => {
       libFiles.map(file => file -> (destDir / file.getFileName).toString)
@@ -16,7 +16,7 @@ object NativePackaging {
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
     scriptMappings <<= (scriptFiles, scriptPath, unixScriptHome) map rebase,
     confMappings <<= (configFiles, configPath, unixConfHome) map rebase,
-    // Linux
+
     // http://lintian.debian.org/tags/maintainer-address-missing.html
     linux.Keys.maintainer := "Michael Skogberg <malliina123@gmail.com>",
     linux.Keys.packageSummary := "This is a summary of the package",
@@ -32,8 +32,9 @@ object NativePackaging {
         pkgMaps(confs ++ Seq((pkgSrc / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)), isConfig = true),
         pkgMap((pkgSrc / "logs") -> logDir.toString, perms = "0755"),
         pkgMap(jarFile.toPath -> ((home / (pkgName + ".jar")).toString))
-      )),
-    // Debian
+      ))
+  )
+  val debianSettings: Seq[Setting[_]] = Seq(
     debian.Keys.linuxPackageMappings in Debian <++= linux.Keys.linuxPackageMappings in Linux,
     debian.Keys.version := "0.1",
     debian.Keys.linuxPackageMappings in Debian <++= (pkgSrcHome, name,
@@ -48,9 +49,12 @@ object NativePackaging {
           prerm -> "DEBIAN/prerm",
           postrm -> "DEBIAN/postrm"
         ), perms = "0755")
-      )),
-    debian.Keys.debianPackageDependencies in Debian ++= Seq("wget"),
-    // RPM
+      ))
+    ,
+    debian.Keys.debianPackageDependencies in Debian ++= Seq("wget")
+
+  )
+  val rpmSettings: Seq[Setting[_]] = Seq(
     rpm.Keys.linuxPackageMappings in Rpm <++= linux.Keys.linuxPackageMappings in Linux,
     rpm.Keys.rpmRelease := "0.1",
     rpm.Keys.rpmVendor := "kingmichael",
@@ -58,10 +62,13 @@ object NativePackaging {
     rpm.Keys.rpmPreInstall <<= (preInstall)(Some(_)),
     rpm.Keys.rpmPostInstall <<= (postInstall)(Some(_)),
     rpm.Keys.rpmPreRemove <<= (preRemove)(Some(_)),
-    rpm.Keys.rpmPostRemove <<= (postRemove)(Some(_)),
+    rpm.Keys.rpmPostRemove <<= (postRemove)(Some(_))
+  )
+  val windowsSettings: Seq[Setting[_]] = Seq(
     // Windows
     windows.Keys.wixFile := new File("doesnotexist")
   )
+  val defaultNativeProject: Seq[Setting[_]] = linuxSettings ++ debianSettings ++ rpmSettings ++ windowsSettings
 
   def pkgMap(file: (Path, String), perms: String = "0644", gzipped: Boolean = false) =
     pkgMaps(Seq(file), perms = perms, gzipped = gzipped)

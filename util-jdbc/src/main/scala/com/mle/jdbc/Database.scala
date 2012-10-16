@@ -1,5 +1,6 @@
-package com.mle.auth.jdbc
+package com.mle.jdbc
 
+import auth.SQLConnectionProvider
 import java.sql.{PreparedStatement, ResultSet}
 import com.mle.util.Util._
 import com.mle.util.Log
@@ -16,6 +17,12 @@ class Database(connectionProvider: SQLConnectionProvider) extends Log {
     statement(sql, params: _*)(stmt =>
       using(stmt.executeQuery())(rs => rs.map(rsCode).toList) // FYI, toSeq doesn't work here
     )
+
+  def find[T](sql: String, params: Any*)(rsMapping: ResultSet => T): Option[T] =
+    query(sql, params: _*)(rsMapping).headOption
+
+  def head[T](sql: String, params: Any*)(code: ResultSet => T) = find(sql, params: _*)(code)
+    .getOrElse(throw new NoSuchElementException("No results for '" + sql + "' with params: " + params.mkString(", ")))
 
   def execute(sql: String, params: Any*) {
     statement(sql, params: _*)(_.execute())

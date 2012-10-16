@@ -1,10 +1,18 @@
-package com.mle.auth.jdbc
+package com.mle.jdbc.auth
 
 import org.apache.tomcat.jdbc.pool.{DataSource, PoolProperties}
 import com.mle.util.Log
 import java.util.Properties
 import collection.JavaConversions._
 
+/**
+ * Uses tomcat jdbc pools.
+ *
+ * @param url
+ * @param user
+ * @param password
+ * @param keystoreSettings
+ */
 class MySQLConnectionProvider(url: String,
                               user: String,
                               password: Option[String],
@@ -39,6 +47,7 @@ class MySQLConnectionProvider(url: String,
     lazy val sslProperties = new Properties
     sslProperties("useSSL") = "true"
     sslProperties("clientCertificateKeyStoreUrl") = keySettings.keystoreUrl.toString
+    log info "Using keystore: " + sslProperties("clientCertificateKeyStoreUrl")
     sslProperties("clientCertificateKeyStorePassword") = keySettings.keystorePass
     sslProperties("trustCertificateKeyStoreUrl") = keySettings.truststoreUrl.toString
     sslProperties("trustCertificateKeyStorePassword") = keySettings.truststorePass

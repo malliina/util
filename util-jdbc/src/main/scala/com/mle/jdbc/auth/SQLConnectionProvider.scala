@@ -1,4 +1,4 @@
-package com.mle.auth.jdbc
+package com.mle.jdbc.auth
 
 import com.mle.auth.ConnectionProvider
 import java.sql.{PreparedStatement, Connection}

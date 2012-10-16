@@ -2,4 +2,4 @@ An exploration of Scala. Test code for wicket, play!, web sockets, actors, funct
 
 To do:
 
-- Evaluate Slick
+- Evaluate Slick after 2.10 is released

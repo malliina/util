@@ -77,4 +77,6 @@ trait UserManager {
   def users(group: String): Seq[String]
 
   def users: Seq[String]
+
+  def groups: Seq[String]
 }
