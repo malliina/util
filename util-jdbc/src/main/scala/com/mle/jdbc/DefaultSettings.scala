@@ -1,6 +1,7 @@
 package com.mle.jdbc
 
-import auth.{DefaultKeystoreSettings, MySQLConnectionProvider}
+import com.mle.util.security.DefaultKeystoreSettings
+import auth.MySQLConnectionProvider
 import com.mle.util.Util
 
 /**
@@ -15,5 +16,4 @@ object DefaultSettings {
     Some(dbInfo("db.pass")),
     keystoreSettings = Some(DefaultKeystoreSettings)
   )
-//  val db = new Database(connProvider)
 }

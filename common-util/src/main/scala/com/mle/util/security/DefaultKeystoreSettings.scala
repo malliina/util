@@ -1,4 +1,5 @@
-package com.mle.jdbc.auth
+package com.mle.util.security
+
 
 /**
  *

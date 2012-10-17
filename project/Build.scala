@@ -43,7 +43,8 @@ object GitBuild extends Build {
   lazy val utilActor = myProject("util-actor")
     .dependsOn(util)
   lazy val utilJdbc = myProject("util-jdbc")
-    .dependsOn(util, auth)
+    // Kids, watch and learn. test->test means this module's tests depend on tests in module auth
+    .dependsOn(util, auth % "compile->compile;test->test")
     .settings(libraryDependencies ++= Seq(scalaTest))
   lazy val rmi = myProject("util-rmi")
     .dependsOn(util)

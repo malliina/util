@@ -1,20 +1,26 @@
 package com.mle.jdbc.auth
 
-import com.mle.auth.UserManager
+import com.mle.auth.{Authenticator, UserManager}
 import com.mle.jdbc.schema.DbTable
 import com.mle.jdbc.DB
+import com.mle.auth.exception.AuthException
 
 /**
  *
  * @author mle
  */
-class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager {
+class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager with Authenticator[String] {
 
   object Users extends DbTable("users")
 
   object Groups extends DbTable("groups")
 
   object UserGroup extends DbTable("usergroup")
+
+  def authenticate(user: String, password: String) = {
+    Users.select("name")("name" -> user, "password" -> password)(_ getString 1).headOption
+      .getOrElse(throw new AuthException("Authentication failed"))
+  }
 
   /**
    *
@@ -41,7 +47,7 @@ class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager {
    * @throws Exception if the user doesn't exist or if the new password defies any policy
    */
   def setPassword(user: String, newPassword: String) {
-    Users.update("password" -> newPassword)(where = "user" -> user)
+    Users.update("password" -> newPassword)(where = "name" -> user)
   }
 
   def addGroup(group: String) {

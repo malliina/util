@@ -1,8 +1,10 @@
 package com.mle.jdbc.schema
 
 import com.mle.jdbc.Database
+import java.sql.ResultSet
 
 /**
+ * TODO: Implement and use class Column instead of String to represent columns for obvious profit
  *
  * @author mle
  */
@@ -17,14 +19,19 @@ abstract class Table(val name: String) {
 
   def allSql = "select * from " + name
 
+  def select[T](columns: String*)(where: (String, Any)*)(mapping: ResultSet => T) = {
+    val selectCols = columns mkString ","
+    val whereCond = toWhereClause(where)
+    db.query("select " + selectCols + " from " + this + " where " + whereCond, toValues(where): _*)(mapping)
+  }
+
   def insert(values: (String, Any)*) {
     if (values.size == 0)
       throw new IllegalArgumentException("No values to insert specified")
     val columns = values.map(_._1).mkString(",")
     val questionMarks = values.size.questionMarks.mkString(",")
-    val vals = values map (_._2)
     val insertSql = "insert into " + name + "(" + columns + ") values (" + questionMarks + ")"
-    db.execute(insertSql, vals: _*)
+    db.execute(insertSql, toValues(values): _*)
   }
 
   def delete(id: Int) {
@@ -35,8 +42,7 @@ abstract class Table(val name: String) {
     if (where.size == 0)
       throw new IllegalArgumentException("No WHERE condition specified for DELETE operation")
     val target = where.map(_._1 + "=?").mkString(" and ")
-    val vals = where map (_._2)
-    db execute("delete from " + name + " where " + target, vals: _*)
+    db execute("delete from " + name + " where " + target, toValues(where): _*)
   }
 
   def id(where: (String, Any)) = {
@@ -49,9 +55,13 @@ abstract class Table(val name: String) {
       throw new IllegalArgumentException("No WHERE condition specified for UPDATE operation")
     val target = values.map(_._1 + "=?").mkString(",")
     val whereCond = where.map(_._1 + "=?").mkString(" and ")
-    val allValues = (values ++ where) map (_._2)
+    val allValues = toValues(values ++ where)
     db execute("update " + name + " set " + target + " where " + whereCond, allValues: _*)
   }
+
+  def toWhereClause(where: Seq[(String, Any)]) = where.map(_._1 + "=?").mkString(" and ")
+
+  def toValues(where: Seq[(String, Any)]) = where map (_._2)
 
   def qMarks(count: Int) = (1 to count).map("?")
 

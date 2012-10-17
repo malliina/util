@@ -1,4 +1,4 @@
-package com.mle.jdbc.auth
+package com.mle.util.security
 
 import com.mle.util.Util
 
@@ -12,4 +12,11 @@ class KeystoreSettings(keystore: String,
                        val truststorePass: String) {
   val keystoreUrl = Util resource keystore
   val truststoreUrl = Util resource truststore
+
+  def setSystemProperties() {
+    sys.props("javax.net.ssl.trustStore") = truststoreUrl.getFile
+    sys.props("javax.net.ssl.trustStorePassword") = truststorePass
+    sys.props("javax.net.ssl.keyStore") = keystoreUrl.getFile
+    sys.props("javax.net.ssl.keyStorePassword") = keystorePass
+  }
 }

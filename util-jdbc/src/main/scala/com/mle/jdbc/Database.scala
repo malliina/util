@@ -8,6 +8,7 @@ import com.mle.util.Log
 
 /**
  * TODO: Explore Slick when 2.10 is out
+ *
  * @author mle
  */
 class Database(connectionProvider: SQLConnectionProvider) extends Log {
@@ -29,8 +30,6 @@ class Database(connectionProvider: SQLConnectionProvider) extends Log {
   }
 
   def statement[T](sql: String, params: Any*)(code: PreparedStatement => T) = {
-    val paramDescription = if (params.isEmpty) "" else params.mkString(" with parameters: ", ", ", "")
-    log info "SQL: '" + sql + "'" + paramDescription
     val values = params.zipWithIndex
     connectionProvider.withStmt(sql)(stmt => {
       values foreach (pair => {

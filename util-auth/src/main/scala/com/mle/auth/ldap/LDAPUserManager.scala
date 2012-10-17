@@ -127,7 +127,7 @@ class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userIn
 object LDAPUserManager {
   def apply(schema: LdapDirInfo,
             adminUser: String,
-            adminPassword: String) = {
+            adminPassword: String, logging: Boolean = true) = {
     val connProvider = new LDAPConnectionProvider {
       val user = adminUser
 
@@ -135,6 +135,9 @@ object LDAPUserManager {
 
       val authenticator = new SimpleLdapAuthenticator(schema.uri, schema.adminInfo)
     }
-    new LoggingLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
+    if (logging)
+      new LoggingLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
+    else
+      new LDAPUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
   }
 }
