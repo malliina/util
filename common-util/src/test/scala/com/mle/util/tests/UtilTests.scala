@@ -1,7 +1,7 @@
 package com.mle.util.tests
 
 import org.scalatest.FunSuite
-import com.mle.util.JsonUtils
+import com.mle.util.{Reflection, JsonUtils}
 
 /**
  *
@@ -15,4 +15,28 @@ class UtilTests extends FunSuite {
     val secondMap = JsonUtils.parseJson(jsonSerialized)
     assert(firstMap === secondMap)
   }
+  test("random reflection") {
+    assert(Reflection.className(TestObj) === "TestObj")
+    val names = Reflection.names(TestObj)
+    val fields = Seq("a", "myVar")
+    assert(fields.intersect(names) === fields)
+    assert(Reflection.fieldName(TestObj, TestObj.myVar) === "myVar")
+    println(Reflection.objects(TestObj).mkString(", "))
+    println(TestObj.name + ", " + TestObj.ocol.name)
+  }
+
+  object TestObj {
+    val a = "value of a"
+    val myVar = "yoyoo"
+
+    object ocol {
+      override def toString = "This is object o"
+
+      def name = Reflection.className(this)
+    }
+
+    def name = Reflection.className(this)
+
+  }
+
 }

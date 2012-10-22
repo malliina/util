@@ -45,7 +45,7 @@ class MySQLConnectionProvider(url: String,
   val ds = new DataSource(p)
 
   private def toSslProperties(keySettings: KeystoreSettings) = {
-    lazy val sslProperties = new Properties
+    val sslProperties = new Properties
     sslProperties("useSSL") = "true"
     sslProperties("clientCertificateKeyStoreUrl") = keySettings.keystoreUrl.toString
 //    log info "Using keystore: " + sslProperties("clientCertificateKeyStoreUrl")

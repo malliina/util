@@ -4,12 +4,18 @@ import com.mle.auth.UserManager
 import javax.naming.directory._
 import com.mle.util.Util._
 import collection.JavaConversions._
+import com.mle.auth.crypto.PasswordHashing
 
 
 /**
+ * Abstract because there's no logging and no hashing of passwords, so users are discouraged from using this directly.
+ * Instead, add mixins to complete your perfect user manager.
+ *
  * @author Mle
  */
-class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userInfo: DnInfo, groupInfo: DnInfo)
+abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionProvider,
+                                       val userInfo: DnInfo,
+                                       groupInfo: DnInfo)
   extends UserManager {
   val groupMemberClass = "groupOfUniqueNames"
   val memberAttribute = "uniqueMember"
@@ -31,13 +37,7 @@ class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userIn
     attr
   }
 
-  /**
-   *
-   * @param user
-   * @param password
-   * @throws NameAlreadyBoundException
-   */
-  override def addUser(user: String, password: String) {
+  def addUser(user: String, password: String) {
     // inetOrgPerson requires sn,cn
     val userAttrs = attributes(
       "uid" -> user,
@@ -50,14 +50,14 @@ class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userIn
     withContext(_.bind(dn, null, userAttrs))
   }
 
-  override def removeUser(user: String) {
+  def removeUser(user: String) {
     val dn = userInfo.toDN(user)
     // We don't want removed user DNs to remain as group members
     groups(user).foreach(revoke(user, _))
     withContext(_.unbind(dn))
   }
 
-  override def addGroup(group: String) {
+  def addGroup(group: String) {
     val groupAttrs = attributes("cn" -> group, memberAttribute -> "")
     val objClasses = attribute("objectClass", groupMemberClass)
     groupAttrs put objClasses
@@ -65,7 +65,7 @@ class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userIn
     withContext(_.bind(dn, null, groupAttrs))
   }
 
-  override def removeGroup(group: String) {
+  def removeGroup(group: String) {
     val dn = groupInfo.toDN(group)
     withContext(_.unbind(dn))
   }
@@ -80,14 +80,14 @@ class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userIn
     withContext(_.modifyAttributes(groupInfo.toDN(group), mod))
   }
 
-  override def assign(user: String, group: String) {
+  def assign(user: String, group: String) {
     if (existsUser(user))
       modifyGroup(DirContext.ADD_ATTRIBUTE, user, group)
     else
       throw new Exception("User doesn't exist: " + user)
   }
 
-  override def revoke(user: String, group: String) {
+  def revoke(user: String, group: String) {
     modifyGroup(DirContext.REMOVE_ATTRIBUTE, user, group)
   }
 
@@ -124,20 +124,21 @@ class LDAPUserManager(val connectionProvider: LDAPConnectionProvider, val userIn
   }
 }
 
-object LDAPUserManager {
+object AbstractLdapUserManager {
   def apply(schema: LdapDirInfo,
             adminUser: String,
-            adminPassword: String, logging: Boolean = true) = {
+            adminPassword: String,
+            logging: Boolean = true) = {
     val connProvider = new LDAPConnectionProvider {
       val user = adminUser
 
       val password = adminPassword
-
+      // pass is hashed on server. works like this. hmm.
       val authenticator = new SimpleLdapAuthenticator(schema.uri, schema.adminInfo)
     }
     if (logging)
-      new LoggingLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
+      new DefaultLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
     else
-      new LDAPUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
+      new AbstractLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo) with PasswordHashing
   }
 }

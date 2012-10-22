@@ -1,7 +1,7 @@
 package com.mle.jdbc.auth
 
 import com.mle.auth.{Authenticator, UserManager}
-import com.mle.jdbc.schema.DbTable
+import com.mle.jdbc.schema.UserMgmtSchema
 import com.mle.jdbc.DB
 import com.mle.auth.exception.AuthException
 
@@ -9,53 +9,39 @@ import com.mle.auth.exception.AuthException
  *
  * @author mle
  */
-class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager with Authenticator[String] {
-
-  object Users extends DbTable("users")
-
-  object Groups extends DbTable("groups")
-
-  object UserGroup extends DbTable("usergroup")
+abstract class JDBCUserManager(connProvider: SQLConnectionProvider,
+                               schema: UserMgmtSchema)
+  extends UserManager with Authenticator[String] {
+  val usersTable = schema.usersTable
+  val usernameCol = "name"
+  val passwordCol = "password"
+  val groupsTable = schema.groupsTable
+  val groupnameCol = "name"
+  val userGroup = schema.userGroup
 
   def authenticate(user: String, password: String) = {
-    Users.select("name")("name" -> user, "password" -> password)(_ getString 1).headOption
+    usersTable.select(usernameCol)(usernameCol -> user, passwordCol -> password)(_ getString 1).headOption
       .getOrElse(throw new AuthException("Authentication failed"))
   }
 
-  /**
-   *
-   * @param user
-   * @throws Exception if that user already exists
-   */
-  def addUser(user: String, password: String) {
-    Users.insert("name" -> user, "password" -> password)
+  override def addUser(user: String, password: String) {
+    usersTable.insert(usernameCol -> user, passwordCol -> password)
   }
 
-  /**
-   *
-   * @param user
-   * @throws Exception if the user does not exist
-   */
   def removeUser(user: String) {
-    Users delete "name" -> user
+    usersTable delete usernameCol -> user
   }
 
-  /**
-   *
-   * @param user
-   * @param newPassword
-   * @throws Exception if the user doesn't exist or if the new password defies any policy
-   */
   def setPassword(user: String, newPassword: String) {
-    Users.update("password" -> newPassword)(where = "name" -> user)
+    usersTable.update(passwordCol -> newPassword)(where = usernameCol -> user)
   }
 
   def addGroup(group: String) {
-    Groups insert "name" -> group
+    groupsTable insert groupnameCol -> group
   }
 
   def removeGroup(group: String) {
-    Groups delete "name" -> group
+    groupsTable delete groupnameCol -> group
   }
 
   /**
@@ -66,12 +52,12 @@ class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager w
    * @throws Exception if the group or user does not exist
    */
   def assign(user: String, group: String) {
-    val userId = Users id "name" -> user
-    val groupId = Groups id "name" -> group
-    UserGroup insert("user_id" -> userId, "group_id" -> groupId)
+    val userId = usersTable id usernameCol -> user
+    val groupId = groupsTable id groupnameCol -> group
+    userGroup insert("user_id" -> userId, "group_id" -> groupId)
   }
 
-  def groups = DB.query("select name from " + Groups)(_ getString 1)
+  def groups = DB.query("select " + groupnameCol + " from " + groupsTable)(_ getString 1)
 
   /**
    *
@@ -81,9 +67,9 @@ class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager w
    * @throws Exception if the group or user does not exist
    */
   def revoke(user: String, group: String) {
-    val userId = Users id "name" -> user
-    val groupId = Groups id "name" -> group
-    UserGroup delete("user_id" -> userId, "group_id" -> groupId)
+    val userId = usersTable id usernameCol -> user
+    val groupId = groupsTable id groupnameCol -> group
+    userGroup delete("user_id" -> userId, "group_id" -> groupId)
   }
 
   /**
@@ -101,9 +87,9 @@ class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager w
    * @return
    * @throws Exception if the user does not exist
    */
-  def groups(user: String) = DB.query("select name from " + Groups + " where id=" +
-    "(select group_id from " + UserGroup + " where user_id=" +
-    "(select id from " + Users + " where name=?))", user)(_ getString 1)
+  def groups(user: String) = DB.query("select " + groupnameCol + " from " + groupsTable + " where id=" +
+    "(select group_id from " + userGroup + " where user_id=" +
+    "(select id from " + usersTable + " where " + usernameCol + "=?))", user)(_ getString 1)
 
   /**
    *
@@ -111,9 +97,9 @@ class JDBCUserManager(connProvider: SQLConnectionProvider) extends UserManager w
    * @return
    * @throws Exception if the group does not exist
    */
-  def users(group: String) = DB.query("select name from " + Users + " where id=" +
-    "(select user_id from " + UserGroup + " where group_id=" +
-    "(select id from " + Groups + " where name=?))", group)(_ getString 1)
+  def users(group: String) = DB.query("select " + usernameCol + " from " + usersTable + " where id=" +
+    "(select user_id from " + userGroup + " where group_id=" +
+    "(select id from " + groupsTable + " where " + groupnameCol + "=?))", group)(_ getString 1)
 
-  def users = DB.query("select name from " + Users)(_ getString 1)
+  def users = DB.query("select " + usernameCol + " from " + usersTable)(_ getString 1)
 }

@@ -1,0 +1,46 @@
+Based on mysql_wp_drbd.pdf
+
+Installation:
+
+rpm --import http://elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh http://elrepo.org/elrepo-release-6-4.el6.elrepo.noarch.rpm
+
+yum install:
+
+drbd84-utils
+kmod-drbd84
+corosync
+pacemaker
+mysql-server
+mysql-client
+
+Configuration:
+
+see mysql_wp_drbd.pdf for file partition setup etc.
+
+crm configure property no-quorum-policy=ignore
+crm configure rsc_defaults resource-stickiness=100
+crm configure property stonith-enabled=false
+
+crm configure
+
+// drbd service, could be called p_drbd just as well
+primitive p_drbd_mysql ocf:linbit:drbd params drbd_resource="clusterdb_res" op monitor interval="15s"
+// allow only one master
+ms ms_drbd_mysql p_drbd_mysql meta master-max="1" master-node-max="1" clone-max="2" clone-node-max="1" notify="true"
+
+primitive p_fs_mysql ocf:heartbeat:Filesystem params device="/dev/drbd0" directory="/drbd" fstype="ext4" 
+// VIP
+primitive p_ip_mysql ocf:heartbeat:IPaddr2 params ip="10.0.0.4" cidr_netmask="24" nic="eth0"
+// mysql service
+primitive p_mysql ocf:heartbeat:mysql params binary="/usr/sbin/mysqld" config="/drbd/mysql/my.cnf" datadir="/drbd/mysql/data" pid="/var/lib/mysql/mysql.pid" socket="/var/lib/mysql/mysql.sock" user="mysql" group="mysql" additional_parameters="--bind-address=10.0.0.4 --user=mysql" op start timeout=120s op stop timeout=120s op monitor interval=20s timeout=30s
+
+group g_mysql p_fs_mysql p_ip_mysql p_mysql
+// mysql services & drbd master must be on the same host
+colocation c_mysql_on_drbd inf: g_mysql ms_drbd_mysql:Master
+// host must be drbd master before any services are started
+order o_drbd_before_mysql inf: ms_drbd_mysql:promote g_mysql:start
+// ping to prevent split-brain
+primitive p_ping ocf:pacemaker:ping params name="ping" multiplier="1000" host_list="10.0.0.1" op monitor interval="15s" timeout="60s" start timeout="60s"
+// do not prefer hosts that can't ping the target ("-inf" preference score)
+location l_drbd_master_on_ping ms_drbd_mysql rule $role="Master" -inf: not_defined ping or ping number:lte 0
