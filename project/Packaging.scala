@@ -32,11 +32,13 @@ object Packaging extends Plugin {
   val scriptOutPath = SettingKey[Option[Path]]("script-output-path", "Output location of scripts (if any)")
   // Native settings
   val unixHome = SettingKey[Path]("unix-home", "Home dir on unix")
-  val unixLibHome = SettingKey[Path]("unix-lib-home", "Lib dir on unix")
-  val unixConfHome = SettingKey[Path]("unix-conf-home", "Conf dir on unix")
-  val unixScriptHome = SettingKey[Path]("unix-script-home", "Script dir on unix")
+  val unixLibDest = SettingKey[Path]("unix-lib-home", "Lib dir on unix")
+  val unixConfDest = SettingKey[Path]("unix-conf-home", "Conf dir on unix")
+  val unixScriptDest = SettingKey[Path]("unix-script-home", "Script dir on unix")
   val unixLogDir = SettingKey[Path]("unix-log-home", "Log dir on unix")
-  val pkgSrcHome = SettingKey[Path]("pkg-src-home", "Packaging home directory")
+  val pkgHome = SettingKey[Path]("pkg-home", "Packaging home directory")
+  val unixPkgHome = SettingKey[Path]("unix-pkg-home", "Unix packaging directory")
+  val windowsPkgHome = SettingKey[Path]("win-pkg-home", "Windows packaging directory")
   val controlDir = SettingKey[Path]("control-dir", "Directory for control files for native packaging")
   val preInstall = SettingKey[Path]("pre-install", "Preinstall script")
   val postInstall = SettingKey[Path]("post-install", "Postinstall script")
@@ -70,13 +72,15 @@ object Packaging extends Plugin {
     basePath <<= (baseDirectory)(_.toPath),
     // Standard directory layout
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
-    unixLibHome <<= (unixHome)(_ / "lib"),
-    unixConfHome <<= (unixHome)(_ / "conf"),
-    unixScriptHome <<= (unixHome)(_ / "scripts"),
+    unixLibDest <<= (unixHome)(_ / "lib"),
+    unixConfDest <<= (unixHome)(_ / "conf"),
+    unixScriptDest <<= (unixHome)(_ / "scripts"),
     unixLogDir <<= (unixHome)(_ / "logs"),
-    pkgSrcHome <<= (basePath)(_ / "src" / "pkg"),
+    pkgHome <<= (basePath)(_ / "src" / "pkg" / "unix"),
+    unixPkgHome <<= (pkgHome)(_ / "unix"),
+    windowsPkgHome <<= (pkgHome)(_ / "windows"),
     // rpm/deb postinst control files
-    controlDir <<= (pkgSrcHome)(_ / "control"),
+    controlDir <<= (pkgHome)(_ / "control"),
     preInstall <<= (controlDir)(_ / "preinstall.sh"),
     postInstall <<= (controlDir)(_ / "postinstall.sh"),
     preRemove <<= (controlDir)(_ / "preuninstall.sh"),
@@ -87,7 +91,7 @@ object Packaging extends Plugin {
     configOutputPath <<= (distribDir)(d => Some((d / confDir))),
     configFiles <<= filesIn(configPath),
     scriptFiles <<= filesIn(scriptPath),
-    appJar <<= (exportedProducts in Compile, name) map ((jars: Classpath, pkgName) => jars.files.head.toPath),
+    appJar <<= (packageBin in Compile, name) map ((jarFile, pkgName) => jarFile.toPath),
     copyConfs <<= copyTask(configFiles),
     copyScripts <<= copyTask(scriptFiles),
     libs <<= (

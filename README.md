@@ -4,5 +4,5 @@ To do:
 
 - Evaluate Slick after 2.10 is released
 - Jetty client cert auth
-- High Availability MySQL
 - Domains
+- MSI packaging
