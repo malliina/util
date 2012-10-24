@@ -79,4 +79,6 @@ trait UserManager {
   def users: Seq[String]
 
   def groups: Seq[String]
+
+  def exists(user: String) = users contains user
 }

@@ -9,6 +9,7 @@ import crypto.Hashing
  */
 trait Authenticator[T] {
   /**
+   * If this method returns normally, the authentication was successful.
    *
    * @param user
    * @param password

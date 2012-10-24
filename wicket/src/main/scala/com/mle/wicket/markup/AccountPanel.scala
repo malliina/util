@@ -11,7 +11,7 @@ import java.security.cert.X509Certificate
  */
 class AccountPanel(id: String) extends Panel(id) with Log {
   val dn = clientDN getOrElse "No certificate"
-  val cn = Regex.parse(dn, "CN=(.*),\\sO=.*") getOrElse "Unable to read CN"
+  val cn = clientCN getOrElse "Unable to read CN"
   add(new Label("certChain", dn))
   add(new Label("cn", cn))
 
@@ -26,6 +26,8 @@ class AccountPanel(id: String) extends Panel(id) with Log {
       .asInstanceOf[Array[java.security.cert.X509Certificate]])
       .getOrElse(Array.empty).toSeq
   }
+
+  def clientCN = clientDN.map(dn => Regex.parse(dn, "CN=(.*),\\sO=.*")) getOrElse None
 
   def clientDN = certChain.headOption map extractDN
 
