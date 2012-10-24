@@ -1,4 +1,4 @@
-An exploration of Scala. Test code for wicket, play!, web sockets, actors, functional programming.
+An exploration of Scala. Test code for wicket, play!, web sockets, actors, functional programming, and whatever seems interesting.
 
 To do:
 
@@ -6,3 +6,5 @@ To do:
 - Jetty client cert auth
 - Domains
 - MSI packaging
+- Play 2.x AsyncResult & Futures
+- More HA apps with DRBD

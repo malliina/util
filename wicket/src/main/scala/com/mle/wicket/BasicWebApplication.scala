@@ -24,6 +24,7 @@ class BasicWebApplication extends Bootstrapping with PageMounting {
     mount(classOf[MessagePage])
     mount(classOf[SortPage])
     mount(classOf[BootstrapPanelPage])
+    mount(classOf[AccountPage])
   }
 }
 

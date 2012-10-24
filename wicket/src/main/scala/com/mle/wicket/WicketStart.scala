@@ -6,6 +6,7 @@ import java.nio.file.Paths
 import com.mle.rmi.{RmiUtil, RmiServer}
 import org.eclipse.jetty.server.Server
 import ch.qos.logback.classic.Level
+import com.mle.util.security.ServerKeystoreSettings
 
 /**
  * @author Mle
@@ -33,7 +34,7 @@ object WicketStart extends Log {
     RmiUtil.initSecurity()
   }
 
-  def startWebApps(port: Int = 8080) = startServer(port)(implicit c => {
+  def startWebApps(port: Int = 8080) = startServer(port, Some(ServerKeystoreSettings), clientAuth = true)(implicit c => {
     addAtmosphere(webApp = classOf[AtmosphereApplication], path = "/atmo/*")
     addWebSockets(webApp = classOf[WebSocketsApplication], path = "/ws/*")
     serveStatic("publicweb/")
@@ -44,6 +45,7 @@ object WicketStart extends Log {
       j.stop()
       log info "Stopped jetty"
     })
+    // wrong place
     Scheduling.shutdown()
   }
 }

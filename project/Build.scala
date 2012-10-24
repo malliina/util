@@ -38,7 +38,7 @@ object GitBuild extends Build {
     Packaging.newSettings ++
     NativePackaging.defaultNativeProject
   lazy val parent = Project("parent", file("."))
-  lazy val util = myProject("common-util")
+  lazy val util = myProject("util")
     .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson)
   )
   lazy val utilActor = myProject("util-actor")

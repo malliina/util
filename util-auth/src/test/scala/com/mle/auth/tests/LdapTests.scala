@@ -2,7 +2,7 @@ package com.mle.auth.tests
 
 import com.mle.util.Util
 import com.mle.auth.ldap.{SimpleLdapAuthenticator, AbstractLdapUserManager, DnInfo, LdapDirInfo}
-import com.mle.util.security.DefaultKeystoreSettings
+import com.mle.util.security.ClientKeystoreSettings
 import com.mle.auth.HashingAuthenticator
 import javax.naming.directory.InitialDirContext
 
@@ -12,7 +12,7 @@ import javax.naming.directory.InitialDirContext
  * @author mle
  */
 class LdapTests extends UserManagementTests {
-  DefaultKeystoreSettings.setSystemProperties()
+  ClientKeystoreSettings.setSystemProperties()
   val ldapProps = Util.props("conf/security/auth.test")
   val uri = ldapProps("ldap.uri")
   val adminInfo = DnInfo("cn", "dc=mle,dc=com")

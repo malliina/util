@@ -4,7 +4,7 @@ import org.apache.tomcat.jdbc.pool.{DataSource, PoolProperties}
 import com.mle.util.Log
 import java.util.Properties
 import collection.JavaConversions._
-import com.mle.util.security.KeystoreSettings
+import com.mle.util.security.IKeystoreSettings
 
 /**
  * Uses tomcat jdbc pools.
@@ -17,7 +17,7 @@ import com.mle.util.security.KeystoreSettings
 class MySQLConnectionProvider(url: String,
                               user: String,
                               password: Option[String],
-                              keystoreSettings: Option[KeystoreSettings] = None)
+                              keystoreSettings: Option[IKeystoreSettings] = None)
   extends SQLConnectionProvider with Log {
   protected val p = new PoolProperties()
   p setUrl url
@@ -44,11 +44,11 @@ class MySQLConnectionProvider(url: String,
   //    "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer")
   val ds = new DataSource(p)
 
-  private def toSslProperties(keySettings: KeystoreSettings) = {
+  private def toSslProperties(keySettings: IKeystoreSettings) = {
     val sslProperties = new Properties
     sslProperties("useSSL") = "true"
     sslProperties("clientCertificateKeyStoreUrl") = keySettings.keystoreUrl.toString
-//    log info "Using keystore: " + sslProperties("clientCertificateKeyStoreUrl")
+    //    log info "Using keystore: " + sslProperties("clientCertificateKeyStoreUrl")
     sslProperties("clientCertificateKeyStorePassword") = keySettings.keystorePass
     sslProperties("trustCertificateKeyStoreUrl") = keySettings.truststoreUrl.toString
     sslProperties("trustCertificateKeyStorePassword") = keySettings.truststorePass

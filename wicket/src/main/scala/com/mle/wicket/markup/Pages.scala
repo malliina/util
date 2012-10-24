@@ -19,4 +19,6 @@ object Pages {
 
   class MessagePage extends BootstrapPage(new SubTabs(_))
 
+  class AccountPage extends BootstrapPage(new AccountPanel(_))
+
 }

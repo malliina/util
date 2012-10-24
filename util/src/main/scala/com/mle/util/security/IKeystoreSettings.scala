@@ -6,12 +6,17 @@ import com.mle.util.Util
  *
  * @author mle
  */
-class KeystoreSettings(keystore: String,
-                       val keystorePass: String,
-                       truststore: String,
-                       val truststorePass: String) {
-  val keystoreUrl = Util resource keystore
-  val truststoreUrl = Util resource truststore
+trait IKeystoreSettings {
+  lazy val keystoreUrl = Util resource keystore
+  lazy val truststoreUrl = Util resource truststore
+
+  def keystore: String
+
+  def keystorePass: String
+
+  def truststore: String
+
+  def truststorePass: String
 
   def setSystemProperties() {
     sys.props("javax.net.ssl.trustStore") = truststoreUrl.getFile

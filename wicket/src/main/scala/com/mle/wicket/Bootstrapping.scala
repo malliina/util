@@ -19,7 +19,8 @@ trait Bootstrapping extends WebApplication with Log {
     ("Home", classOf[HomePage], Some(IconType.Home)),
     ("Sorting", classOf[SortPage], None),
     ("Bootstrap", classOf[SettingsPage], Some(IconType.Cog)),
-    ("MOTD", classOf[MessagePage], None)
+    ("MOTD", classOf[MessagePage], None),
+    ("Account", classOf[AccountPage], Some(IconType.User))
   )
 
   def tabs: Seq[BootTab[_ <: WebPage]] = defaultTabs

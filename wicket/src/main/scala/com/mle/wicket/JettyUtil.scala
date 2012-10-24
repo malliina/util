@@ -3,7 +3,6 @@ package com.mle.wicket
 import com.mle.util.{Util, Log}
 import java.util.EnumSet
 import javax.servlet.{DispatcherType, Filter}
-import org.apache.wicket.protocol.http._
 import org.atmosphere.cache.HeaderBroadcasterCache
 import org.atmosphere.cpr.AtmosphereServlet
 import org.atmosphere.handler.ReflectorServletProcessor
@@ -12,6 +11,10 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.nio.SelectChannelConnector
 import org.eclipse.jetty.servlet._
 import collection.JavaConversions._
+import com.mle.util.security.IKeystoreSettings
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector
+import org.eclipse.jetty.util.ssl.SslContextFactory
+import org.apache.wicket.protocol.http.{ContextParamWebApplicationFactory, WicketFilter, Jetty7WebSocketFilter, WebApplication}
 
 /**
  * https://cwiki.apache.org/WICKET/wicket-without-webxml-embedded-jetty.html
@@ -32,7 +35,6 @@ object JettyUtil extends Log {
     context addFilter(holder, path, EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR))
     context addServlet(classOf[DefaultServlet], path)
   }
-
 
   /**
    * Adds a Wicket app with WebSockets enabled.
@@ -109,13 +111,12 @@ object JettyUtil extends Log {
     handler setFilterClassName classOf[WicketFilter].getName
     handler setServletClassName classOf[AtmosphereServlet].getName
     servlet.framework().addAtmosphereHandler(path, handler)
-    //    servlet.framework().getAtmosphereHandlers.map(_._2).foreach(_.broadcaster.getBroadcasterConfig.destroy())
     servlet
   }
 
-  def startServer(port: Int = 8080)(contextInit: ServletContextHandler => Unit): Server = {
+  def startServer(port: Int = 8080, keystoreSettings: Option[IKeystoreSettings] = None, clientAuth: Boolean = false)(contextInit: ServletContextHandler => Unit): Server = {
     val server = new Server
-    val connector = new SelectChannelConnector
+    val connector = keystoreSettings.map(newSslConnector(_, clientAuth)).getOrElse(newHttpConnector)
     connector setPort port
     server addConnector connector
     val contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS)
@@ -124,8 +125,20 @@ object JettyUtil extends Log {
     val pathSpecs = contextHandler.getServletHandler.getServletMappings.flatMap(_.getPathSpecs).mkString(", ")
     server.start()
     val host = Option(connector getHost) getOrElse "0.0.0.0"
-    //    val protocol=if (connector.isInstanceOf[SelectChannelConnector])"http" else "https"
-    log info "Server started on: http://" + host + ":" + connector.getPort + ", paths: " + pathSpecs
+    val protocol = if (connector.isInstanceOf[SslSelectChannelConnector]) "https" else "http"
+    log info "Server started on: " + protocol + "://" + host + ":" + connector.getPort + ", paths: " + pathSpecs
     server
+  }
+
+  def newHttpConnector = new SelectChannelConnector
+
+  def newSslConnector(keys: IKeystoreSettings, clientAuth: Boolean = false) = {
+    val factory = new SslContextFactory
+    factory setKeyStorePath keys.keystoreUrl.toExternalForm
+    factory setKeyStorePassword keys.keystorePass
+    factory setTrustStore keys.truststoreUrl.toExternalForm
+    factory setTrustStorePassword keys.truststorePass
+    factory setNeedClientAuth clientAuth
+    new SslSelectChannelConnector(factory)
   }
 }
