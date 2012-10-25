@@ -9,8 +9,7 @@ import com.mle.auth.exception.AuthException
  *
  * @author mle
  */
-abstract class JDBCUserManager(connProvider: SQLConnectionProvider,
-                               schema: UserMgmtSchema)
+abstract class JDBCUserManager(schema: UserMgmtSchema)
   extends UserManager with Authenticator[String] {
   val usersTable = schema.usersTable
   val usernameCol = "name"

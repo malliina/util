@@ -1,10 +1,11 @@
 package com.mle.auth.ldap
 
-import com.mle.auth.UserManager
+import com.mle.auth.{Authenticator, UserManager}
 import javax.naming.directory._
-import com.mle.util.Util._
 import collection.JavaConversions._
 import com.mle.auth.crypto.PasswordHashing
+import javax.naming.Context
+import java.util.Properties
 
 
 /**
@@ -16,11 +17,19 @@ import com.mle.auth.crypto.PasswordHashing
 abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionProvider,
                                        val userInfo: DnInfo,
                                        groupInfo: DnInfo)
-  extends UserManager {
+  extends UserManager with Authenticator[InitialDirContext] {
   val groupMemberClass = "groupOfUniqueNames"
   val memberAttribute = "uniqueMember"
 
-  def withContext[T](code: InitialDirContext => T) = resource(connectionProvider.connection)(code)
+  def authenticate(user: String, password: String) = {
+    val connectionProps = connectionProvider.noUserProperties ++ Map(
+      Context.SECURITY_PRINCIPAL -> userInfo.toDN(user),
+      Context.SECURITY_CREDENTIALS -> password
+    )
+    val props = new Properties
+    props putAll connectionProps
+    new InitialDirContext(props)
+  }
 
   private def attributes(keyValues: (String, String)*) = {
     val attrs = new BasicAttributes()
@@ -47,14 +56,14 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
       "cn" -> user
     )
     val dn = userInfo.toDN(user)
-    withContext(_.bind(dn, null, userAttrs))
+    connectionProvider.withConnection(_.bind(dn, null, userAttrs))
   }
 
   def removeUser(user: String) {
     val dn = userInfo.toDN(user)
     // We don't want removed user DNs to remain as group members
     groups(user).foreach(revoke(user, _))
-    withContext(_.unbind(dn))
+    connectionProvider.withConnection(_.unbind(dn))
   }
 
   def addGroup(group: String) {
@@ -62,12 +71,12 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     val objClasses = attribute("objectClass", groupMemberClass)
     groupAttrs put objClasses
     val dn = groupInfo.toDN(group)
-    withContext(_.bind(dn, null, groupAttrs))
+    connectionProvider.withConnection(_.bind(dn, null, groupAttrs))
   }
 
   def removeGroup(group: String) {
     val dn = groupInfo.toDN(group)
-    withContext(_.unbind(dn))
+    connectionProvider.withConnection(_.unbind(dn))
   }
 
   private def arrayModification(modAttribute: Int, kv: (String, String)) = {
@@ -77,7 +86,7 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
 
   private def modifyGroup(modAttribute: Int, user: String, group: String) {
     val mod = arrayModification(modAttribute, memberAttribute -> userInfo.toDN((user)))
-    withContext(_.modifyAttributes(groupInfo.toDN(group), mod))
+    connectionProvider.withConnection(_.modifyAttributes(groupInfo.toDN(group), mod))
   }
 
   def assign(user: String, group: String) {
@@ -97,12 +106,12 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     val filter = "(&(objectClass=" + groupMemberClass + ")(" + memberAttribute + "=" + userInfo.toDN(user) + "))"
     val controls = new SearchControls()
     controls setSearchScope SearchControls.ONELEVEL_SCOPE
-    val results = withContext(_.search(groupInfo.branch, filter, controls))
+    val results = connectionProvider.withConnection(_.search(groupInfo.branch, filter, controls))
     results.map(group => groupInfo.toName(group.getName)).toSeq
   }
 
   def users(group: String) = {
-    val attrs = withContext(_.getAttributes(groupInfo.toDN(group), Array(memberAttribute)))
+    val attrs = connectionProvider.withConnection(_.getAttributes(groupInfo.toDN(group), Array(memberAttribute)))
     // uniqueMember contains DNs of users
     Option(attrs get memberAttribute)
       .map(_.getAll.map(dn => userInfo toName String.valueOf(dn)).filter(_.size > 0).toSeq)
@@ -115,12 +124,12 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
 
   def groups = list(groupInfo.branch, groupInfo.key)
 
-  private def list(branch: String, keyPrefix: String) = withContext(_.list(branch)
+  private def list(branch: String, keyPrefix: String) = connectionProvider.withConnection(_.list(branch)
     .map(_.getName.stripPrefix(keyPrefix + "="))).toSeq
 
   def setPassword(user: String, newPassword: String) {
     val mod = arrayModification(DirContext.REPLACE_ATTRIBUTE, "userPassword" -> newPassword)
-    withContext(_.modifyAttributes(userInfo.toDN((user)), mod))
+    connectionProvider.withConnection(_.modifyAttributes(userInfo.toDN((user)), mod))
   }
 }
 
@@ -129,16 +138,10 @@ object AbstractLdapUserManager {
             adminUser: String,
             adminPassword: String,
             logging: Boolean = true) = {
-    val connProvider = new LDAPConnectionProvider {
-      val user = adminUser
-
-      val password = adminPassword
-      // pass is hashed on server. works like this. hmm.
-      val authenticator = new SimpleLdapAuthenticator(schema.uri, schema.adminInfo)
-    }
+    val connProvider = new LDAPConnectionProvider(schema.uri, adminUser, Some(adminPassword), schema.adminInfo)
     if (logging)
       new DefaultLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
     else
-      new AbstractLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo) with PasswordHashing
+      new AbstractLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo) with PasswordHashing[InitialDirContext]
   }
 }

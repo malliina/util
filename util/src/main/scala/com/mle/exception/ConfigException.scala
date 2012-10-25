@@ -3,6 +3,6 @@ package com.mle.exception
 /**
  * @author Mle
  */
-class ConfigException(msg: String, t: Throwable) extends Exception(msg, t) {
+class ConfigException(msg: String, t: Throwable) extends GenericException(msg, t) {
   def this(msg: String) = this(msg, null)
 }

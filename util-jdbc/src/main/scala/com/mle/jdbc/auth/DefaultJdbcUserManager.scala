@@ -1,16 +1,15 @@
 package com.mle.jdbc.auth
 
 import com.mle.auth.crypto.PasswordHashing
-import com.mle.auth.{ChangeLogging, HashingAuthenticator}
+import com.mle.auth.ChangeLogging
 import com.mle.jdbc.schema.UserMgmtSchema
 
 /**
  *
  * @author mle
  */
-class DefaultJdbcUserManager(connProvider: SQLConnectionProvider, schema: UserMgmtSchema)
-  extends JDBCUserManager(connProvider, schema)
+class DefaultJdbcUserManager(schema: UserMgmtSchema)
+  extends JDBCUserManager(schema)
   with ChangeLogging
-  with PasswordHashing
-  with HashingAuthenticator[String] {
+  with PasswordHashing[String] {
 }

@@ -1,18 +1,21 @@
 package com.mle.wicket.markup
 
-import com.mle.util.{Regex, Log}
+import com.mle.util.Log
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest
 import org.apache.wicket.markup.html.basic.Label
-import java.security.cert.X509Certificate
+import com.mle.wicket.model.LDModel
+import com.mle.auth.CertificateContainer
 
 /**
  * @author Mle
  */
 class AccountPanel(id: String) extends Panel(id) with Log {
-  val dn = clientDN getOrElse "No certificate"
-  val cn = clientCN getOrElse "Unable to read CN"
-  add(new Label("certChain", dn))
+  val certModel = LDModel(new CertificateContainer(certChain))
+  def cert = certModel.getObject
+  val dn = LDModel(cert.dn getOrElse "No certificate")
+  val cn = LDModel(cert.dn getOrElse "Unable to read CN")
+  add(new Label("dn", dn))
   add(new Label("cn", cn))
 
   /**
@@ -26,10 +29,4 @@ class AccountPanel(id: String) extends Panel(id) with Log {
       .asInstanceOf[Array[java.security.cert.X509Certificate]])
       .getOrElse(Array.empty).toSeq
   }
-
-  def clientCN = clientDN.map(dn => Regex.parse(dn, "CN=(.*),\\sO=.*")) getOrElse None
-
-  def clientDN = certChain.headOption map extractDN
-
-  def extractDN(cert: X509Certificate) = cert.getSubjectDN.getName
 }

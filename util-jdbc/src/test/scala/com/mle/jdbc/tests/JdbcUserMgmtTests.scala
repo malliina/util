@@ -10,7 +10,7 @@ import com.mle.jdbc.tests.TestSchema.UserMgmtTables
  * @author mle
  */
 class JdbcUserMgmtTests extends UserManagementTests {
-  val manager = new DefaultJdbcUserManager(DefaultSettings.connProvider, UserMgmtTables)
+  val manager = new DefaultJdbcUserManager(UserMgmtTables)
 
   val authenticator = manager
 }

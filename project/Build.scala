@@ -39,8 +39,7 @@ object GitBuild extends Build {
     NativePackaging.defaultNativeProject
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("util")
-    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson)
-  )
+    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson))
   lazy val utilActor = myProject("util-actor")
     .dependsOn(util)
   lazy val utilJdbc = myProject("util-jdbc")
@@ -55,7 +54,7 @@ object GitBuild extends Build {
   lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
     .dependsOn(util, utilActor)
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
-    .dependsOn(util, utilActor, rmi)
+    .dependsOn(util, utilActor, rmi, auth)
     .settings(cloudBeesSettings: _*)
     .settings(myWebSettings: _*)
     .settings(

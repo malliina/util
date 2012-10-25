@@ -34,7 +34,7 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
       // MySQLIntegrityConstraintViolationException (SQLException) for MySQL
       manager addUser(testUser, testPassword)
     }
-//    println(e.getClass.getSimpleName + ": " + e.getMessage)
+    //    println(e.getClass.getSimpleName + ": " + e.getMessage)
     assert(manager.users contains testUser)
     manager removeUser testUser
     assert(usersBefore === manager.users)

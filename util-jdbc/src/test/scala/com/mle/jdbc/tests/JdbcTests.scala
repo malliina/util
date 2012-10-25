@@ -2,7 +2,7 @@ package com.mle.jdbc.tests
 
 import org.scalatest.FunSuite
 import com.mle.util.Log
-import com.mle.jdbc.{DefaultSettings, DB}
+import com.mle.jdbc.DB
 import com.mle.jdbc.auth.DefaultJdbcUserManager
 import com.mle.jdbc.tests.TestSchema._
 
@@ -11,7 +11,7 @@ import com.mle.jdbc.tests.TestSchema._
  * @author mle
  */
 class JdbcTests extends FunSuite with Log {
-  val userManager = new DefaultJdbcUserManager(DefaultSettings.connProvider, UserMgmtTables)
+  val userManager = new DefaultJdbcUserManager(UserMgmtTables)
   val testUser = "jack"
 
   test("can perform simple query on mysql schema") {

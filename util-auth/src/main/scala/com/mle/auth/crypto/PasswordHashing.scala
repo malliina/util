@@ -1,12 +1,12 @@
 package com.mle.auth.crypto
 
-import com.mle.auth.UserManager
+import com.mle.auth.{HashingAuthenticator, UserManager}
 
 /**
  *
- * @author mle
+ * @tparam T type of connection ([[javax.naming.directory.InitialDirContext]], [[java.sql.Connection]], ...)
  */
-trait PasswordHashing extends UserManager with Hashing {
+trait PasswordHashing[T] extends UserManager with HashingAuthenticator[T] {
 
   abstract override def setPassword(user: String, newPassword: String) {
     super.setPassword(user, hash(user, newPassword))

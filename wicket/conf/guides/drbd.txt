@@ -28,13 +28,13 @@ crm configure
 primitive p_drbd_mysql ocf:linbit:drbd params drbd_resource="clusterdb_res" op monitor interval="15s"
 // allow only one master
 ms ms_drbd_mysql p_drbd_mysql meta master-max="1" master-node-max="1" clone-max="2" clone-node-max="1" notify="true"
-
+// mount drbd
 primitive p_fs_mysql ocf:heartbeat:Filesystem params device="/dev/drbd0" directory="/drbd" fstype="ext4" 
-// VIP
+// vip: note that nodes should all have an interface named 'eth0'
 primitive p_ip_mysql ocf:heartbeat:IPaddr2 params ip="10.0.0.4" cidr_netmask="24" nic="eth0"
 // mysql service
 primitive p_mysql ocf:heartbeat:mysql params binary="/usr/sbin/mysqld" config="/drbd/mysql/my.cnf" datadir="/drbd/mysql/data" pid="/var/lib/mysql/mysql.pid" socket="/var/lib/mysql/mysql.sock" user="mysql" group="mysql" additional_parameters="--bind-address=10.0.0.4 --user=mysql" op start timeout=120s op stop timeout=120s op monitor interval=20s timeout=30s
-
+// create group g_mysql that refers to drbd, vip and mysql
 group g_mysql p_fs_mysql p_ip_mysql p_mysql
 // mysql services & drbd master must be on the same host
 colocation c_mysql_on_drbd inf: g_mysql ms_drbd_mysql:Master
@@ -44,3 +44,10 @@ order o_drbd_before_mysql inf: ms_drbd_mysql:promote g_mysql:start
 primitive p_ping ocf:pacemaker:ping params name="ping" multiplier="1000" host_list="10.0.0.1" op monitor interval="15s" timeout="60s" start timeout="60s"
 // do not prefer hosts that can't ping the target ("-inf" preference score)
 location l_drbd_master_on_ping ms_drbd_mysql rule $role="Master" -inf: not_defined ping or ping number:lte 0
+
+// show settings
+crm configure show
+// manual migration
+crm resource migrate g_mysql node_host_name_here
+// the manual migration command also sets the new node as preferred; lookup the name with "crm configure show" and delete the preference with
+service configure delete preference_name
