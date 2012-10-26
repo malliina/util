@@ -1,5 +1,6 @@
 package com.mle.wicket
 
+import markup.Pages.{AtmospherePage, WebSocketsPage}
 import org.apache.wicket.protocol.http.WebApplication
 import org.apache.wicket.atmosphere.EventBus
 import com.mle.util.Log

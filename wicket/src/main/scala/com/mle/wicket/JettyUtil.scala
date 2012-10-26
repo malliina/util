@@ -82,7 +82,7 @@ object JettyUtil extends Log {
   }
 
   def addAtmosphereParameters(holder: ServletHolder) {
-    holder setInitParameter("org.atmosphere.useWebSocket", "true") // if true, ie works but firefox doesn't
+    holder setInitParameter("org.atmosphere.useWebSocket", "false") // if true, ie9? works but firefox, IE10 don't
     holder setInitParameter("org.atmosphere.useNative", "true")
     // "No AtmosphereHandler found..." unless we set EchoProtocol. hmm?
     holder setInitParameter("org.atmosphere.websocket.WebSocketProtocol", classOf[EchoProtocol].getName)

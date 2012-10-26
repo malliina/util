@@ -9,4 +9,9 @@ import markup.Pages.AtmospherePage
 
 class AtmosphereApplication extends BasicWebApplication with Atmosphering {
   override val tabs = super.tabs :+ BootTab("Atmosphere", classOf[AtmospherePage])
+
+  override def init() {
+    super.init()
+    mount(classOf[AtmospherePage])
+  }
 }

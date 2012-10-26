@@ -16,9 +16,7 @@ object RmiUtil {
 
   def initCerts() {
     val keystore = "security/develkeys/keystore.key"
-    FileUtilities.resourceToFile(keystore).foreach(file =>
-      println("Created " + file.toAbsolutePath + " for RMI")
-    )
+    FileUtilities.resourceToFile(keystore)
     sys.props("javax.net.ssl.keyStore") = FileUtilities.pathTo(keystore).toAbsolutePath.toString
     sys.props("javax.net.ssl.keyStorePassword") = "changeme"
     sys.props("javax.net.ssl.trustStore") = FileUtilities.pathTo(keystore).toAbsolutePath.toString
@@ -27,8 +25,8 @@ object RmiUtil {
 
   def initMisc() {
     sys.props("java.security.policy") = Util.resource("security/server.policy").toURI.toString
-//    if (System.getSecurityManager == null) {
-//      System.setSecurityManager(new SecurityManager)
-//    }
+    //    if (System.getSecurityManager == null) {
+    //      System.setSecurityManager(new SecurityManager)
+    //    }
   }
 }
