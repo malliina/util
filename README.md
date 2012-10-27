@@ -7,6 +7,7 @@ To do:
 - MSI packaging
 - Play fucks up the logback configuration jesus christ
 - More HA apps with DRBD
+- IPsec DRBD, performance tests
 - A sane container class for sbt-native-packager mappings that spits out settings for rpm, deb, windows
 - BoneCP
 - DB operations that return Promise[ResultSet]
