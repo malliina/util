@@ -13,27 +13,29 @@ abstract class Schema {
 
   override def toString = name
 
-  abstract class DbTable extends Table {
+  abstract class DbTable extends JdbcTable {
     def db = Schema.this.db
 
     def schema = Schema.this
 
-    def tableName = Reflection.className(this)
-
     override def toString = schema + "." + tableName
+  }
 
-    class Col extends Column {
-      def schema = DbTable.this.schema
+}
 
-      def table = DbTable.this
+abstract class JdbcTable extends Table {
+  def tableName = Reflection.className(this)
 
-      def name = Reflection.fieldName(DbTable.this, this)
-    }
+  class Col extends Column {
+    def schema = JdbcTable.this.schema
 
-    object Col {
-      def apply() = new Col
-    }
+    def table = JdbcTable.this
 
+    def name = Reflection.fieldName(JdbcTable.this, this)
+  }
+
+  object Col {
+    def apply() = new Col
   }
 
 }

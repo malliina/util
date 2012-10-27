@@ -76,7 +76,7 @@ object Util {
 
   def uri(path: String) = {
     val maybeFile = FileUtilities.pathTo(path)
-    if (Files.exists(maybeFile))
+    if (Files exists maybeFile)
       maybeFile.toUri
     else
       resourceUri(path)

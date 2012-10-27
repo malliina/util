@@ -53,7 +53,7 @@ object GitBuild extends Build {
     .dependsOn(util)
     .settings(libraryDependencies ++= Seq(tomcatJdbc, mysql, hashing, scalaTest))
   lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
-    .dependsOn(util, utilActor)
+    .dependsOn(util, utilActor, utilJdbc)
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
     .dependsOn(util, utilActor, rmi, auth)
     .settings(cloudBeesSettings: _*)

@@ -23,8 +23,9 @@ abstract class Table {
 
   def select[T](columns: String*)(where: (String, Any)*)(mapping: ResultSet => T) = {
     val selectCols = columns mkString ","
-    val whereCond = toWhereClause(where)
-    db.query("select " + selectCols + " from " + this + " where " + whereCond, toValues(where): _*)(mapping)
+    val baseSql = "select " + selectCols + " from " + this
+    val whereCond = if (where.isEmpty) "" else " where " + toWhereClause(where)
+    db.query(baseSql + whereCond, toValues(where): _*)(mapping)
   }
 
   def insert(values: (String, Any)*) {
@@ -67,6 +68,6 @@ abstract class Table {
 
   def qMarks(count: Int) = (1 to count).map("?")
 
-//  override def toString = schema + "." + name
+  //  override def toString = schema + "." + name
 
 }

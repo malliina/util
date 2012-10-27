@@ -3,11 +3,12 @@ package com.mle.actor
 
 import com.mle.actor.Messages.{Start, Stop}
 import actors.Actor
+import com.mle.util.Log
 
 /**
  * @author Mle
  */
-trait BroadcastAware[T] extends KingActor[T] {
+trait BroadcastAware[T] extends KingActor[T] with Log {
   def broadcaster: Actor
 
   override def onConnect(clientAddress: T) = {

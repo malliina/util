@@ -7,7 +7,7 @@ import util.PlayLog
 import views._
 
 
-object HelloWorld extends Controller with PlayLog{
+object HelloWorld extends Controller with PlayLog {
 
   /**
    * Describes the hello form.
