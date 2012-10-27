@@ -7,4 +7,5 @@ To do:
 - MSI packaging
 - Play 2.x AsyncResult & Futures
 - More HA apps with DRBD
+- IPsec DRBD
 - A sane container class for sbt-native-packager mappings that spits out settings for rpm, deb, windows
