@@ -1,1 +1,1 @@
-java -jar project\sbt\sbt-launch.jar
+java -Xmx1024m -jar project\sbt\sbt-launch.jar

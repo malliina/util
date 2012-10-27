@@ -17,7 +17,7 @@ object BuildBuild extends Build {
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/", // for play plugin
     libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.12.0-0.2.11.1")),
-    addSbtPlugin("play" % "sbt-plugin" % "2.1-09092012"),
+    addSbtPlugin("play" % "sbt-plugin" % "2.1-09142012"),
     addSbtPlugin("eu.getintheloop" %% "sbt-cloudbees-plugin" % "0.4.1")
   )
   lazy val root = Project("plugins", file("."))

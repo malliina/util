@@ -30,3 +30,6 @@ GET     /ws/open                    controllers.WebSockets.webSocket
 GET     /chat                       controllers.ChatApp.index
 GET     /chat/room                  controllers.ChatApp.chatRoom(username: Option[String] ?= None)
 GET     /chat/room/chat             controllers.ChatApp.chat(username)
+
+# Async test pages
+GET     /async                      controllers.Async.index

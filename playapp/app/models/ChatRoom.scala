@@ -70,38 +70,29 @@ object ChatRoom {
         (iteratee, enumerator)
 
       case CannotConnect(error) =>
-
         // Connection error
-
         // A finished Iteratee sending EOF
         val iteratee = Done[JsValue, Unit]((), Input.EOF)
-
         // Send an error and close the socket
         val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString(error)))).andThen(Enumerator.enumInput(Input.EOF))
-
         (iteratee, enumerator)
-
     }
 
   }
-
 }
 
 class ChatRoom extends Actor {
-
   var members = Map.empty[String, PushEnumerator[JsValue]]
 
   def receive = {
-
     case Join(username) => {
       // Create an Enumerator to write to this socket
       //      val channel = Concurrent.broadcast[JsValue](onStart = self ! NotifyJoin(username))
       val channel = Enumerator.imperative[JsValue](onStart = () => self ! NotifyJoin(username))
-      if (members.contains(username)) {
+      if (members contains username) {
         sender ! CannotConnect("This username is already used")
       } else {
-        members = members + (username -> channel)
-
+        members += (username -> channel)
         sender ! Connected(channel)
       }
     }
@@ -136,7 +127,6 @@ class ChatRoom extends Actor {
       case (_, channel) => channel.push(msg)
     }
   }
-
 }
 
 case class Join(username: String)
