@@ -2,7 +2,6 @@ package com.mle.jdbc.tests
 
 import org.scalatest.FunSuite
 import com.mle.util.Log
-import com.mle.jdbc.DB
 import com.mle.jdbc.auth.DefaultJdbcUserManager
 import com.mle.jdbc.tests.TestSchema._
 
@@ -15,7 +14,7 @@ class JdbcTests extends FunSuite with Log {
   val testUser = "jack"
 
   test("can perform simple query on mysql schema") {
-    DB.query("select user,host from mysql.user")(rs => UserHost(rs getString 1, rs getString 2))
+    TestDb.query("select user,host from mysql.user")(rs => UserHost(rs getString 1, rs getString 2))
     //    log info "Got " + users.size + " users: " + users.mkString(", ")
   }
   test("can reflect schema from code") {

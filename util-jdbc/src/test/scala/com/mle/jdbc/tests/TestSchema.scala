@@ -1,7 +1,6 @@
 package com.mle.jdbc.tests
 
 import com.mle.jdbc.schema.{UserMgmtSchema, Schema}
-import com.mle.jdbc.DB
 
 /**
  *
@@ -9,8 +8,8 @@ import com.mle.jdbc.DB
  */
 object TestSchema extends Schema {
 
-  val db = DB
-  val name = DB.schema
+  val db = TestDb
+  val name = "testdb"
 
   object Test extends DbTable {
     val myCol, hoihoi = Col()

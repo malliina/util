@@ -32,5 +32,6 @@ object Dependencies {
   val scalaTest = "org.scalatest" %% "scalatest" % "[1.8,)" % "test"
   val mysql = "mysql" % "mysql-connector-java" % "[5.1.21,)"
   val tomcatJdbc = "org.apache.tomcat" % "tomcat-jdbc" % "[7.0.30,)"
+  val boneCp = "com.jolbox" % "bonecp" % "[0.7.1.RELEASE,)"
   val jerkson = "io.backchat.jerkson" %% "jerkson" % "[0.7.0,)"
 }

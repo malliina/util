@@ -13,7 +13,7 @@ abstract class Table {
     def questionMarks = (1 to count) map (_ => "?")
   }
 
-  def db: Database
+  def db: Database    // TODO: this should not be here?
 
   def schema: Schema
 

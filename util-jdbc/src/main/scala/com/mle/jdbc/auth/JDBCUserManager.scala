@@ -2,7 +2,6 @@ package com.mle.jdbc.auth
 
 import com.mle.auth.{Authenticator, UserManager}
 import com.mle.jdbc.schema.UserMgmtSchema
-import com.mle.jdbc.DB
 import com.mle.auth.exception.AuthException
 
 /**
@@ -56,7 +55,7 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
     userGroup insert("user_id" -> userId, "group_id" -> groupId)
   }
 
-  def groups = DB.query("select " + groupnameCol + " from " + groupsTable)(_ getString 1)
+  def groups = usersTable.db.query("select " + groupnameCol + " from " + groupsTable)(_ getString 1)
 
   /**
    *
@@ -86,7 +85,7 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
    * @return
    * @throws Exception if the user does not exist
    */
-  def groups(user: String) = DB.query("select " + groupnameCol + " from " + groupsTable + " where id=" +
+  def groups(user: String) = usersTable.db.query("select " + groupnameCol + " from " + groupsTable + " where id=" +
     "(select group_id from " + userGroup + " where user_id=" +
     "(select id from " + usersTable + " where " + usernameCol + "=?))", user)(_ getString 1)
 
@@ -96,9 +95,9 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
    * @return
    * @throws Exception if the group does not exist
    */
-  def users(group: String) = DB.query("select " + usernameCol + " from " + usersTable + " where id=" +
+  def users(group: String) = usersTable.db.query("select " + usernameCol + " from " + usersTable + " where id=" +
     "(select user_id from " + userGroup + " where group_id=" +
     "(select id from " + groupsTable + " where " + groupnameCol + "=?))", group)(_ getString 1)
 
-  def users = DB.query("select " + usernameCol + " from " + usersTable)(_ getString 1)
+  def users = usersTable.db.query("select " + usernameCol + " from " + usersTable)(_ getString 1)
 }

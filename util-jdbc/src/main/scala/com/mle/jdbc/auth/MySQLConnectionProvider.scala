@@ -24,7 +24,7 @@ class MySQLConnectionProvider(url: String,
   p setDriverClassName classOf[com.mysql.jdbc.Driver].getName
   p setUsername user
   password foreach (pass => p setPassword pass)
-  keystoreSettings foreach (kss => p setDbProperties toSslProperties(kss))
+  keystoreSettings foreach (kss => p setDbProperties MySQLConnectionProvider.toSslProperties(kss))
 
   p setTestWhileIdle false
   p setTestOnBorrow true
@@ -44,16 +44,21 @@ class MySQLConnectionProvider(url: String,
   //    "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer")
   val ds = new DataSource(p)
 
-  private def toSslProperties(keySettings: IKeystoreSettings) = {
-    val sslProperties = new Properties
-    sslProperties("useSSL") = "true"
-    sslProperties("clientCertificateKeyStoreUrl") = keySettings.keystoreUrl.toString
-    //    log info "Using keystore: " + sslProperties("clientCertificateKeyStoreUrl")
-    sslProperties("clientCertificateKeyStorePassword") = keySettings.keystorePass
-    sslProperties("trustCertificateKeyStoreUrl") = keySettings.truststoreUrl.toString
-    sslProperties("trustCertificateKeyStorePassword") = keySettings.truststorePass
+  def connection = ds.getConnection
+}
+
+object MySQLConnectionProvider {
+  def toMap(keySettings: IKeystoreSettings) = Map(
+    "useSSL" -> "true",
+    "clientCertificateKeyStoreUrl" -> keySettings.keystoreUrl.toString,
+    "clientCertificateKeyStorePassword" -> keySettings.keystorePass,
+    "trustCertificateKeyStoreUrl" -> keySettings.truststoreUrl.toString,
+    "trustCertificateKeyStorePassword" -> keySettings.truststorePass
+  )
+
+  def toSslProperties(keySettings: IKeystoreSettings) = {
+    val sslProperties = new Properties()
+    sslProperties putAll toMap(keySettings)
     sslProperties
   }
-
-  def connection = ds.getConnection
 }
