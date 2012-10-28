@@ -1,0 +1,10 @@
+see keys.txt
+
+For correct issuer/subject MySQL syntax:
+
+openssl x509 -text -in /path/to/ca-cert.pem | grep Issuer | cut -d':' -f2 | sed -e 's/, /\//g'
+
+GRANT ALL PRIVILEGES ON *.* TO 'user'@'%'
+  IDENTIFIED BY 'pass'
+  REQUIRE SUBJECT '/C=FI/ST=Some-State/L=Helsinki/O=Hell/CN=client.cert'
+  AND ISSUER '/C=FI/ST=Some-State/L=Helsinki/O=Hell/OU=Home/CN=ca.mle.com';
