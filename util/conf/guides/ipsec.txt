@@ -9,5 +9,11 @@ server1$ ipsec showhostkey --left
 server2$ ipsec showhostkey --right
 etc, see url
 
-Ensure that ipsec is shut down after corosync during reboots, otherwise corosync's shutdown sequence freezes:
+Ensure that the corosync service is stopped before ipsec during shutdown sequences, otherwise corosync's shutdown procedure freezes:
+# corosync should be /etc/rc*/K80corosync therefore we make ipsec K86ipsec so that the init system stops it later as 86>80
+# reboots
 mv /etc/rc6.d/K76ipsec /etc/rc6.d/K86ipsec
+# shutdowns
+mv /etc/rc0.d/K76ipsec /etc/rc0.d/K86ipsec
+# maintenance mode
+mv /etc/rc1.d/K76ipsec /etc/rc1.d/K86ipsec
