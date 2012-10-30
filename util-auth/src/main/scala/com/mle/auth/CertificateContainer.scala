@@ -11,7 +11,7 @@ import com.mle.exception.ParseException
 class CertificateContainer(certChain: Seq[X509Certificate]) {
   val dn = certChain.headOption map extractDN
 
-  val cn = dn.map(dName => Regex.parse(dName, "CN=(.*),\\sO=.*")
+  val cn = dn.map(dName => Regex.parse(dName, "CN=([^,]*),\\sO=.*")
     .getOrElse(throw new ParseException("Unable to extract CN from DN: " + dName)))
 
   def extractDN(cert: X509Certificate) = cert.getSubjectDN.getName

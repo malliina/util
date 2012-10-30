@@ -1,6 +1,6 @@
 package com.mle.jdbc.auth
 
-import com.mle.auth.{Authenticator, UserManager}
+import com.mle.auth.{PasswordAuthenticator, UserManager}
 import com.mle.jdbc.schema.UserMgmtSchema
 import com.mle.auth.exception.AuthException
 

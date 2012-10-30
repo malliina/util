@@ -1,7 +1,7 @@
 package com.mle.auth.tests
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
-import com.mle.auth.{Authenticator, UserManager}
+import com.mle.auth.{PasswordAuthenticator, UserManager}
 import com.mle.util.Util
 
 /**

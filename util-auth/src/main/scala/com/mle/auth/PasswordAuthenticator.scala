@@ -7,7 +7,7 @@ import crypto.Hashing
  *
  * @author Mle
  */
-trait Authenticator[T] {
+trait PasswordAuthenticator[T] {
   /**
    * If this method returns normally, the authentication was successful.
    *
@@ -18,6 +18,6 @@ trait Authenticator[T] {
   def authenticate(user: String, password: String): T
 }
 
-trait HashingAuthenticator[T] extends Authenticator[T] with Hashing {
+trait HashingAuthenticator[T] extends PasswordAuthenticator[T] with Hashing {
   abstract override def authenticate(user: String, password: String) = super.authenticate(user, hash(user, password))
 }

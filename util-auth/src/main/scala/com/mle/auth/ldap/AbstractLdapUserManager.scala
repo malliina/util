@@ -1,6 +1,6 @@
 package com.mle.auth.ldap
 
-import com.mle.auth.{Authenticator, UserManager}
+import com.mle.auth.{PasswordAuthenticator, UserManager}
 import javax.naming.directory._
 import collection.JavaConversions._
 import com.mle.auth.crypto.PasswordHashing
@@ -17,7 +17,7 @@ import java.util.Properties
 abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionProvider,
                                        val userInfo: DnInfo,
                                        groupInfo: DnInfo)
-  extends UserManager with Authenticator[InitialDirContext] {
+  extends UserManager with PasswordAuthenticator[InitialDirContext] {
   val groupMemberClass = "groupOfUniqueNames"
   val memberAttribute = "uniqueMember"
 

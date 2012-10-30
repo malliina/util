@@ -12,11 +12,12 @@ import com.mle.auth.CertificateContainer
  */
 class AccountPanel(id: String) extends Panel(id) with Log {
   val certModel = LDModel(new CertificateContainer(certChain))
-  def cert = certModel.getObject
   val dn = LDModel(cert.dn getOrElse "No certificate")
   val cn = LDModel(cert.dn getOrElse "Unable to read CN")
   add(new Label("dn", dn))
   add(new Label("cn", cn))
+
+  def cert = certModel.getObject
 
   /**
    *
