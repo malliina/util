@@ -13,6 +13,6 @@ import java.security.cert.X509Certificate
  *
  * @author mle
  */
-trait CertificateAuthenticator[T] extends Authenticator2[Seq[X509Certificate], T] {
+trait CertificateAuthenticator[T] extends Authenticator[Seq[X509Certificate], T] {
   def authenticate(certChain: Seq[X509Certificate]): T
 }

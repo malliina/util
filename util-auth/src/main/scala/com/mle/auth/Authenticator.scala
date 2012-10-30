@@ -9,6 +9,6 @@ package com.mle.auth
  * @tparam T type of credential: a user-pass container, a certificate chain, ...
  * @tparam U
  */
-trait Authenticator2[T, U] {
+trait Authenticator[T, U] {
   def authenticate(credential: T): U
 }
