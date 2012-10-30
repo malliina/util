@@ -8,3 +8,6 @@ ipsec newhostkey --output /etc/ipsec.d/ipsec.secrets --configdir /etc/ipsec.d/ -
 server1$ ipsec showhostkey --left
 server2$ ipsec showhostkey --right
 etc, see url
+
+Ensure that ipsec is shut down after corosync during reboots, otherwise corosync's shutdown sequence freezes:
+mv /etc/rc6.d/K76ipsec /etc/rc6.d/K86ipsec

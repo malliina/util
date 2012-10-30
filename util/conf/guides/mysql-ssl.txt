@@ -1,6 +1,6 @@
-see keys.txt
+see keys.txt for key generation
 
-For correct issuer/subject MySQL syntax:
+For correct issuer MySQL syntax:
 
 openssl x509 -text -in /path/to/ca-cert.pem | grep Issuer | cut -d':' -f2 | sed -e 's/, /\//g'
 

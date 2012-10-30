@@ -16,7 +16,7 @@ mysql-client
 
 Configuration:
 
-see mysql_wp_drbd.pdf for file partition setup etc.
+see mysql_wp_drbd.pdf for partition setup etc.
 relevant conf files:
 /etc/drbd.d/clusterdb.res
 /etc/corosync/corosync.conf
@@ -49,8 +49,7 @@ primitive p_ping ocf:pacemaker:ping params name="ping" multiplier="1000" host_li
 // do not prefer hosts that can't ping the target ("-inf" preference score)
 location l_drbd_master_on_ping ms_drbd_mysql rule $role="Master" -inf: not_defined ping or ping number:lte 0
 
-// hmm
-order o_ipsec_before_ip inf: lsb:ipsec:start g_ip_mysql:start
+// see ipsec.txt to enable ipsec between DRBD devices
 
 // show settings
 crm configure show
@@ -58,3 +57,4 @@ crm configure show
 crm resource migrate g_mysql node_host_name_here
 // the manual migration command also sets the new node as preferred; lookup the name with "crm configure show" and delete the preference with
 service configure delete preference_name
+
