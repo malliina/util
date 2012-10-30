@@ -2,6 +2,8 @@ package com.mle.util
 
 import java.util.concurrent.TimeUnit
 import java.nio.file.Path
+import java.util.Properties
+import collection.JavaConversions._
 
 /**
  * @author Mle
@@ -34,5 +36,13 @@ object Implicits {
    */
   implicit def path2path(path: Path) = new {
     def /(next: String) = path resolve next
+  }
+
+  implicit def map2props(map: collection.Map[_ <: AnyRef, _ <: AnyRef]) = new {
+    def toProperties = {
+      val props = new Properties
+      props putAll map
+      props
+    }
   }
 }

@@ -5,7 +5,7 @@ import javax.naming.directory._
 import collection.JavaConversions._
 import com.mle.auth.crypto.PasswordHashing
 import javax.naming.Context
-import java.util.Properties
+import com.mle.util.Implicits._
 
 
 /**
@@ -22,13 +22,11 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
   val memberAttribute = "uniqueMember"
 
   def authenticate(user: String, password: String) = {
-    val connectionProps = connectionProvider.noUserProperties ++ Map(
+    val connectionProps = (connectionProvider.noUserProperties ++ Map(
       Context.SECURITY_PRINCIPAL -> userInfo.toDN(user),
       Context.SECURITY_CREDENTIALS -> password
-    )
-    val props = new Properties
-    props putAll connectionProps
-    new InitialDirContext(props)
+    )).toProperties
+    new InitialDirContext(connectionProps)
   }
 
   private def attributes(keyValues: (String, String)*) = {

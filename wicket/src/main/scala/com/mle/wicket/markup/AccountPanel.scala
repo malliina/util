@@ -13,7 +13,7 @@ import com.mle.auth.CertificateContainer
 class AccountPanel(id: String) extends Panel(id) with Log {
   val certModel = LDModel(new CertificateContainer(certChain))
   val dn = LDModel(cert.dn getOrElse "No certificate")
-  val cn = LDModel(cert.dn getOrElse "Unable to read CN")
+  val cn = LDModel(cert.cn getOrElse "Unable to read CN")
   add(new Label("dn", dn))
   add(new Label("cn", cn))
 
@@ -27,7 +27,7 @@ class AccountPanel(id: String) extends Panel(id) with Log {
     val servletRequest = getRequest.asInstanceOf[ServletWebRequest]
     val request = servletRequest.getContainerRequest
     Option(request.getAttribute("javax.servlet.request.X509Certificate")
-      .asInstanceOf[Array[java.security.cert.X509Certificate]])
-      .getOrElse(Array.empty).toSeq
+      .asInstanceOf[Array[java.security.cert.X509Certificate]]
+    ).getOrElse(Array.empty).toSeq
   }
 }

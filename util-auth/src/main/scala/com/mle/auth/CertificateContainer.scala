@@ -9,6 +9,7 @@ import com.mle.exception.ParseException
  * @author mle
  */
 class CertificateContainer(certChain: Seq[X509Certificate]) {
+  if(certChain.isEmpty)throw new
   val dn = certChain.headOption map extractDN
 
   val cn = dn.map(dName => Regex.parse(dName, "CN=([^,]*),\\sO=.*")
