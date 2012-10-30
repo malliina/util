@@ -1,11 +1,12 @@
 package com.mle.auth.ldap
 
-import com.mle.auth.{PasswordAuthenticator, UserManager}
+import com.mle.auth.{CertificateContainer, CertificateAuthenticator, PasswordAuthenticator, UserManager}
 import javax.naming.directory._
 import collection.JavaConversions._
 import com.mle.auth.crypto.PasswordHashing
 import javax.naming.Context
 import com.mle.util.Implicits._
+import java.security.cert.X509Certificate
 
 
 /**
@@ -17,7 +18,7 @@ import com.mle.util.Implicits._
 abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionProvider,
                                        val userInfo: DnInfo,
                                        groupInfo: DnInfo)
-  extends UserManager with PasswordAuthenticator[InitialDirContext] {
+  extends UserManager with PasswordAuthenticator[InitialDirContext] with CertificateAuthenticator[InitialDirContext] {
   val groupMemberClass = "groupOfUniqueNames"
   val memberAttribute = "uniqueMember"
 
@@ -27,6 +28,13 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
       Context.SECURITY_CREDENTIALS -> password
     )).toProperties
     new InitialDirContext(connectionProps)
+  }
+
+
+  def authenticate(certChain: Seq[X509Certificate]): InitialDirContext = {
+    val certInfo = new CertificateContainer(certChain)
+    existsUser(certInfo.cn)
+    null // not yet implemented
   }
 
   private def attributes(keyValues: (String, String)*) = {

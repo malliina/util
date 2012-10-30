@@ -4,16 +4,16 @@ import bootstrap.BootstrapThemes
 import de.agilecoders.wicket.settings.BootstrapSettings
 import de.agilecoders.wicket.Bootstrap
 import markup.Pages._
-import org.apache.wicket.protocol.http.WebApplication
 import org.apache.wicket.Page
 import org.apache.wicket.markup.html.WebPage
 import com.mle.util.Log
 import de.agilecoders.wicket.markup.html.bootstrap.image.IconType
+import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication
 
 /**
  * @author Mle
  */
-trait Bootstrapping extends WebApplication with Log {
+trait Bootstrapping extends AuthenticatedWebApplication with Log {
   var themeService: BootstrapThemes = null
   private val defaultTabs = buildTabs(
     ("Home", classOf[HomePage], Some(IconType.Home)),
@@ -24,6 +24,11 @@ trait Bootstrapping extends WebApplication with Log {
   )
 
   def tabs: Seq[BootTab[_ <: WebPage]] = defaultTabs
+
+  def getWebSessionClass = classOf[MyAuthenticatedWebSession]
+
+  // TODO: Change
+  def getSignInPageClass = classOf[AccountPage]
 
   override def init() {
     super.init()

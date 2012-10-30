@@ -1,15 +1,16 @@
 package com.mle.jdbc.auth
 
-import com.mle.auth.{PasswordAuthenticator, UserManager}
+import com.mle.auth.{CertificateContainer, CertificateAuthenticator, PasswordAuthenticator, UserManager}
 import com.mle.jdbc.schema.UserMgmtSchema
 import com.mle.auth.exception.AuthException
+import java.security.cert.X509Certificate
 
 /**
  *
  * @author mle
  */
 abstract class JDBCUserManager(schema: UserMgmtSchema)
-  extends UserManager with Authenticator[String] {
+  extends UserManager with PasswordAuthenticator[String] with CertificateAuthenticator[String] {
   val usersTable = schema.usersTable
   val usernameCol = "name"
   val passwordCol = "password"
@@ -19,7 +20,13 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
 
   def authenticate(user: String, password: String) = {
     usersTable.select(usernameCol)(usernameCol -> user, passwordCol -> password)(_ getString 1).headOption
-      .getOrElse(throw new AuthException("Authentication failed"))
+      .getOrElse(throw new AuthException("Password authentication failed for user: " + user))
+  }
+
+  def authenticate(certChain: Seq[X509Certificate]) = {
+    val certInfo = new CertificateContainer(certChain)
+    usersTable.select(usernameCol)(usernameCol -> certInfo.cn)(_ getString 1).headOption
+      .getOrElse(throw new AuthException("Certificate authentication failed for CN: " + certInfo.cn))
   }
 
   override def addUser(user: String, password: String) {
@@ -100,4 +107,5 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
     "(select id from " + groupsTable + " where " + groupnameCol + "=?))", group)(_ getString 1)
 
   def users = usersTable.db.query("select " + usernameCol + " from " + usersTable)(_ getString 1)
+
 }

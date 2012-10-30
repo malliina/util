@@ -3,19 +3,19 @@ package com.mle.wicket.markup
 import com.mle.util.Log
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest
-import org.apache.wicket.markup.html.basic.Label
 import com.mle.wicket.model.LDModel
 import com.mle.auth.CertificateContainer
+import com.mle.wicket.component.SLabel
 
 /**
  * @author Mle
  */
 class AccountPanel(id: String) extends Panel(id) with Log {
   val certModel = LDModel(new CertificateContainer(certChain))
-  val dn = LDModel(cert.dn getOrElse "No certificate")
-  val cn = LDModel(cert.cn getOrElse "Unable to read CN")
-  add(new Label("dn", dn))
-  add(new Label("cn", cn))
+  add(
+    SLabel("dn", cert.dn),
+    SLabel("cn", cert.cn)
+  )
 
   def cert = certModel.getObject
 
