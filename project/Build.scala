@@ -32,7 +32,9 @@ object GitBuild extends Build {
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
   ) ++ webSettings
   // TODO: we cannot reload the project if bees.config doens't exist. fix.
-  val beesConfig = MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
+  val beesConfig = MyUtil.optionally(
+    MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
+  ).getOrElse(Map.empty)
   lazy val wicketSettings: Seq[Setting[_]] = commonSettings ++
     myWebSettings ++
     PackagerPlugin.packagerSettings ++
@@ -61,9 +63,9 @@ object GitBuild extends Build {
     .settings(
     libraryDependencies ++= webDeps ++ wiQuery ++ Seq(jerkson),
     CloudBees.applicationId := Some("wicket"),
-    CloudBees.apiKey := Some(beesConfig("bees.api.key")),
-    CloudBees.apiSecret := Some(beesConfig("bees.api.secret")),
-    CloudBees.username := Some(beesConfig("bees.project.app.domain"))
+    CloudBees.apiKey := beesConfig get "bees.api.key",
+    CloudBees.apiSecret := beesConfig get "bees.api.secret",
+    CloudBees.username := beesConfig get "bees.project.app.domain"
   )
 
   def myProject(id: String) = Project(id, file(id), settings = commonSettings)

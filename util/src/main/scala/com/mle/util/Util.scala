@@ -74,6 +74,12 @@ object Util {
 
   def resourceUri(path: String) = resource(path).toURI
 
+  /**
+   *
+   * @param path
+   * @return
+   * @throws ResourceNotFoundException
+   */
   def uri(path: String) = {
     val maybeFile = FileUtilities.pathTo(path)
     if (Files exists maybeFile)
@@ -82,6 +88,12 @@ object Util {
       resourceUri(path)
   }
 
+  /**
+   *
+   * @param path
+   * @return
+   * @throws ResourceNotFoundException
+   */
   def props(path: String) = io.Source.fromURI(uri(path)).getLines()
     .map(line => line.split("=", 2))
     .map(arr => arr(0) -> arr(1)).toMap
