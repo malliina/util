@@ -19,8 +19,6 @@
 # Adapted from artifactory's start/stop script
 # Should be LSB compliant and therefore usable with pacemaker for HA configurations
 
-
-
 usage() {
     echo "Usage: $0 {start|stop|restart|status}"
     exit 1
