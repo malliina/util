@@ -54,6 +54,7 @@ case "$1" in
     start)
         if is_running; then
             echo "Already running"
+            # LSB says: return 0 when starting an already started service
             exit 0
         fi
         COMMAND="exec ${JAVA_CMD} ${JAVA_OPTS} -cp ${APP_HOME}/lib/*:${APP_HOME}/${APP_NAME}.jar ${MAIN_CLASS} >> ${APP_HOME}/logs/console.out 2>&1"
