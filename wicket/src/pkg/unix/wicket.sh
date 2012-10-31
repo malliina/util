@@ -19,7 +19,6 @@
 # Adapted from artifactory's start/stop script
 # Should be LSB compliant and therefore usable with pacemaker for HA configurations
 
-APP_NAME=wicket
 usage() {
     echo "Usage: $0 {start|stop|restart|status}"
     exit 1
@@ -45,6 +44,8 @@ is_running(){
         return 1
     fi
 }
+
+APP_NAME=wicket
 if [ -f /etc/default/${APP_NAME} ] ; then
   . /etc/default/${APP_NAME}
 fi
@@ -62,17 +63,22 @@ case "$1" in
             nohup su - ${APP_USER} --shell=/bin/sh -c "${COMMAND}" >/dev/null 2>&1 &
         fi
         echo $! > ${PID_FILE}
-        echo "Started"
+        sleep 1
+        if is_running; then
+            echo "Started"
+        else
+            echo "Startup failed"
+            exit 1
+        fi
         ;;
-
     stop)
+        # TODO: use rmi call to stop service
         PID=`cat ${PID_FILE} 2>/dev/null`
         kill $PID 2>/dev/null
         kill -9 $PID 2>/dev/null
         rm -f ${PID_FILE}
         echo "Stopped"
         ;;
-
     restart)
         $0 stop $*
         sleep 2

@@ -59,15 +59,15 @@ object NativePackaging {
     rpm.Keys.rpmRelease := "0.1",
     rpm.Keys.rpmVendor := "kingmichael",
     rpm.Keys.rpmLicense := Some("You have the right to remain silent"),
-    rpm.Keys.rpmPreInstall <<= (preInstall)(Some(_)),
-    rpm.Keys.rpmPostInstall <<= (postInstall)(Some(_)),
-    rpm.Keys.rpmPreRemove <<= (preRemove)(Some(_)),
-    rpm.Keys.rpmPostRemove <<= (postRemove)(Some(_))
+    rpm.Keys.rpmPreInstall <<= (preInstall)(preInst => Some(preInst.toFile)),
+    rpm.Keys.rpmPostInstall <<= (postInstall)(postInst => Some(postInst.toFile)),
+    rpm.Keys.rpmPreRemove <<= (preRemove)(preRm => Some(preRm.toFile)),
+    rpm.Keys.rpmPostRemove <<= (postRemove)(postRm => Some(postRm.toFile))
   )
   val windowsMappings = mappings in windows.Keys.packageMsi in Windows
   val windowsSettings: Seq[Setting[_]] = Seq(
     windows.Keys.wixConfig <<= (windowsPkgHome) map ((dir: Path) => makeWindowsXml(dir)),
-//    windows.Keys.wixFile := new File("doesnotexist"),
+    //    windows.Keys.wixFile := new File("doesnotexist"),
     windowsMappings <+= (appJar) map ((jar: Path) => jar.toFile -> jar.getFileName.toString)
   )
   val defaultNativeProject: Seq[Setting[_]] = linuxSettings ++ debianSettings ++ rpmSettings ++ windowsSettings

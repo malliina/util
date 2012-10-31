@@ -1,4 +1,4 @@
 #!/bin/sh
 echo "Executing postuninstall..."
-#userdel wicket
+# done in preuninstall? userdel wicket
 echo "Done"
