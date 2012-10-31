@@ -58,3 +58,8 @@ crm resource migrate g_mysql node_host_name_here
 // the manual migration command also sets the new node as preferred; lookup the name with "crm configure show" and delete the preference with
 service configure delete preference_name
 
+// su root won't work
+su -
+primitive wicket lsb:wicket op monitor interval=10s timeout=30s op start timeout=120s op stop timeout=120s
+
+

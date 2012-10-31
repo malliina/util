@@ -19,6 +19,8 @@
 # Adapted from artifactory's start/stop script
 # Should be LSB compliant and therefore usable with pacemaker for HA configurations
 
+
+
 usage() {
     echo "Usage: $0 {start|stop|restart|status}"
     exit 1
@@ -44,7 +46,50 @@ is_running(){
         return 1
     fi
 }
+# needed for HA configuration so we can use this as an LSB resource agent
+meta_data() {
+    cat <<END
+    <?xml version="1.0"?>
+    <!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
+    <resource-agent name="wicket" version="0.9">
+        <version>1.0</version>
 
+        <longdesc lang="en">
+            This is a Dummy Resource Agent. It does absolutely nothing except
+            keep track of whether its running or not.
+        </longdesc>
+        <shortdesc lang="en">Example stateless resource agent</shortdesc>
+
+        <parameters>
+            <parameter name="state" unique="1">
+                <longdesc lang="en">
+                Location to store the resource state in.
+                </longdesc>
+                <shortdesc lang="en">State file</shortdesc>
+                <content type="string" default="${HA_RSCTMP}/wicket-${OCF_RESOURCE_INSTANCE}.state" />
+            </parameter>
+            <parameter name="fake" unique="0">
+                <longdesc lang="en">Fake attribute that can be changed to cause a reload</longdesc>
+                <shortdesc lang="en">Fake attribute that can be changed to cause a reload</shortdesc>
+                <content type="string" default="wicket" />
+            </parameter>
+        </parameters>
+
+        <actions>
+            <action name="start"        timeout="20" />
+            <action name="stop"         timeout="20" />
+            <action name="monitor"      timeout="20" interval="10" depth="0" />
+            <action name="reload"       timeout="20" />
+            <action name="migrate_to"   timeout="20" />
+            <action name="migrate_from" timeout="20" />
+            <action name="meta-data"    timeout="5" />
+            <action name="validate-all"   timeout="20" />
+        </actions>
+    </resource-agent>
+    END
+}
+
+# Script starts here
 APP_NAME=wicket
 if [ -f /etc/default/${APP_NAME} ] ; then
   . /etc/default/${APP_NAME}
