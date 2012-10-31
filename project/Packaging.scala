@@ -80,7 +80,7 @@ object Packaging extends Plugin {
     unixPkgHome <<= (pkgHome)(_ / "unix"),
     windowsPkgHome <<= (pkgHome)(_ / "windows"),
     // rpm/deb postinst control files
-    controlDir <<= (pkgHome)(_ / "control"),
+    controlDir <<= (unixPkgHome)(_ / "control"),
     preInstall <<= (controlDir)(_ / "preinstall.sh"),
     postInstall <<= (controlDir)(_ / "postinstall.sh"),
     preRemove <<= (controlDir)(_ / "preuninstall.sh"),
