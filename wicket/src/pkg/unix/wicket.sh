@@ -14,8 +14,11 @@
 # Short-Description: Start wicket at boot time
 # Description:       Manages the services needed to run wicket
 ### END INIT INFO
+#
 # Startup script for wicket under *nix systems (it works under NT/cygwin too).
 # Adapted from artifactory's start/stop script
+# Should be LSB compliant and therefore usable with pacemaker for HA configurations
+
 APP_NAME=wicket
 usage() {
     echo "Usage: $0 {start|stop|restart|status}"
@@ -80,6 +83,9 @@ case "$1" in
             echo "Running"
         else
             echo "Not running"
+            # LSB says exit status 3 is "program is not running"
+            # http://refspecs.linux-foundation.org/LSB_3.2.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+            exit 3
         fi
         ;;
     *)
