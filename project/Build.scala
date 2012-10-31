@@ -31,7 +31,6 @@ object GitBuild extends Build {
   val myWebSettings: Seq[Setting[_]] = Seq(
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
   ) ++ webSettings
-  // TODO: we cannot reload the project if bees.config doens't exist. fix.
   val beesConfig = MyUtil.optionally(
     MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
   ).getOrElse(Map.empty)

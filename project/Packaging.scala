@@ -76,7 +76,7 @@ object Packaging extends Plugin {
     unixConfDest <<= (unixHome)(_ / "conf"),
     unixScriptDest <<= (unixHome)(_ / "scripts"),
     unixLogDir <<= (unixHome)(_ / "logs"),
-    pkgHome <<= (basePath)(_ / "src" / "pkg" / "unix"),
+    pkgHome <<= (basePath)(_ / "src" / "pkg"),
     unixPkgHome <<= (pkgHome)(_ / "unix"),
     windowsPkgHome <<= (pkgHome)(_ / "windows"),
     // rpm/deb postinst control files
