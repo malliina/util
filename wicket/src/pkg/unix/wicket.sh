@@ -73,6 +73,17 @@ case "$1" in
         fi
         ;;
     stop)
+        if pid_exists; then
+            # TODO: use rmi call to stop service
+            PID=`cat ${PID_FILE} 2>/dev/null`
+            kill $PID 2>/dev/null
+            rm -f ${PID_FILE}
+            # Wait for the service to die; remove if RMI in use
+            sleep 2
+            echo "Stopped"
+        else
+            echo "Unable to find PID file; already stopped?"
+        fi
         # TODO: use rmi call to stop service
         PID=`cat ${PID_FILE} 2>/dev/null`
         kill $PID 2>/dev/null
@@ -82,7 +93,6 @@ case "$1" in
         ;;
     restart)
         $0 stop $*
-        sleep 2
         $0 start $*
         ;;
     status)
