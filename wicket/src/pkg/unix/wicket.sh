@@ -84,12 +84,6 @@ case "$1" in
         else
             echo "Unable to find PID file; already stopped?"
         fi
-        # TODO: use rmi call to stop service
-        PID=`cat ${PID_FILE} 2>/dev/null`
-        kill $PID 2>/dev/null
-        kill -9 $PID 2>/dev/null
-        rm -f ${PID_FILE}
-        echo "Stopped"
         ;;
     restart)
         $0 stop $*
