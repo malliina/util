@@ -26,7 +26,9 @@ object GitBuild extends Build {
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
-    sbt.Keys.fork in Test := true
+    sbt.Keys.fork in Test := true,
+    // the jars of modules depended on are not included unless this is true
+    exportJars := true
   )
   val myWebSettings: Seq[Setting[_]] = Seq(
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
