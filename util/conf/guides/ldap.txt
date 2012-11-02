@@ -18,7 +18,7 @@ olcAccess: {1}to dn.base="" by * read
 olcAccess: {2}to * by self write by dn="cn=admin,dc=mle,dc=com" write by * read
 olcLastMod: TRUE
 olcRootDN: cn=admin,dc=mle,dc=com
-olcRootPW: {SSHA}K6iotdVrpf3/gCzam4j0sahFgGENPHEj
+olcRootPW: {SSHA}J6jkTA6U5xndQfAE15I2GXeHC0yHJKQ1
 olcDbCheckpoint: 512 30
 olcDbConfig: {0}set_cachesize 0 2097152 0
 olcDbConfig: {1}set_lk_max_objects 1500

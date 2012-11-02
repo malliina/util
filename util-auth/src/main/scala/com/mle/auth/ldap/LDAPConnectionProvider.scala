@@ -8,7 +8,7 @@ import java.util.Properties
 import collection.JavaConversions._
 
 /**
- * TODO: Connection pooling
+ * TODO: optional ssl
  *
  * @author Mle
  */
@@ -16,10 +16,15 @@ class LDAPConnectionProvider(uri: String,
                              user: String,
                              password: Option[String],
                              adminInfo: DnInfo,
-                             authMechanism: String = "simple")
+                             authMechanism: String = "simple",
+                             ssl: Boolean = true)
   extends ConnectionProvider[InitialDirContext] {
-  val noUserProperties = Map(
-    Context.SECURITY_PROTOCOL -> "ssl",
+  private val sslSetting = if (ssl)
+    Map(Context.SECURITY_PROTOCOL -> "ssl")
+  else
+    Map.empty[String, String]
+
+  val noUserProperties = sslSetting ++ Map(
     Context.SECURITY_AUTHENTICATION -> authMechanism,
     Context.INITIAL_CONTEXT_FACTORY -> classOf[LdapCtxFactory].getName,
     Context.PROVIDER_URL -> uri,

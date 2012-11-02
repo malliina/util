@@ -138,16 +138,3 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     connectionProvider.withConnection(_.modifyAttributes(userInfo.toDN((user)), mod))
   }
 }
-
-object AbstractLdapUserManager {
-  def apply(schema: LdapDirInfo,
-            adminUser: String,
-            adminPassword: String,
-            logging: Boolean = true) = {
-    val connProvider = new LDAPConnectionProvider(schema.uri, adminUser, Some(adminPassword), schema.adminInfo)
-    if (logging)
-      new DefaultLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
-    else
-      new AbstractLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo) with PasswordHashing[InitialDirContext]
-  }
-}

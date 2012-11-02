@@ -16,7 +16,7 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
 
   def manager: UserManager
 
-  def authenticator: Authenticator[_]
+  def authenticator: PasswordAuthenticator[_]
 
   after {
     Util optionally (manager removeUser testUser)

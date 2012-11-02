@@ -73,12 +73,11 @@ object Util {
     .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: " + path))
 
   def resourceUri(path: String) = resource(path).toURI
-
   /**
    *
    * @param path
-   * @return
-   * @throws ResourceNotFoundException
+   * @return the uri of the file at the given path, or classpath resource if no classpath resource is found
+   * @throws ResourceNotFoundException if neither a resource nor a file is found
    */
   def uri(path: String) = {
     val maybeFile = FileUtilities.pathTo(path)
@@ -88,13 +87,16 @@ object Util {
       resourceUri(path)
   }
 
+  def url(path: String) = uri(path).toURL
+
   /**
+   * Reads the properties of the classpath resource at the given path, or if none is found, of a file at the given path.
    *
    * @param path
-   * @return
-   * @throws ResourceNotFoundException
+   * @return the properties as a map
+   * @throws ResourceNotFoundException if neither a resource nor a file is found
    */
-  def props(path: String) = io.Source.fromURI(uri(path)).getLines()
+  def props(path: String) = io.Source.fromURL(url(path)).getLines()
     .map(line => line.split("=", 2))
     .map(arr => arr(0) -> arr(1)).toMap
 }

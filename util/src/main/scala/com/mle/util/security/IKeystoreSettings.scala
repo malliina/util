@@ -1,14 +1,14 @@
 package com.mle.util.security
 
-import com.mle.util.Util
+import com.mle.util.{Log, FileUtilities, Util}
 
 /**
  *
  * @author mle
  */
-trait IKeystoreSettings {
-  lazy val keystoreUrl = Util resource keystore
-  lazy val truststoreUrl = Util resource truststore
+trait IKeystoreSettings extends Log {
+  lazy val keystoreUrl = Util url keystore
+  lazy val truststoreUrl = Util url truststore
 
   def keystore: String
 
@@ -18,10 +18,19 @@ trait IKeystoreSettings {
 
   def truststorePass: String
 
-  def setSystemProperties() {
-    sys.props("javax.net.ssl.trustStore") = truststoreUrl.getFile
+  /**
+   * Creates files of the keystore and truststore unless they already are such and sets the correct javax.ssl system properties.
+   *
+   * Files are needed because java's ssl tools do not accept resources from the classpath; only files.
+   */
+  def prepareSystemProperties() {
+    val keystoreFileUrl = FileUtilities.resourceToFile(keystore).map(_.toUri.toURL)
+      .getOrElse(keystoreUrl).getFile
+    val truststoreFileUrl = FileUtilities.resourceToFile(truststore).map(_.toUri.toURL)
+      .getOrElse(truststoreUrl).getFile
+    sys.props("javax.net.ssl.trustStore") = truststoreFileUrl
     sys.props("javax.net.ssl.trustStorePassword") = truststorePass
-    sys.props("javax.net.ssl.keyStore") = keystoreUrl.getFile
+    sys.props("javax.net.ssl.keyStore") = keystoreFileUrl
     sys.props("javax.net.ssl.keyStorePassword") = keystorePass
   }
 }
