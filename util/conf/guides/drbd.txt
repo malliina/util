@@ -62,5 +62,10 @@ service configure delete preference_name
 // su root won't work
 su -
 primitive wicket lsb:wicket op monitor interval=10s timeout=30s op start timeout=120s op stop timeout=120s
+primitive named lsb:named op monitor interval=10s timeout=30s op start timeout=120s op stop timeout=120s
+// didn't work as desired (why?)
+primitive named ocf:redhat:named params config_file="/drbd/etc/named.conf" named_working_dir="/drbd/var/named" op monitor interval=10s timeout=30s op start timeout=120s op stop timeout=120s
+
+
 
 
