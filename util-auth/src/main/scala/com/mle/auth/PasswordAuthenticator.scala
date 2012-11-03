@@ -8,16 +8,11 @@ import crypto.Hashing
  * @author Mle
  */
 trait PasswordAuthenticator[T] {
-  /**
-   * If this method returns normally, the authentication was successful.
-   *
-   * @param user
-   * @param password
-   * @throws Exception if authentication fails
-   */
+  def authenticate(credential: UserPassContainer): T = authenticate(credential.username, credential.password)
+
   def authenticate(user: String, password: String): T
 }
 
-trait HashingAuthenticator[T] extends PasswordAuthenticator[T] with Hashing {
+trait AuthHashing[T] extends PasswordAuthenticator[T] with Hashing {
   abstract override def authenticate(user: String, password: String) = super.authenticate(user, hash(user, password))
 }

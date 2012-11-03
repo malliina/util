@@ -73,6 +73,7 @@ object Util {
     .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: " + path))
 
   def resourceUri(path: String) = resource(path).toURI
+
   /**
    *
    * @param path

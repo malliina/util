@@ -1,9 +1,9 @@
 package com.mle.jdbc.tests
 
-import com.mle.jdbc.{Database, DefaultSettings}
+import com.mle.jdbc.{StatementLogging, Database, DefaultSettings}
 
 /**
  *
  * @author mle
  */
-object TestDb extends Database(DefaultSettings.connProvider)
+object TestDb extends Database(DefaultSettings.connProvider) with StatementLogging

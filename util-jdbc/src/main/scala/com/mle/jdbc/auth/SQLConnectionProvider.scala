@@ -3,12 +3,13 @@ package com.mle.jdbc.auth
 import com.mle.auth.ConnectionProvider
 import java.sql.{PreparedStatement, Connection}
 import com.mle.util.Util._
+import com.mle.util.Log
 
 /**
  *
  * @author mle
  */
-trait SQLConnectionProvider extends ConnectionProvider[Connection] {
+trait SQLConnectionProvider extends ConnectionProvider[Connection] with Log {
   override def withConnection[T](code: Connection => T) = using(connection)(code)
 
   def withStmt[T](sql: String)(code: PreparedStatement => T) = withConnection(conn => {

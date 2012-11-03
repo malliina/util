@@ -7,6 +7,8 @@ package com.mle.wicket.markup
  */
 object Pages {
 
+  class LoginPage extends PanelPage(new LoginPanel(_))
+
   class HomePage extends BootstrapPage(new Home(_))
 
   class WebSocketsPage extends BootstrapPage(new WebSocketTabs(_))

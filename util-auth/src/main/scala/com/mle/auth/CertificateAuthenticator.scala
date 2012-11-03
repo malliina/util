@@ -7,9 +7,10 @@ import java.security.cert.X509Certificate
  *
  * This class does not verify that the client certificate is signed by a ca certificate the server trusts.
  * It is assumed that this step has already been done,
- * and in web contexts it is already done by the web container at this point, for example by Jetty.
+ * and in web contexts it is already done by the web container by the time this trait is used, for example by Jetty.
  *
- * Therefore to authenticate we only need to read the CN from the DN and check if such a user exists.
+ * Therefore to "authenticate", implementations only need to read the CN from the DN
+ * and check if such a user exists in the user database.
  *
  * @author mle
  */

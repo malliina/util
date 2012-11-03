@@ -15,5 +15,5 @@ trait Column {
 
   def defaultValue: Option[String] = None
 
-  override def toString = schema + "." + table + "." + name
+  override def toString = table + "." + name
 }

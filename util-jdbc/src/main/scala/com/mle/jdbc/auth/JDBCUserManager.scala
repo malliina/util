@@ -1,33 +1,39 @@
 package com.mle.jdbc.auth
 
-import com.mle.auth.{CertificateContainer, CertificateAuthenticator, PasswordAuthenticator, UserManager}
-import com.mle.jdbc.schema.UserMgmtSchema
+import com.mle.auth._
 import com.mle.auth.exception.AuthException
-import java.security.cert.X509Certificate
+import com.mle.jdbc.schema.UserMgmtSchema
 
 /**
  *
  * @author mle
  */
 abstract class JDBCUserManager(schema: UserMgmtSchema)
-  extends UserManager with PasswordAuthenticator[String] with CertificateAuthenticator[String] {
+  extends UserManager
+  with PasswordAuthenticator[String]
+  with DefaultCertificateAuthenticator {
   val usersTable = schema.usersTable
-  val usernameCol = "name"
-  val passwordCol = "password"
+  val usernameCol = usersTable.name.name
+  val passwordCol = usersTable.password.name
   val groupsTable = schema.groupsTable
-  val groupnameCol = "name"
+  val groupnameCol = groupsTable.name.name
   val userGroup = schema.userGroup
+  val userIdCol = userGroup.user_id.name
+  val groupIdCol = userGroup.group_id.name
 
   def authenticate(user: String, password: String) = {
     usersTable.select(usernameCol)(usernameCol -> user, passwordCol -> password)(_ getString 1).headOption
       .getOrElse(throw new AuthException("Password authentication failed for user: " + user))
   }
 
-  def authenticate(certChain: Seq[X509Certificate]) = {
-    val certInfo = new CertificateContainer(certChain)
-    usersTable.select(usernameCol)(usernameCol -> certInfo.cn)(_ getString 1).headOption
-      .getOrElse(throw new AuthException("Certificate authentication failed for CN: " + certInfo.cn))
-  }
+  /**
+   * A performance optimization to reading all users which is the default impl.
+   *
+   * @param user the user to look for
+   * @return true if the user exists, false otherwise
+   */
+  override def existsUser(user: String) = usersTable.select(usernameCol)(usernameCol -> user)(_ getString 1)
+    .headOption.map(_ => true).getOrElse(false)
 
   override def addUser(user: String, password: String) {
     usersTable.insert(usernameCol -> user, passwordCol -> password)
@@ -59,7 +65,7 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
   def assign(user: String, group: String) {
     val userId = usersTable id usernameCol -> user
     val groupId = groupsTable id groupnameCol -> group
-    userGroup insert("user_id" -> userId, "group_id" -> groupId)
+    userGroup insert(userIdCol -> userId, groupIdCol -> groupId)
   }
 
   def groups = usersTable.db.query("select " + groupnameCol + " from " + groupsTable)(_ getString 1)
@@ -74,7 +80,7 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
   def revoke(user: String, group: String) {
     val userId = usersTable id usernameCol -> user
     val groupId = groupsTable id groupnameCol -> group
-    userGroup delete("user_id" -> userId, "group_id" -> groupId)
+    userGroup delete(userIdCol -> userId, groupIdCol -> groupId)
   }
 
   /**
@@ -92,9 +98,10 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
    * @return
    * @throws Exception if the user does not exist
    */
-  def groups(user: String) = usersTable.db.query("select " + groupnameCol + " from " + groupsTable + " where id=" +
-    "(select group_id from " + userGroup + " where user_id=" +
-    "(select id from " + usersTable + " where " + usernameCol + "=?))", user)(_ getString 1)
+  def groups(user: String) = groupsTable.db.query("select " + groupnameCol + " from " + groupsTable + " " +
+    "where " + groupsTable.id + "=" +
+    "(select " + groupIdCol + " from " + userGroup + " where " + userIdCol + "=" +
+    "(select " + usersTable.id + " from " + usersTable + " where " + usernameCol + "=?))", user)(_ getString 1)
 
   /**
    *
@@ -102,9 +109,10 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
    * @return
    * @throws Exception if the group does not exist
    */
-  def users(group: String) = usersTable.db.query("select " + usernameCol + " from " + usersTable + " where id=" +
-    "(select user_id from " + userGroup + " where group_id=" +
-    "(select id from " + groupsTable + " where " + groupnameCol + "=?))", group)(_ getString 1)
+  def users(group: String) = usersTable.db.query("select " + usernameCol + " from " + usersTable + " " +
+    "where " + usersTable.id + "=" +
+    "(select " + userIdCol + " from " + userGroup + " where " + groupIdCol + "=" +
+    "(select " + groupsTable.id + " from " + groupsTable + " where " + groupnameCol + "=?))", group)(_ getString 1)
 
   def users = usersTable.db.query("select " + usernameCol + " from " + usersTable)(_ getString 1)
 

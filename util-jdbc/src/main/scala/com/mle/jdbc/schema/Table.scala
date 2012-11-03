@@ -19,7 +19,7 @@ abstract class Table {
 
   def tableName: String
 
-  def allSql = "select * from " + tableName
+  def allSql = "select * from " + this
 
   def select[T](columns: String*)(where: (String, Any)*)(mapping: ResultSet => T) = {
     val selectCols = columns mkString ","
@@ -33,7 +33,7 @@ abstract class Table {
       throw new IllegalArgumentException("No values to insert specified")
     val columns = values.map(_._1).mkString(",")
     val questionMarks = values.size.questionMarks.mkString(",")
-    val insertSql = "insert into " + tableName + "(" + columns + ") values (" + questionMarks + ")"
+    val insertSql = "insert into " + this + "(" + columns + ") values (" + questionMarks + ")"
     db.execute(insertSql, toValues(values): _*)
   }
 
@@ -45,12 +45,12 @@ abstract class Table {
     if (where.size == 0)
       throw new IllegalArgumentException("No WHERE condition specified for DELETE operation")
     val target = where.map(_._1 + "=?").mkString(" and ")
-    db execute("delete from " + tableName + " where " + target, toValues(where): _*)
+    db execute("delete from " + this + " where " + target, toValues(where): _*)
   }
 
   def id(where: (String, Any)) = {
     val (column, value) = where
-    db.head("select id from " + tableName + " where " + column + "=?", value)(_ getInt 1)
+    db.head("select id from " + this + " where " + column + "=?", value)(_ getInt 1)
   }
 
   def update(values: (String, Any)*)(where: (String, Any)*) {
@@ -59,7 +59,7 @@ abstract class Table {
     val target = values.map(_._1 + "=?").mkString(",")
     val whereCond = where.map(_._1 + "=?").mkString(" and ")
     val allValues = toValues(values ++ where)
-    db execute("update " + tableName + " set " + target + " where " + whereCond, allValues: _*)
+    db execute("update " + this + " set " + target + " where " + whereCond, allValues: _*)
   }
 
   def toWhereClause(where: Seq[(String, Any)]) = where.map(_._1 + "=?").mkString(" and ")

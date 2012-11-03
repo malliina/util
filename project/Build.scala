@@ -58,7 +58,7 @@ object GitBuild extends Build {
   lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
     .dependsOn(util, utilActor, utilJdbc)
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
-    .dependsOn(util, utilActor, rmi, auth)
+    .dependsOn(util, utilActor, rmi, auth, utilJdbc)
     .settings(cloudBeesSettings: _*)
     .settings(myWebSettings: _*)
     .settings(

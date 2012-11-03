@@ -1,7 +1,7 @@
 package com.mle.jdbc
 
 import com.mle.util.security.ClientKeystoreSettings
-import auth.BoneCpConnectionProvider
+import auth.{MySQLConnectionProvider, BoneCpConnectionProvider}
 import com.mle.util.Util
 
 /**
@@ -10,7 +10,7 @@ import com.mle.util.Util
  */
 object DefaultSettings {
   val dbInfo = Util.props("conf/security/auth.test")
-  val connProvider = new BoneCpConnectionProvider(// MySQLConnectionProvider
+  val connProvider = new MySQLConnectionProvider(
     dbInfo("db.uri"),
     dbInfo("db.user"),
     Some(dbInfo("db.pass")),

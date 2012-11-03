@@ -1,8 +1,9 @@
 package com.mle.wicket
 
 import markup.Pages._
-import markup.{BootstrapPanelPage, SoloPage}
+import markup.{Login, BootstrapPanelPage, SoloPage}
 import org.apache.wicket.protocol.http.WebApplication
+import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication
 
 /**
  * JQWicket doesn't work with Wicket 6.0.0: NoClassDefFoundError: org/apache/wicket/markup/html/IHeaderResponse.
@@ -13,11 +14,13 @@ import org.apache.wicket.protocol.http.WebApplication
  *
  * @author Mle
  */
-class BasicWebApplication extends Bootstrapping with PageMounting {
-  def getHomePage = classOf[SettingsPage]
+class BasicWebApplication extends AuthenticatedWebApplication with Bootstrapping with PageMounting {
 
   override def init() {
     super.init()
+    getMarkupSettings.setStripWicketTags(true)
+    mount(classOf[Login])
+    mount(classOf[LoginPage])
     mount(classOf[HomePage])
     mount(classOf[SettingsPage])
     mount(classOf[SoloPage])
@@ -26,6 +29,12 @@ class BasicWebApplication extends Bootstrapping with PageMounting {
     mount(classOf[BootstrapPanelPage])
     mount(classOf[AccountPage])
   }
+
+  def getHomePage = classOf[SettingsPage]
+
+  def getWebSessionClass = classOf[MySession]
+
+  def getSignInPageClass = classOf[LoginPage]
 }
 
 object BasicWebApplication {
