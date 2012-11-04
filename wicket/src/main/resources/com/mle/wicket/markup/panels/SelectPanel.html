@@ -1,0 +1,23 @@
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<wicket:head>
+</wicket:head>
+<wicket:panel>
+    <form wicket:id="selectForm" class="form-vertical">
+        <fieldset>
+            <legend>Select</legend>
+            <div wicket:id="selectFeedback"></div>
+            <div class="control-group">
+                <div class="controls">
+                    <select class="span3" wicket:id="choices"></select>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="button" wicket:id="delete" class="btn">
+                    <input type="button" wicket:id="create" class="btn">
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</wicket:panel>
+</html>

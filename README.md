@@ -3,7 +3,6 @@ An exploration of Scala. Test code for wicket, play!, web sockets, actors, funct
 To do:
 
 - Evaluate Slick after 2.10 is released
-- User authentication based on certificate
 - Test LDAP server with some 3PP, e.g. subsonic, and user management using my modules
 - MSI packaging
 - Play fucks up the logback configuration jesus christ

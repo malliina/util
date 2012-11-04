@@ -1,7 +1,7 @@
 package com.mle.wicket
 
 import markup.Pages._
-import markup.{Login, BootstrapPanelPage, SoloPage}
+import markup.{BootstrapPanelPage, SoloPage}
 import org.apache.wicket.protocol.http.WebApplication
 import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication
 
@@ -19,7 +19,6 @@ class BasicWebApplication extends AuthenticatedWebApplication with Bootstrapping
   override def init() {
     super.init()
     getMarkupSettings.setStripWicketTags(true)
-    mount(classOf[Login])
     mount(classOf[LoginPage])
     mount(classOf[HomePage])
     mount(classOf[SettingsPage])
@@ -28,6 +27,7 @@ class BasicWebApplication extends AuthenticatedWebApplication with Bootstrapping
     mount(classOf[SortPage])
     mount(classOf[BootstrapPanelPage])
     mount(classOf[AccountPage])
+    mount(classOf[UsersPage])
   }
 
   def getHomePage = classOf[SettingsPage]

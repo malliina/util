@@ -8,7 +8,6 @@ import org.apache.wicket.Page
 import org.apache.wicket.markup.html.WebPage
 import com.mle.util.Log
 import de.agilecoders.wicket.markup.html.bootstrap.image.IconType
-import org.apache.wicket.authroles.authentication.AuthenticatedWebApplication
 import org.apache.wicket.protocol.http.WebApplication
 
 /**
@@ -21,7 +20,8 @@ trait Bootstrapping extends WebApplication with Log {
     ("Sorting", classOf[SortPage], None),
     ("Bootstrap", classOf[SettingsPage], Some(IconType.Cog)),
     ("MOTD", classOf[MessagePage], None),
-    ("Account", classOf[AccountPage], Some(IconType.User))
+    ("Account", classOf[AccountPage], Some(IconType.User)),
+    ("Users", classOf[UsersPage], Some(IconType.User))
   )
 
   def tabs: Seq[BootTab[_ <: WebPage]] = defaultTabs

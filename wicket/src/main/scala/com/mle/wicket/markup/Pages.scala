@@ -23,4 +23,6 @@ object Pages {
 
   class AccountPage extends BootstrapPage(new AccountPanel(_))
 
+  class UsersPage extends BootstrapPage(new Users(_))
+
 }

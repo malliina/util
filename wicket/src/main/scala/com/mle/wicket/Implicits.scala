@@ -1,6 +1,8 @@
 package com.mle.wicket
 
+import model.LDModel
 import org.apache.wicket.util.time.Duration
+import org.apache.wicket.model.IModel
 
 
 /**
@@ -22,5 +24,9 @@ object Implicits {
     def hours = Duration.valueOf(i + " hours")
 
     def days = Duration.valueOf(i + " days")
+  }
+
+  implicit def model2model[T, U](model: IModel[T]) = new {
+    def map(transformer: T => U): IModel[U] = LDModel(transformer(model.getObject))
   }
 }
