@@ -10,6 +10,6 @@ import com.mle.jdbc.schema.UserMgmtSchema
  */
 class DefaultJdbcUserManager(schema: UserMgmtSchema)
   extends JDBCUserManager(schema)
-  with ChangeLogging
+  with ChangeLogging[String]
   with PasswordHashing[String] {
 }

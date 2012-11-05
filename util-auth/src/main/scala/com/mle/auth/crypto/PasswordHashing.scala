@@ -4,9 +4,8 @@ import com.mle.auth.{AuthHashing, UserManager}
 
 /**
  * TODO: Self-type?
- * @tparam T type of connection ([[javax.naming.directory.InitialDirContext]], [[java.sql.Connection]], ...)
  */
-trait PasswordHashing[T] extends UserManager with AuthHashing[T] {
+trait PasswordHashing[U] extends UserManager[String] with AuthHashing[U] {
 
   abstract override def setPassword(user: String, newPassword: String) {
     super.setPassword(user, hash(user, newPassword))

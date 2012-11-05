@@ -11,7 +11,7 @@ import java.security.cert.X509Certificate
  *
  * Therefore to "authenticate", implementations only need to read the CN from the DN
  * and check if such a user exists in the user database.
- *
+ * @tparam T type of user identifier
  * @author mle
  */
 trait CertificateAuthenticator[T] extends Authenticator[Seq[X509Certificate], T] {

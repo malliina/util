@@ -1,65 +1,46 @@
 package com.mle.wicket.markup.panels
 
-import org.apache.wicket.model.IModel
+import org.apache.wicket.model.{PropertyModel, IModel}
 import org.apache.wicket.markup.html.form.{TextField, Form}
-import com.mle.wicket.model.LDModel
 import org.apache.wicket.markup.html.basic.Label
 import org.apache.wicket.markup.html.panel.Fragment
 import com.mle.util.Log
-import org.apache.wicket.ajax.markup.html.form.AjaxButton
-import org.apache.wicket.ajax.AjaxRequestTarget
 import com.mle.db.DatabaseSettings
+import com.mle.wicket.model.RWModel
+import com.mle.wicket.markup.EditableUser
 
 /**
- * TODO move parts to a generic superclass for editing arbitrary objects
  * @author mle
  */
-class UserEditPanel(id: String, editModel: IModel[String])
-  extends EditPanel(id, editModel) with Log {
+class UserEditPanel(id: String, editModel: IModel[EditableUser])
+  extends EditPanel(id, editModel, new PropertyModel[Boolean](editModel, "newUser")) with Log {
   def userManager = DatabaseSettings.userManager
-
-  def username = editModel.getObject
 
   val form = new Form("editForm")
   add(form)
+  val usernameField = new TextField("username", RWModel[String](editModel.getObject.username, editModel.getObject.username = _))
 
-  def editModeModel = LDModel(
-    if (username != null && username.size > 0) {
-      "Update"
-    } else {
-      "Create"
-    }
-  )
 
-  def editMode = editModeModel.getObject
-
-  //  val feedbackPanel = new NotificationPanel("feedback")
-  val usernameField = new TextField("username", editModel)
-  //    if (editMode == "Create")
-  //      new EditUserFragment("username", "userText")
-  //    else
-  //      new ReadUserFragment("username", "userLabel")
-  val submitText = editModeModel
-  val submitButton = new AjaxButton("submitButton", submitText) {
-    override def onSubmit(target: AjaxRequestTarget, form: Form[_]) {
-      // TODO determine whether to update or create
-      onCreate()
-      target add getPage
-    }
+  def onUpdate(updatedUser: EditableUser) {
+    log info "Update: " + item
   }
 
-  def onUpdate() {
-    log info "Update: " + username
-  }
-
-  def onCreate() {
-    log info "Create: " + username
-    userManager.addUser(username, "")
+  def onCreate(newUser: EditableUser) {
+    log info "Create: " + item
+    userManager.addUser(newUser.username, "")
+    newUser.groups.foreach(group => userManager.assign(newUser.username, group))
     //    feedbackPanel info "Created user: " + username
   }
 
   form add(usernameField, submitButton)
 
+  // work in progress
+
+  //  val feedbackPanel = new NotificationPanel("feedback")
+  //    if (editMode == "Create")
+  //      new EditUserFragment("username", "userText")
+  //    else
+  //      new ReadUserFragment("username", "userLabel")
   private class EditUserFragment(id: String, markupId: String)
     extends Fragment(id, markupId, UserEditPanel.this) {
     add(new TextField("username", editModel))

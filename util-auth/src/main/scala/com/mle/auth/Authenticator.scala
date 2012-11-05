@@ -10,7 +10,7 @@ package com.mle.auth
 /**
  *
  * @tparam T type of credential: a user-pass container, a certificate chain, ...
- * @tparam U type of user
+ * @tparam U type of user identifier
  */
 trait Authenticator[T, U] {
   /**

@@ -3,7 +3,6 @@ package com.mle.jdbc.tests
 import org.scalatest.FunSuite
 import com.mle.util.Log
 import com.mle.jdbc.auth.DefaultJdbcUserManager
-import com.mle.jdbc.tests.TestSchema._
 import com.mle.jdbc.schema.UserMgmtSchema
 
 /**
@@ -20,6 +19,8 @@ class JdbcTests extends FunSuite with Log {
   }
   test("can reflect schema from code") {
     assert(Test.tableName === "Test")
+  }
+  test("can reflect column name") {
     assert(Test.myCol.name === "myCol")
   }
 

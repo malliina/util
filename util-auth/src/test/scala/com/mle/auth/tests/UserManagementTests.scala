@@ -14,7 +14,7 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
   val testGroup = "testGroup"
   val testPassword = "TOP_SECRET_CLASSIFIED_X-GRADE"
 
-  def manager: UserManager
+  def manager: UserManager[String]
 
   def authenticator: PasswordAuthenticator[_]
 

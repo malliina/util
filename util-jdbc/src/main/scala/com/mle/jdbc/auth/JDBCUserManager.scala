@@ -9,7 +9,7 @@ import com.mle.jdbc.schema.UserMgmtSchema
  * @author mle
  */
 abstract class JDBCUserManager(schema: UserMgmtSchema)
-  extends UserManager
+  extends UserManager[String]
   with PasswordAuthenticator[String]
   with DefaultCertificateAuthenticator {
   val usersTable = schema.usersTable

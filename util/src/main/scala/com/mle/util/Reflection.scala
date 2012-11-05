@@ -40,9 +40,12 @@ object Reflection {
   def className(obj: AnyRef) = {
     val clazz = obj.getClass
     val longName = clazz.getName
-    if (longName.contains('$'))
-      longName.reverse.tail.takeWhile(_ != '$').reverse
-    else
+    // for a scala class named Test, longName is: com.mle.jdbc.tests.Test$
+    if (longName.contains('$')) {
+      // getSimpleName throws an exception if it sees a '$' so we parse it by hand
+      longName.reverse.tail.takeWhile(c => c != '$' && c != '.').reverse
+    } else {
       clazz.getSimpleName
+    }
   }
 }

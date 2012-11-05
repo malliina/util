@@ -127,6 +127,6 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
 
   def setPassword(user: String, newPassword: String) {
     val mod = arrayModification(DirContext.REPLACE_ATTRIBUTE, "userPassword" -> newPassword)
-    connectionProvider.withConnection(_.modifyAttributes(userInfo.toDN((user)), mod))
+    connectionProvider.withConnection(_.modifyAttributes(userInfo.toDN(user), mod))
   }
 }

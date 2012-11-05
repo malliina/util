@@ -4,7 +4,7 @@ import crypto.Hashing
 
 /**
  * This is bullshit and should be part of trait [[com.mle.auth.UserManager]]
- *
+ * @tparam T type of user
  * @author Mle
  */
 trait PasswordAuthenticator[T] {
