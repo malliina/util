@@ -5,13 +5,26 @@
     <form wicket:id="editForm" class="form-horizontal">
         <fieldset>
             <legend>Edit</legend>
-            <!-- <div wicket:id="feedback"></div> -->
             <div class="control-group">
                 <label class="control-label" for="user">Username:</label>
 
                 <div class="controls">
-                    <!-- <span wicket:id="username" id="user"></span> -->
                     <input type="text" wicket:id="username" id="user" class="input-medium">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="password">Password:</label>
+
+                <div class="controls">
+                    <input type="password" wicket:id="password" id="password" class="input-medium">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="groups">Groups:</label>
+
+                <div class="controls">
+                    <!-- <span wicket:id="username" id="user"></span> -->
+                    <select wicket:id="groups" id="groups" class="span2"></select>
                 </div>
             </div>
             <div class="form-actions">

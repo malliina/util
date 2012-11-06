@@ -3,9 +3,9 @@ package com.mle.wicket.markup.panels
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.model.IModel
 import java.util.{List => JList}
-import org.apache.wicket.markup.html.form.{Form, DropDownChoice}
+import org.apache.wicket.markup.html.form.{ListChoice, Form}
 import com.mle.util.Log
-import com.mle.wicket.model.LDModel
+import com.mle.wicket.model.{ReadOnlyModel, LDModel}
 import com.mle.wicket.component.{SAjaxButton, EnabledToggle}
 import org.apache.wicket.Component
 import de.agilecoders.wicket.markup.html.bootstrap.common.NotificationPanel
@@ -18,17 +18,13 @@ abstract class SelectPanel[T](id: String, model: IModel[T], choices: IModel[JLis
   val selectForm = new Form("selectForm")
   add(selectForm)
   val feedbackPanel = new NotificationPanel("selectFeedback")
-  val itemList = new DropDownChoice("choices", model, choices) {
+  val itemList = new ListChoice("choices", model, choices) {
+    // TODO ajaxify
     override val wantOnSelectionChangedNotifications = true
-
-    //    setNullValid(true)
-    override def onSelectionChanged(newSelection: T) {
-      super.onSelectionChanged(newSelection)
-      log info "New selection: " + newSelection
-    }
   }
+  val isSelected = ReadOnlyModel(choices.getObject contains model.getObject)
   val deleteButton = new SAjaxButton("delete", LDModel("Delete"))(target => {
-    onDelete()
+    onDeleteClicked(model.getObject)
     feedbackPanel info "Deleted successfully"
     target add getPage
   }) with ActionButton
@@ -41,10 +37,10 @@ abstract class SelectPanel[T](id: String, model: IModel[T], choices: IModel[JLis
   def selection = model.getObject
 
   trait ActionButton extends Component with EnabledToggle {
-    def enabled = selection != null
+    def enabled = isSelected.getObject
   }
 
-  def onDelete()
+  def onDeleteClicked(deleteItem: T)
 
   def onCreateNewSelected()
 
