@@ -20,6 +20,7 @@ class Groups(id: String) extends ManagementPanel(id) {
   val selectPanel = (id: String) => new SelectPanel(id, selectedGroup, groups, header = "Groups") {
     def onDeleteClicked(deleteItem: String) {
       userManager removeGroup deleteItem
+      info("Removed group: " + deleteItem)
     }
 
     def reset() {
