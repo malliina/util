@@ -99,7 +99,7 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
    * @throws Exception if the user does not exist
    */
   def groups(user: String) = groupsTable.db.query("select " + groupnameCol + " from " + groupsTable + " " +
-    "where " + groupsTable.id + "=" +
+    "where " + groupsTable.id + " IN " +
     "(select " + groupIdCol + " from " + userGroup + " where " + userIdCol + "=" +
     "(select " + usersTable.id + " from " + usersTable + " where " + usernameCol + "=?))", user)(_ getString 1)
 
@@ -110,7 +110,7 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
    * @throws Exception if the group does not exist
    */
   def users(group: String) = usersTable.db.query("select " + usernameCol + " from " + usersTable + " " +
-    "where " + usersTable.id + "=" +
+    "where " + usersTable.id + " IN " +
     "(select " + userIdCol + " from " + userGroup + " where " + groupIdCol + "=" +
     "(select " + groupsTable.id + " from " + groupsTable + " where " + groupnameCol + "=?))", group)(_ getString 1)
 

@@ -2,19 +2,18 @@
 <wicket:head>
 </wicket:head>
 <wicket:panel>
-    <form wicket:id="selectForm" class="form-vertical">
+    <form wicket:id="editForm" class="form-horizontal">
         <fieldset>
             <legend><span wicket:id="header"></span></legend>
             <div class="control-group">
+                <label class="control-label" for="groupname">Group name:</label>
+
                 <div class="controls">
-                    <select class="span3" wicket:id="choices" id="choices"></select>
+                    <input type="text" wicket:id="groupName" id="groupname" class="input-medium">
                 </div>
             </div>
-            <div class="control-group">
-                <div class="controls">
-                    <input type="button" wicket:id="delete" class="btn">
-                    <input type="button" wicket:id="create" class="btn">
-                </div>
+            <div class="form-actions">
+                <input wicket:id="submitButton" type="button" class="btn">
             </div>
         </fieldset>
     </form>

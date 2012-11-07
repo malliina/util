@@ -28,6 +28,7 @@ class BasicWebApplication extends AuthenticatedWebApplication with Bootstrapping
     mount(classOf[BootstrapPanelPage])
     mount(classOf[AccountPage])
     mount(classOf[UsersPage])
+    mount(classOf[GroupsPage])
   }
 
   def getHomePage = classOf[SettingsPage]

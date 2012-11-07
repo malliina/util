@@ -3,7 +3,7 @@ package com.mle.db
 import com.mle.util.Util
 import com.mle.jdbc.auth.{DefaultJdbcUserManager, MySQLConnectionProvider}
 import com.mle.util.security.ClientKeystoreSettings
-import com.mle.jdbc.Database
+import com.mle.jdbc.{StatementLogging, Database}
 import com.mle.jdbc.schema.{UserMgmtSchema, Schema}
 
 /**
@@ -18,7 +18,7 @@ object DatabaseSettings {
 
   object ConnectionPool extends MySQLConnectionProvider(uri, user, Some(pass), Some(ClientKeystoreSettings))
 
-  object Db extends Database(ConnectionPool)
+  object Db extends Database(ConnectionPool) with StatementLogging
 
   object MySchema extends Schema {
     val db = Db

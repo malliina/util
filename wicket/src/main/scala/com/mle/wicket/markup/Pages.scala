@@ -25,4 +25,6 @@ object Pages {
 
   class UsersPage extends BootstrapPage(new Users(_))
 
+  class GroupsPage extends BootstrapPage(new Groups(_))
+
 }
