@@ -10,6 +10,11 @@ import java.nio.file.Files
  * @author Mle
  */
 object Util {
+  /**
+   * Turns on SSL debug logging.
+   *
+   * User for SSL troubleshooting.
+   */
   def sslDebug() {
     sys.props("javax.net.debug") = "ssl"
   }

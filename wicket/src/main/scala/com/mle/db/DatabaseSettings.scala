@@ -11,7 +11,7 @@ import com.mle.jdbc.schema.{UserMgmtSchema, Schema}
  * @author mle
  */
 object DatabaseSettings {
-  val dbInfo = Util.props("conf/security/jdbc.test")
+  val dbInfo = Util.props("conf/security/wicketauth.test")
   val uri = dbInfo("db.uri")
   val user = dbInfo("db.user")
   val pass = dbInfo("db.pass")

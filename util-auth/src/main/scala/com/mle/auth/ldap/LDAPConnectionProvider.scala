@@ -6,6 +6,7 @@ import javax.naming.Context
 import com.sun.jndi.ldap.LdapCtxFactory
 import java.util.Properties
 import collection.JavaConversions._
+import com.mle.util.Log
 
 /**
  * TODO: optional ssl
@@ -18,7 +19,7 @@ class LDAPConnectionProvider(uri: String,
                              adminInfo: DnInfo,
                              authMechanism: String = "simple",
                              ssl: Boolean = true)
-  extends ConnectionProvider[InitialDirContext] {
+  extends ConnectionProvider[InitialDirContext] with Log {
   private val sslSetting = if (ssl)
     Map(Context.SECURITY_PROTOCOL -> "ssl")
   else

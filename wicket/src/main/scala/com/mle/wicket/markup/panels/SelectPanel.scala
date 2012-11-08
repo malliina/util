@@ -21,15 +21,12 @@ abstract class SelectPanel[T](id: String,
   val selectForm = new Form("selectForm")
   add(selectForm)
   val isSelected = ReadOnlyModel(choices.getObject contains model.getObject)
-
-
   val headerLabel = new Label("header", header)
   val itemList = new ListChoice("choices", model, choices) {
     // TODO ajaxify
     override val wantOnSelectionChangedNotifications = true
   }
   val deleteButton = new MyAjaxButton("delete", LDModel("Delete"))(onDeleteClicked(model.getObject))
-  // TODO move this to the "edit" area
   val createNewButton = new MyAjaxButton("create", LDModel("Create New"))(onCreateNewSelected())
 
   selectForm add(headerLabel, itemList, deleteButton, createNewButton)

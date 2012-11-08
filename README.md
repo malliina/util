@@ -3,8 +3,8 @@ An exploration of Scala. Test code for wicket, play!, web sockets, actors, funct
 To do:
 
 - Evaluate Slick after 2.10 is released
-- Test LDAP server with some 3PP, e.g. subsonic, and user management using my modules
+- To avoid conflicts, make it so that RMI and JNDI do not read SSL keys from system properties
 - MSI packaging
-- Play fucks up the logback configuration jesus christ
 - A sane container class for sbt-native-packager mappings that spits out settings for rpm, deb, windows
 - DB operations that return Promise[ResultSet]
+- Play fucks up the logback configuration jesus christ

@@ -5,19 +5,19 @@ import org.apache.wicket.markup.html.form.{ListMultipleChoice, PasswordTextField
 import org.apache.wicket.markup.html.basic.Label
 import org.apache.wicket.markup.html.panel.Fragment
 import com.mle.util.Log
-import com.mle.db.DatabaseSettings
 import com.mle.wicket.model.{LDModel, RWModel}
 import com.mle.wicket.markup.EditableUser
 import java.util.{List => JList, ArrayList => JArrayList}
 import collection.JavaConversions._
 import com.mle.wicket.component.EnabledToggle
+import com.mle.auth.UserManager
 
 /**
  * @author mle
  */
-class UserEditPanel(id: String, editModel: IModel[EditableUser], updating: IModel[Boolean])
+abstract class UserEditPanel(id: String, editModel: IModel[EditableUser], updating: IModel[Boolean])
   extends UpdateAwareEditPanel(id, editModel, updating) with Log {
-  def userManager = DatabaseSettings.userManager
+  def userManager: UserManager[String]
 
   val form = new Form("editForm")
   add(form)
@@ -37,21 +37,14 @@ class UserEditPanel(id: String, editModel: IModel[EditableUser], updating: IMode
     val username = updatedUser.username
     userManager setPassword(username, updatedUser.password.getOrElse(""))
     // Revoke/assign group membership
-    // TODO move to userManager.setGroups(groups:Seq[Group])
-    log info "New groups: " + updatedUser.groups
-    val oldGroups = userManager.groups(username)
-    val newGroups = updatedUser.groups
-    val removeGroups = oldGroups.filterNot(newGroups.contains)
-    val addGroups = newGroups.filterNot(oldGroups.contains)
-    removeGroups foreach (g => userManager revoke(username, g))
-    addGroups foreach (g => userManager assign(username, g))
+    userManager groups(username, updatedUser.groups)
     info("Updated user: " + username)
   }
 
   def onCreate(newUser: EditableUser) {
     val username = newUser.username
-    userManager.addUser(username, newUser.password.getOrElse(""))
-    newUser.groups.foreach(group => userManager.assign(username, group))
+    userManager addUser(username, newUser.password.getOrElse(""))
+    userManager assign(username, newUser.groups)
     info("Created user: " + username)
   }
 

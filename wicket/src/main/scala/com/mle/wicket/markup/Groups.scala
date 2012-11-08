@@ -4,15 +4,15 @@ import panels.{GroupEditPanel, SelectPanel, ManagementPanel}
 import org.apache.wicket.model.{Model, IModel}
 import java.util.{List => JList}
 import com.mle.wicket.model.LDModel
-import com.mle.db.DatabaseSettings
 import collection.JavaConversions._
+import com.mle.ldap.LdapSettings
 
 /**
  *
  * @author mle
  */
 class Groups(id: String) extends ManagementPanel(id) {
-  def userManager = DatabaseSettings.userManager
+  def userManager = LdapSettings.manager //DatabaseSettings.userManager
 
   val groups: IModel[JList[String]] = LDModel(userManager.groups)
   val selectedGroup = Model.of(newEmptyItem)
@@ -28,7 +28,9 @@ class Groups(id: String) extends ManagementPanel(id) {
     }
   }
 
-  val editPanel = (id: String) => new GroupEditPanel(id, selectedGroup, sPanel.isSelected)
+  val editPanel = (id: String) => new GroupEditPanel(id, selectedGroup, sPanel.isSelected) {
+    def userManager = Groups.this.userManager
+  }
   add(sPanel, ePanel)
 
   def newEmptyItem = ""

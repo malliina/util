@@ -1,17 +1,17 @@
 package com.mle.wicket.markup.panels
 
 import org.apache.wicket.model.IModel
-import com.mle.db.DatabaseSettings
 import org.apache.wicket.markup.html.form.{Form, TextField}
 import com.mle.wicket.component.EnabledToggle
+import com.mle.auth.UserManager
 
 /**
  *
  * @author mle
  */
-class GroupEditPanel(id: String, model: IModel[String], updating: IModel[Boolean])
+abstract class GroupEditPanel(id: String, model: IModel[String], updating: IModel[Boolean])
   extends UpdateAwareEditPanel(id, model, updating) {
-  def userManager = DatabaseSettings.userManager
+  def userManager: UserManager[String]
 
   val form = new Form("editForm")
   add(form)

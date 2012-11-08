@@ -6,6 +6,7 @@ import collection.JavaConversions._
 import javax.naming.Context
 import com.mle.util.Implicits._
 import com.mle.util.Util._
+import com.mle.util.Log
 
 
 /**
@@ -18,7 +19,7 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
                                        val userInfo: DnInfo,
                                        groupInfo: DnInfo)
   extends CertUserManager
-  with PasswordAuthenticator[String] {
+  with PasswordAuthenticator[String] with Log {
   val groupMemberClass = "groupOfUniqueNames"
   val memberAttribute = "uniqueMember"
 

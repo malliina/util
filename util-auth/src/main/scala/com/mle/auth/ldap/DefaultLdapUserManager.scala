@@ -9,4 +9,4 @@ import com.mle.auth.crypto.PasswordHashing
 class DefaultLdapUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnInfo, groupInfo: DnInfo)
   extends AbstractLdapUserManager(connectionProvider, userInfo, groupInfo)
   with ChangeLogging[String]
-  with PasswordHashing[String]
+//  with PasswordHashing[String]

@@ -15,6 +15,7 @@ trait UserManager[T] {
   def addUser(user: T, password: String)
 
   /**
+   * Removes the user including any attributes like group membership.
    *
    * @param user
    * @throws Exception if the user does not exist
@@ -31,7 +32,15 @@ trait UserManager[T] {
 
   def addGroup(group: String)
 
+  def addGroups(groups: String*) {
+    groups foreach addGroup
+  }
+
   def removeGroup(group: String)
+
+  def removeGroups(groups: String*) {
+    groups foreach removeGroup
+  }
 
   /**
    *
@@ -42,6 +51,10 @@ trait UserManager[T] {
    */
   def assign(user: T, group: String)
 
+  def assign(user: T, groups: Seq[String]) {
+    groups foreach (group => assign(user, group))
+  }
+
   /**
    *
    * @param user
@@ -50,6 +63,10 @@ trait UserManager[T] {
    * @throws Exception if the group or user does not exist
    */
   def revoke(user: T, group: String)
+
+  def revoke(user: T, groups: Seq[String]) {
+    groups foreach (group => revoke(user, group))
+  }
 
   /**
    *
@@ -81,6 +98,22 @@ trait UserManager[T] {
   def groups: Seq[String]
 
   def existsUser(user: T) = users contains user
+
+  /**
+   * Sets the group membership for the given user.
+   *
+   * Any pre-existing group membership not included in the supplied groups is revoked.
+   *
+   * @param user
+   * @param newGroups
+   */
+  def groups(user: T, newGroups: Seq[String]) {
+    val oldGroups = groups(user)
+    val removeGroups = oldGroups filterNot newGroups.contains
+    val addGroups = newGroups filterNot oldGroups.contains
+    removeGroups foreach (g => revoke(user, g))
+    addGroups foreach (g => assign(user, g))
+  }
 
   // Move?
 

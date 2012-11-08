@@ -81,4 +81,13 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
     manager setPassword(testUser, testPassword)
     authenticator authenticate(testUser, testPassword)
   }
+  test("group setter") {
+    manager addUser(testUser, testPassword)
+    manager addGroups("a", "b", "c", testGroup)
+    val testGroups = Seq("a", "b", "c")
+    manager assign(testUser, testGroup)
+    manager groups(testUser, testGroups)
+    assert(manager.groups(testUser) === testGroups)
+    manager removeGroups (testGroups: _*)
+  }
 }
