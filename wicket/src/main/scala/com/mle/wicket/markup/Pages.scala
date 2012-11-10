@@ -9,6 +9,8 @@ object Pages {
 
   class LoginPage extends PanelPage(new LoginPanel(_))
 
+  class MyHome extends PanelPage(new Home(_))
+
   class HomePage extends BootstrapPage(new Home(_))
 
   class WebSocketsPage extends BootstrapPage(new WebSocketTabs(_))

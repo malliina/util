@@ -1,11 +1,13 @@
+import com.github.siasia.PluginKeys._
 import java.nio.file._
 import sbt._
 import Keys._
 import com.mle.util.FileUtilities
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager._
-import linux.LinuxPackageMapping
 import Implicits._
+import linux.LinuxPackageMapping
+import scala.Some
 
 /**
  * Builds packages containing all the jars, libs, etc. Based on

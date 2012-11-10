@@ -33,8 +33,8 @@ object WicketStart extends Log {
     //    RmiUtil.initSecurity()
   }
 
-  def startWebApps(port: Int = 8080) = startServer(port, Some(ServerKeystoreSettings), clientAuth = true)(implicit c => {
-    //  def startWebApps(port: Int = 8080) = startServer(port)(implicit c => {
+  //  def startWebApps(port: Int = 8080) = startServer(port, Some(ServerKeystoreSettings), clientAuth = true)(implicit c => {
+  def startWebApps(port: Int = 8080) = startServer(port)(implicit c => {
     addAtmosphere(webApp = classOf[AtmosphereApplication], path = "/atmo/*")
     addWebSockets(webApp = classOf[WebSocketsApplication], path = "/ws/*")
     serveStatic("publicweb/")

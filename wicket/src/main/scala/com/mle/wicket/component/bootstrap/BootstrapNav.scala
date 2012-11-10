@@ -13,12 +13,14 @@ import org.apache.wicket.ajax.AjaxRequestTarget
 import org.apache.wicket.ajax.markup.html.AjaxLink
 import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonType, ButtonBehavior}
 import de.agilecoders.wicket.Bootstrap
+import org.apache.wicket.markup.head.IHeaderResponse
 
 /**
  * test: tooltibhehavior, popoverbehavior
  * @author Mle
  */
 trait BootstrapNav extends MarkupContainer with Log {
+
   val navbar = new Navbar("navBar")
 //  navbar.set
   navbar.fluid()

@@ -30,17 +30,15 @@ object GitBuild extends Build {
     // the jars of modules depended on are not included unless this is true
     exportJars := true
   )
-  val myWebSettings: Seq[Setting[_]] = Seq(
-    webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
-  ) ++ webSettings
   val beesConfig = MyUtil.optionally(
     MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
   ).getOrElse(Map.empty)
   lazy val wicketSettings: Seq[Setting[_]] = commonSettings ++
-    myWebSettings ++
+//    myWebSettings ++
     PackagerPlugin.packagerSettings ++
     Packaging.newSettings ++
-    NativePackaging.defaultNativeProject
+    NativePackaging.defaultNativeProject ++
+    webSettings
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("util")
     .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson))
@@ -60,13 +58,13 @@ object GitBuild extends Build {
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
     .dependsOn(util, utilActor, rmi, auth, utilJdbc)
     .settings(cloudBeesSettings: _*)
-    .settings(myWebSettings: _*)
     .settings(
     libraryDependencies ++= webDeps ++ wiQuery ++ Seq(jerkson),
     CloudBees.applicationId := Some("wicket"),
     CloudBees.apiKey := beesConfig get "bees.api.key",
     CloudBees.apiSecret := beesConfig get "bees.api.secret",
-    CloudBees.username := beesConfig get "bees.project.app.domain"
+    CloudBees.username := beesConfig get "bees.project.app.domain",
+    webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
   )
 
   def myProject(id: String) = Project(id, file(id), settings = commonSettings)

@@ -1,7 +1,24 @@
 <html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
 <wicket:panel>
-    <div class="span12">
-        <div wicket:id="tabs"></div>
+    <div class="row">
+        <div class="span6">
+            <a href="https://github.com/malliina"><img src="static/octocat.png"/></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span offset6">
+            <a href="https://twitter.com/kungmalle" class="twitter-follow-button" data-show-count="false"
+               data-size="large">Follow @kungmalle</a>
+            <script>!function (d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (!d.getElementById(id)) {
+                    js = d.createElement(s);
+                    js.id = id;
+                    js.src = "//platform.twitter.com/widgets.js";
+                    fjs.parentNode.insertBefore(js, fjs);
+                }
+            }(document, "script", "twitter-wjs");</script>
+        </div>
     </div>
 </wicket:panel>
 </html>
