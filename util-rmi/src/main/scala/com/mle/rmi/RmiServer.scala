@@ -1,6 +1,6 @@
 package com.mle.rmi
 
-import com.mle.util.Log
+import com.mle.util.{Util, Log}
 import java.rmi.server.UnicastRemoteObject
 import java.io.Closeable
 import java.rmi.NoSuchObjectException

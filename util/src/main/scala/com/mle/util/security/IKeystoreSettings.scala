@@ -1,6 +1,6 @@
 package com.mle.util.security
 
-import com.mle.util.{Log, FileUtilities, Util}
+import com.mle.util.{Log, Util}
 
 /**
  *
@@ -19,18 +19,23 @@ trait IKeystoreSettings extends Log {
   def truststorePass: String
 
   /**
-   * Creates files of the keystore and truststore unless they already are such and sets the correct javax.ssl system properties.
+   * Registers the keys contained in this object with the JVM.
    *
-   * Files are needed because java's ssl tools do not accept resources from the classpath; only files.
+   * @see [[com.mle.util.security.MultiKeyStoreManager]]
+   *
    */
   def prepareSystemProperties() {
-    val keystoreFileUrl = FileUtilities.resourceToFile(keystore).map(_.toUri.toURL)
-      .getOrElse(keystoreUrl).getFile
-    val truststoreFileUrl = FileUtilities.resourceToFile(truststore).map(_.toUri.toURL)
-      .getOrElse(truststoreUrl).getFile
-    sys.props("javax.net.ssl.trustStore") = truststoreFileUrl
-    sys.props("javax.net.ssl.trustStorePassword") = truststorePass
-    sys.props("javax.net.ssl.keyStore") = keystoreFileUrl
-    sys.props("javax.net.ssl.keyStorePassword") = keystorePass
+    MultiKeyStoreManager.addKeySettings(this)
+
+    //    val keystoreFileUrl = FileUtilities.resourceToFile(keystore).map(_.toUri.toURL)
+    //      .getOrElse(keystoreUrl).getFile
+    //    val truststoreFileUrl = FileUtilities.resourceToFile(truststore).map(_.toUri.toURL)
+    //      .getOrElse(truststoreUrl).getFile
+
+
+    //    sys.props("javax.net.ssl.trustStore") = truststoreFileUrl
+    //    sys.props("javax.net.ssl.trustStorePassword") = truststorePass
+    //    sys.props("javax.net.ssl.keyStore") = keystoreFileUrl
+    //    sys.props("javax.net.ssl.keyStorePassword") = keystorePass
   }
 }

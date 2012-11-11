@@ -1,6 +1,7 @@
 package com.mle.rmi
 
-import com.mle.util.{Util, FileUtilities}
+import com.mle.util.Util
+import com.mle.util.security.KeystoreSettings
 
 /**
  * The security policy and/or the [[java.lang.SecurityManager]]
@@ -16,11 +17,8 @@ object RmiUtil {
 
   def initCerts() {
     val keystore = "security/develkeys/keystore.key"
-    FileUtilities.resourceToFile(keystore)
-    sys.props("javax.net.ssl.keyStore") = FileUtilities.pathTo(keystore).toAbsolutePath.toString
-    sys.props("javax.net.ssl.keyStorePassword") = "changeme"
-    sys.props("javax.net.ssl.trustStore") = FileUtilities.pathTo(keystore).toAbsolutePath.toString
-    sys.props("javax.net.ssl.trustStorePassword") = "changeme"
+    val keySettings = KeystoreSettings(keystore, "changeme", keystore, "changeme")
+    keySettings.prepareSystemProperties()
   }
 
   def initMisc() {

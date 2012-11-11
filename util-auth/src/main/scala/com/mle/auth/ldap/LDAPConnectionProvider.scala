@@ -13,6 +13,15 @@ import com.mle.util.Log
  *
  * @author Mle
  */
+/**
+ *
+ * @param uri
+ * @param user
+ * @param password
+ * @param adminInfo
+ * @param authMechanism
+ * @param ssl this value doesn't seem to matter if the uri starts with https
+ */
 class LDAPConnectionProvider(uri: String,
                              user: String,
                              password: Option[String],

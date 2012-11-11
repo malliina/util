@@ -1,6 +1,6 @@
 package com.mle.rmi
 
-import com.mle.util.Log
+import com.mle.util.{Util, Log}
 import java.rmi.registry.LocateRegistry
 
 /**
@@ -25,7 +25,6 @@ class RmiClient extends Log {
  */
 object RmiClient {
   RmiUtil.initSecurity()
-
   def launchClient() {
     new RmiClient
   }

@@ -20,7 +20,7 @@ class LdapTests extends UserManagementTests with Log {
   val peopleInfo = DnInfo("uid", "ou=People,dc=mle,dc=com")
   val groupInfo = DnInfo("cn", "ou=Groups,dc=mle,dc=com")
   val schema = LdapDirInfo(uri, adminInfo, peopleInfo, groupInfo)
-  val connProvider = new LDAPConnectionProvider(schema.uri, adminUser, Some(adminPass), schema.adminInfo, ssl = false)
+  val connProvider = new LDAPConnectionProvider(schema.uri, adminUser, Some(adminPass), schema.adminInfo, ssl = true)
   val manager = new DefaultLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
   val authenticator = manager
 }

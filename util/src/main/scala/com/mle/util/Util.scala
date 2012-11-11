@@ -45,6 +45,8 @@ object Util {
     }
 
   /**
+   * try-with-resources Scala style
+   *
    * @see [[com.mle.util.Util]]#resource
    */
   def using[T <: AutoCloseable, U](resource: T)(op: T => U): U =

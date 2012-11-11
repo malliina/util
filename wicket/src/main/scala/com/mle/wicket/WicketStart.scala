@@ -1,11 +1,11 @@
 package com.mle.wicket
 
-import com.mle.util.{FileUtilities, Scheduling, Log}
+import com.mle.util.{AppUtils, FileUtilities, Scheduling, Log}
 import com.mle.wicket.JettyUtil._
 import java.nio.file.Paths
-import com.mle.rmi.RmiServer
+import com.mle.rmi.{RmiUtil, RmiServer}
 import org.eclipse.jetty.server.Server
-import com.mle.util.security.ServerKeystoreSettings
+import ch.qos.logback.classic.Level
 
 /**
  * @author Mle
@@ -17,12 +17,12 @@ object WicketStart extends Log {
 
   def main(args: Array[String]) {
     init()
-    //    rmi = Some(new RmiServer() {
-    //      override def onClosed() {
-    //        WicketStart.this.close()
-    //      }
-    //    })
-    //    AppUtils setLogLevel Level.INFO
+    rmi = Some(new RmiServer() {
+      override def onClosed() {
+        WicketStart.this.close()
+      }
+    })
+    AppUtils setLogLevel Level.INFO
     jetty = Some(startWebApps(8889))
   }
 
@@ -30,7 +30,7 @@ object WicketStart extends Log {
     sys.props.get("wicket.home").foreach(home =>
       FileUtilities.basePath = Paths get home
     )
-    //    RmiUtil.initSecurity()
+    RmiUtil.initSecurity()
   }
 
   //  def startWebApps(port: Int = 8080) = startServer(port, Some(ServerKeystoreSettings), clientAuth = true)(implicit c => {
