@@ -5,6 +5,7 @@ import com.mle.util.Util
 import com.mle.auth.ldap.{DefaultLdapUserManager, LDAPConnectionProvider, LdapDirInfo, DnInfo}
 
 /**
+ * Settings for wicket.
  *
  * @author mle
  */
