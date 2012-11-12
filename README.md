@@ -3,7 +3,6 @@ An exploration of Scala. Test code for wicket, play!, web sockets, actors, funct
 To do:
 
 - Evaluate Slick after 2.10 is released
-- To avoid conflicts, make it so that RMI and JNDI do not read SSL keys from system properties
 - MSI packaging
 - A sane container class for sbt-native-packager mappings that spits out settings for rpm, deb, windows
 - DB operations that return Promise[ResultSet]
