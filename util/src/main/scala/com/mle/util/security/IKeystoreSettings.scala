@@ -17,25 +17,4 @@ trait IKeystoreSettings extends Log {
   def truststore: String
 
   def truststorePass: String
-
-  /**
-   * Registers the keys contained in this object with the JVM.
-   *
-   * @see [[com.mle.util.security.MultiKeyStoreManager]]
-   *
-   */
-  def prepareSystemProperties() {
-    MultiKeyStoreManager.addKeySettings(this)
-
-    //    val keystoreFileUrl = FileUtilities.resourceToFile(keystore).map(_.toUri.toURL)
-    //      .getOrElse(keystoreUrl).getFile
-    //    val truststoreFileUrl = FileUtilities.resourceToFile(truststore).map(_.toUri.toURL)
-    //      .getOrElse(truststoreUrl).getFile
-
-
-    //    sys.props("javax.net.ssl.trustStore") = truststoreFileUrl
-    //    sys.props("javax.net.ssl.trustStorePassword") = truststorePass
-    //    sys.props("javax.net.ssl.keyStore") = keystoreFileUrl
-    //    sys.props("javax.net.ssl.keyStorePassword") = keystorePass
-  }
 }

@@ -9,7 +9,6 @@ import com.mle.auth.ldap.{DefaultLdapUserManager, LDAPConnectionProvider, LdapDi
  * @author mle
  */
 object LdapSettings {
-  ClientKeystoreSettings.prepareSystemProperties()
   val ldapProps = Util.props("conf/security/wicketauth.test")
   val uri = ldapProps("ldap.uri")
   val adminUser = ldapProps("ldap.user")
@@ -18,6 +17,6 @@ object LdapSettings {
   val peopleInfo = DnInfo("uid", "ou=People,dc=mle,dc=com")
   val groupInfo = DnInfo("cn", "ou=Groups,dc=mle,dc=com")
   val schema = LdapDirInfo(uri, adminInfo, peopleInfo, groupInfo)
-  val connProvider = new LDAPConnectionProvider(schema.uri, adminUser, Some(adminPass), schema.adminInfo, ssl = true)
+  val connProvider = new LDAPConnectionProvider(schema.uri, adminUser, Some(adminPass), schema.adminInfo, keySettings = Some(ClientKeystoreSettings))
   val manager = new DefaultLdapUserManager(connProvider, schema.usersInfo, schema.groupsInfo)
 }

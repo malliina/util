@@ -1,21 +1,22 @@
 package com.mle.rmi
 
-import com.mle.util.{Util, Log}
+import com.mle.util.Log
 import java.rmi.server.UnicastRemoteObject
 import java.io.Closeable
 import java.rmi.NoSuchObjectException
+import com.mle.util.security.{MultiKeyStoreManager, IKeystoreSettings}
 
 /**
  * Create a keystore with: keytool -genkey -alias rmi -keyalg RSA -validity 9999 -keystore keystore.key
  *
  * @author Mle
  */
-class RmiServer(port: Int = RmiRegistry.DEFAULT_PORT) extends Closeable with Log {
+class RmiServer(registryPort: Int = RmiRegistry.DEFAULT_PORT, keySettings: IKeystoreSettings) extends Closeable with Log {
+  private val sslContext = MultiKeyStoreManager.newSslContext(keySettings)
   val remoteObject = new RmiImpl(this)
   val stub = toStub(remoteObject)
-  val registry = RmiRegistry.init(port)(classOf[RmiInterface].getSimpleName -> stub)
+  val registry = RmiRegistry.init(registryPort, sslContext)(classOf[RmiInterface].getSimpleName -> stub)
   registry.bind(remoteObject.getClass.getSimpleName, remoteObject)
-
   // Wait for registry daemon thread to start
   Thread sleep 100
 
@@ -23,7 +24,7 @@ class RmiServer(port: Int = RmiRegistry.DEFAULT_PORT) extends Closeable with Log
     impl,
     0,
     new PickyClientSocketFactory,
-    new PickyServerSocketFactory
+    new PickyServerSocketFactory(context = sslContext)
   ).asInstanceOf[RmiInterface]
 
   def close() {
@@ -42,8 +43,8 @@ class RmiServer(port: Int = RmiRegistry.DEFAULT_PORT) extends Closeable with Log
 }
 
 object RmiServer {
-  def start = {
-    RmiUtil.initSecurity()
-    new RmiServer()
+  def start(keySettings: IKeystoreSettings) = {
+    RmiUtil.initSecurityPolicy()
+    new RmiServer(keySettings = keySettings)
   }
 }

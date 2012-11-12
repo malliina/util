@@ -3,6 +3,7 @@ package com.mle.rmi
 import com.mle.util.Log
 import java.rmi.registry.LocateRegistry
 import java.rmi.Remote
+import javax.net.ssl.SSLContext
 
 /**
  * @author Mle
@@ -17,8 +18,8 @@ object RmiRegistry extends Log {
    * @tparam T type of interface
    * @return a registry
    */
-  def init[T <: Remote](port: Int)(stubs: (String, T)*) = {
-    val registry = LocateRegistry.createRegistry(port, new PickyClientSocketFactory, new PickyServerSocketFactory)
+  def init[T <: Remote](port: Int, context: SSLContext)(stubs: (String, T)*) = {
+    val registry = LocateRegistry.createRegistry(port, new PickyClientSocketFactory, new PickyServerSocketFactory(context = context))
     stubs.foreach(stub => {
       val (referenceName, obj) = stub
       registry.rebind(referenceName, obj)

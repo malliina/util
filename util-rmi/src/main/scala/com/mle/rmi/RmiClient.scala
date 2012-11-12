@@ -1,6 +1,6 @@
 package com.mle.rmi
 
-import com.mle.util.{Util, Log}
+import com.mle.util.Log
 import java.rmi.registry.LocateRegistry
 
 /**
@@ -24,7 +24,8 @@ class RmiClient extends Log {
  * Init scripts can for example use something like "java -jar app.jar com.mle.rmi.RmiClient stop" to stop the server.
  */
 object RmiClient {
-  RmiUtil.initSecurity()
+  RmiUtil.initClientSecurity()
+
   def launchClient() {
     new RmiClient
   }
@@ -35,7 +36,7 @@ object RmiClient {
     val command = args(0)
     command match {
       case "start" =>
-        new RmiServer()
+        new RmiServer(keySettings = RmiUtil.keySettings)
       case "stop" =>
         launchClient()
     }

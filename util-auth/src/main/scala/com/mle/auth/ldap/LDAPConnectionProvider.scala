@@ -7,12 +7,9 @@ import com.sun.jndi.ldap.LdapCtxFactory
 import java.util.Properties
 import collection.JavaConversions._
 import com.mle.util.Log
+import com.mle.util.security.IKeystoreSettings
+import javax.net.SocketFactory
 
-/**
- * TODO: optional ssl
- *
- * @author Mle
- */
 /**
  *
  * @param uri
@@ -20,21 +17,20 @@ import com.mle.util.Log
  * @param password
  * @param adminInfo
  * @param authMechanism
- * @param ssl this value doesn't seem to matter if the uri starts with https
  */
 class LDAPConnectionProvider(uri: String,
                              user: String,
                              password: Option[String],
                              adminInfo: DnInfo,
-                             authMechanism: String = "simple",
-                             ssl: Boolean = true)
+                             keySettings: Option[IKeystoreSettings] = None,
+                             authMechanism: String = "simple")
   extends ConnectionProvider[InitialDirContext] with Log {
-  private val sslSetting = if (ssl)
-    Map(Context.SECURITY_PROTOCOL -> "ssl")
-  else
-    Map.empty[String, String]
+  // Context.SECURITY_PROTOCOL is redundant if using ldaps uris
+  private val sslProperties = keySettings.map(_ =>
+    Map(Context.SECURITY_PROTOCOL -> "ssl", "java.naming.ldap.factory.socket" -> classOf[LdapSocketFactory].getName)
+  ).getOrElse(Map.empty[String, String])
 
-  val noUserProperties = sslSetting ++ Map(
+  val noUserProperties = sslProperties ++ Map(
     Context.SECURITY_AUTHENTICATION -> authMechanism,
     Context.INITIAL_CONTEXT_FACTORY -> classOf[LdapCtxFactory].getName,
     Context.PROVIDER_URL -> uri,
@@ -62,4 +58,14 @@ class LDAPConnectionProvider(uri: String,
   def authMechanisms(uri: String) = {
     withConnection(_.getAttributes(uri, Array("supportedSASLMechanisms")))
   }
+
+  // if SSL is used, uses this custom SSL socket factory derived from the supplied keystore settings
+  class LdapSocketFactory(keySettings: IKeystoreSettings) extends MySocketFactory(keySettings)
+
+  object LdapSocketFactory {
+    val socketFactory = keySettings.map(ks => new MySocketFactory(ks)).getOrElse(SocketFactory.getDefault)
+
+    val getDefault: SocketFactory = socketFactory
+  }
+
 }

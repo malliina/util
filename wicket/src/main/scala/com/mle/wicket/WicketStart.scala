@@ -6,18 +6,20 @@ import java.nio.file.Paths
 import com.mle.rmi.{RmiUtil, RmiServer}
 import org.eclipse.jetty.server.Server
 import ch.qos.logback.classic.Level
+import com.mle.util.security.ServerKeystoreSettings
 
 /**
  * @author Mle
  */
 
 object WicketStart extends Log {
+  val jettyCerts = ServerKeystoreSettings
   var jetty: Option[Server] = None
   var rmi: Option[RmiServer] = None
 
   def main(args: Array[String]) {
     init()
-    rmi = Some(new RmiServer() {
+    rmi = Some(new RmiServer(keySettings = RmiUtil.keySettings) {
       override def onClosed() {
         WicketStart.this.close()
       }
@@ -30,7 +32,7 @@ object WicketStart extends Log {
     sys.props.get("wicket.home").foreach(home =>
       FileUtilities.basePath = Paths get home
     )
-    RmiUtil.initSecurity()
+    RmiUtil.initSecurityPolicy()
   }
 
   //  def startWebApps(port: Int = 8080) = startServer(port, Some(ServerKeystoreSettings), clientAuth = true)(implicit c => {
