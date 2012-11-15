@@ -1,4 +1,3 @@
-import com.github.siasia.PluginKeys._
 import java.nio.file._
 import sbt._
 import Keys._
@@ -24,7 +23,7 @@ object Packaging extends Plugin {
   val libOutDir = outDir + "/" + libDir
   val confOutDir = outDir + "/" + confDir
   val scriptOutDir = outDir + "/" + scriptDir
-  val packageKey = packageBin in Compile
+  val appJarAsFile = packageBin in Compile
   // Settings
   val basePath = SettingKey[Path]("base-path", "Same as base-directory")
   val distribDir = SettingKey[Path]("package-dist-dir", "The directory to package dists into")
@@ -67,10 +66,12 @@ object Packaging extends Plugin {
   val scriptMappings = TaskKey[Seq[(Path, String)]]("script-mappings", "Scripts mapped to paths")
   val debFiles = TaskKey[Seq[String]]("deb-files", "Files on Debian")
   val rpmFiles = TaskKey[Seq[String]]("rpm-files", "Files on RPM")
+  val appJarName = TaskKey[String]("app-jar-name", "Main app jar on destination")
   // Codify what the tasks do
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
+    appJarName <<= (appJar, name) map ((jar: Path, appName: String) => (appName + ".jar")),
     basePath <<= (baseDirectory)(_.toPath),
     // Standard directory layout
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),

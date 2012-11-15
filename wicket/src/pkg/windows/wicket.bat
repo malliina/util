@@ -1,15 +1,17 @@
 
 
-@REM SBT launcher script
+@REM App launcher script
 @REM
-@REM Envioronment:
+@REM Environment:
 @REM JAVA_HOME - location of a JDK home dir (mandatory)
-@REM SBT_OPTS  - JVM options (optional)
+@REM APP_OPTS  - JVM options (optional)
 
 @setlocal
 @echo off
-set SBT_HOME=%~dp0
+set APP_HOME=%~dp0
 set ERROR_CODE=0
+set APP_JAR=wicket.jar
+set MAIN_CLASS=com.mle.wicket.WicketStart
 rem We use the value of the JAVACMD environment variable if defined
 set _JAVACMD=%JAVACMD%
 if "%_JAVACMD%"=="" (
@@ -25,7 +27,7 @@ if "%_JAVA_OPTS%"=="" set _JAVA_OPTS=-Xmx512M -XX:MaxPermSize=256m -XX:ReservedC
 
 :run
 
-"%_JAVACMD%" %_JAVA_OPTS% %APP_OPTS% -cp "%APP_HOME%jansi.jar;%SBT_HOME%wicket.jar;%APP_HOME%classes" SbtJansiLaunch %*
+"%_JAVACMD%" %_JAVA_OPTS% %APP_OPTS% -cp "%APP_HOME%%APP_JAR%;%APP_HOME%lib/*" %MAIN_CLASS% %*
 if ERRORLEVEL 1 goto error
 goto end
 

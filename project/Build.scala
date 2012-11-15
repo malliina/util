@@ -22,7 +22,7 @@ object GitBuild extends Build {
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
-    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt"),
+//    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt"),
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
@@ -59,7 +59,7 @@ object GitBuild extends Build {
     .dependsOn(util, utilActor, rmi, auth, utilJdbc)
     .settings(cloudBeesSettings: _*)
     .settings(
-    libraryDependencies ++= webDeps ++ wiQuery ++ Seq(jerkson),
+    libraryDependencies ++= webDeps ++ wiQuery ++ Seq(jerkson, scalaTest),
     CloudBees.applicationId := Some("wicket"),
     CloudBees.apiKey := beesConfig get "bees.api.key",
     CloudBees.apiSecret := beesConfig get "bees.api.secret",

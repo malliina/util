@@ -6,6 +6,7 @@ import sbt.Keys._
 import sbt._
 import Packaging._
 import Implicits._
+import xml.NodeSeq
 
 object NativePackaging {
   val linuxSettings: Seq[Setting[_]] = Seq(
@@ -23,15 +24,15 @@ object NativePackaging {
     linux.Keys.packageDescription := "This is the description of the package.",
     //    name := "wicket",
     linux.Keys.linuxPackageMappings in Linux <++= (
-      unixHome, unixPkgHome, name, packageKey, libMappings, confMappings,
-      scriptMappings, unixLogDir
+      unixHome, unixPkgHome, name, appJar, libMappings, confMappings,
+      scriptMappings, unixLogDir, appJarName
       ) map (
-      (home, pkgSrc, pkgName, jarFile, libs, confs, scripts, logDir) => Seq(
+      (home, pkgSrc, pkgName, jarFile, libs, confs, scripts, logDir, jarName) => Seq(
         pkgMaps(Seq((pkgSrc / (pkgName + ".sh")) -> ("/etc/init.d/" + pkgName)) ++ scripts, perms = "0755"),
         pkgMaps(libs),
         pkgMaps(confs ++ Seq((pkgSrc / (pkgName + ".defaults")) -> ("/etc/default/" + pkgName)), isConfig = true),
         pkgMap((pkgSrc / "logs") -> logDir.toString, perms = "0755"),
-        pkgMap(jarFile.toPath -> ((home / (pkgName + ".jar")).toString))
+        pkgMap(jarFile.toPath -> ((home / jarName).toString))
       ))
   )
   val debianSettings: Seq[Setting[_]] = Seq(
@@ -66,21 +67,40 @@ object NativePackaging {
   )
   val windowsMappings = mappings in windows.Keys.packageMsi in Windows
   val windowsSettings: Seq[Setting[_]] = Seq(
-    windows.Keys.wixConfig <<= (windowsPkgHome) map ((dir: Path) => makeWindowsXml(dir)),
+    windows.Keys.wixConfig <<= (windowsPkgHome, name, appJarName, libs) map (
+      (winDir: Path, appName: String, jarName: String, libz: Seq[Path]) =>
+        makeWindowsXml(winDir, appName, jarName, libz)
+      ),
     //    windows.Keys.wixFile := new File("doesnotexist"),
-    windowsMappings <+= (appJar) map ((jar: Path) => jar.toFile -> jar.getFileName.toString)
+    windowsMappings <+= (appJar, appJarName) map ((jar: Path, jarName: String) => jar.toFile -> jarName),
+    windowsMappings <++= (libs) map ((libz: Seq[Path]) => libz.map(libPath => (libPath.toFile -> ("lib/" + libPath.getFileName.toString)))),
+    windows.Keys.lightOptions ++= Seq("-ext", "WixUIExtension", "-cultures:en-us")
   )
   val defaultNativeProject: Seq[Setting[_]] = linuxSettings ++ debianSettings ++ rpmSettings ++ windowsSettings
-
-  def makeWindowsXml(windowsSrcDir: Path): scala.xml.Node = {
-    val appVersion = "1.0"
+  /**
+   * Product GUID: AA8D2CDE-6274-4415-8DD4-0075BDE77FDA
+   * Package GUID: C2726D33-268F-47EA-BDA8-1B21EC6CC5EE
+   * Upgrade GUID: 5EC7F255-24F9-4E1C-B19D-581626C50F02
+   * Launcher GUID: 24241F02-194C-4AAD-8BD4-379B26F1C661
+   */
+  /**
+   *
+   * @param windowsSrcDir
+   * @return
+   */
+  def makeWindowsXml(windowsSrcDir: Path, appName: String, jarName: String, libz: Seq[Path]): scala.xml.Node = {
+    val appVersion = "1.0.0"
+    val windowsSrc = windowsSrcDir.toAbsolutePath.toString
+    val wixXml = toWixFragment(libz)
+    val libsXml = wixXml.compsFragment
+    val compRefXml = wixXml.compRefs
     (<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>
-      <Product Id='ce07be71-510d-414a-92d4-dff47631848a'
-               Name='Test app'
+      <Product Name='Test app'
+               Id='AA8D2CDE-6274-4415-8DD4-0075BDE77FDA'
+               UpgradeCode='5EC7F255-24F9-4E1C-B19D-581626C50F02'
                Language='1033'
                Version={appVersion}
-               Manufacturer='Skogberg Labs'
-               UpgradeCode='4552fb0e-e257-4dbd-9ecb-dba9dbacf424'>
+               Manufacturer='Skogberg Labs'>
         <Package Description='Test app launcher script.'
                  Comments='Test Windows installer.'
                  Manufacturer='Skogberg Labs'
@@ -92,27 +112,19 @@ object NativePackaging {
           <Directory Id='ProgramFilesFolder' Name='PFiles'>
             <Directory Id='INSTALLDIR' Name='wicket'>
               <Directory Id='classes_dir' Name='classes'>
-                <Component Id='JansiLaunch' Guid='*'>
-                  <File Id='jansi_launch'
-                        Name='WicketJansiLaunch.class'
-                        DiskId='1'
-                        Source='WicketJansiLaunch.class'/>
-                </Component>
-              </Directory> <Component Id='WicketLauncherScript' Guid='DE0A5B50-0792-40A9-AEE0-AB97E9F845F5'>
-              <File Id='sbt_bat' Name='wicket.bat' DiskId='1' Source='wicket.bat'>
-                <!-- <util:PermissionEx User="Users" Domain="[LOCAL_MACHINE_NAME]" GenericRead="yes" Read="yes" GenericExecute="yes" ChangePermission="yes"/> -->
-              </File> <File Id='wicket_sh' Name='wicket' DiskId='1' Source='wicket'>
-                <!-- <util:PermissionEx User="Users" Domain="[LOCAL_MACHINE_NAME]" GenericRead="yes" Read="yes" GenericExecute="yes" ChangePermission="yes"/> -->
-              </File>
-            </Component>
-              <Component Id='JansiJar' Guid='3370A26B-E8AB-4143-B837-CE9A8573BF60'>
-                <File Id='jansi_jar' Name='jansi.jar' DiskId='1' Source='jansi.jar'/>
-                <File Id='jansi_license' Name='jansi-license.txt' DiskId='1' Source='jansi-license.txt'/>
+              </Directory>
+              <Directory Id="lib_dir" Name="lib">
+                {libsXml}
+              </Directory>
+              <Component Id='WicketLauncherScript' Guid='*'>
+                <File Id='wicket_bat' Name='wicket.bat' DiskId='1' Source={windowsSrc + "\\" + appName + ".bat"}>
+                  <!-- <util:PermissionEx User="Users" Domain="[LOCAL_MACHINE_NAME]" GenericRead="yes" Read="yes" GenericExecute="yes" ChangePermission="yes"/> -->
+                </File>
               </Component>
               <Component Id='WicketLauncherJar' Guid='*'>
-                <File Id='wicket_jar' Name='wicket.jar' DiskId='1' Source='wicket.jar'/>
+                <File Id='wicket_jar' Name='wicket.jar' DiskId='1' Source={jarName}/>
               </Component>
-              <Component Id='WicketLauncherPath' Guid='17EA4092-3C70-11E1-8CD8-1BB54724019B'>
+              <Component Id='WicketLauncherPath' Guid='24241F02-194C-4AAD-8BD4-379B26F1C661'>
                 <CreateFolder/>
                 <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]" Permanent="no" Part="last" Action="set" System="yes"/>
                 <Environment Id="WICKET_HOME" Name="WICKET_HOME" Value="[INSTALLDIR]" Permanent="no" Action="set" System="yes"/>
@@ -121,22 +133,20 @@ object NativePackaging {
           </Directory>
         </Directory>
         <Feature Id='Complete'
-                 Title='Simple Build Tool'
+                 Title='Wicket Application'
                  Description='The windows installation of wicket test.'
                  Display='expand'
                  Level='1'
                  ConfigurableDirectory='INSTALLDIR'>
           <Feature Id='WicketLauncher'
                    Title='Wicket Launcher Script'
-                   Description='The application which downloads and launches wicket test.'
+                   Description='The application which and launches wicket test.'
                    Level='1'
                    Absent='disallow'>
             <ComponentRef Id='WicketLauncherScript'/>
-            <ComponentRef Id='WicketLauncherJar'/>
-            <ComponentRef Id='JansiLaunch'/>
-            <ComponentRef Id='JansiJar'/>
+            <ComponentRef Id='WicketLauncherJar'/>{compRefXml}
           </Feature>
-          <Feature Id='WicketLauncherPathF'
+          <Feature Id='WicketLauncherPath'
                    Title='Add wicket to windows system PATH'
                    Description='This will append wicket to your windows system path.'
                    Level='1'>
@@ -149,13 +159,43 @@ object NativePackaging {
         <MajorUpgrade AllowDowngrades="no"
                       Schedule="afterInstallInitialize"
                       DowngradeErrorMessage="A later version of [ProductName] is already installed.  Setup will no exit."/>
+
         <UIRef Id="WixUI_FeatureTree"/>
         <UIRef Id="WixUI_ErrorProgressText"/>
+
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
-        <WixVariable Id="WixUILicenseRtf" Value={windowsSrcDir.toAbsolutePath.toString + "\\license.rtf"}/>
+        <WixVariable Id="WixUILicenseRtf" Value={windowsSrc + "\\license.rtf"}/>
       </Product>
     </Wix>)
   }
+
+  def toWixFragment(file: Path): WixFile = {
+    val libPathString = file.toAbsolutePath.toString
+    val fileName = file.getFileName.toString
+    val fileId = fileName.replace('-', '_')
+    val compId = fileId.filter(_ != '_')
+    val fragment = (<Component Id={compId} Guid='*'>
+      <File Id={fileId} Name={fileName} DiskId='1' Source={libPathString}>
+      </File>
+    </Component>)
+    WixFile(compId, fragment)
+  }
+
+  def toCompRef(refId: String) = {
+      <ComponentRef Id={refId}/>
+  }
+
+  def toWixFragment(files: Seq[Path]): WixFiles = {
+    val wixFiles = files.map(toWixFragment)
+    val compIds = wixFiles.map(_.compId)
+    val compRefFragment = compIds.map(toCompRef).foldLeft(NodeSeq.Empty)(_ ++ _)
+    val fragment = wixFiles.map(_.compFragment).foldLeft(NodeSeq.Empty)(_ ++ _)
+    WixFiles(compIds, compRefFragment, fragment)
+  }
+
+  case class WixFiles(compIds: Seq[String], compRefs: NodeSeq, compsFragment: NodeSeq)
+
+  case class WixFile(compId: String, compFragment: NodeSeq)
 
   def pkgMap(file: (Path, String), perms: String = "0644", gzipped: Boolean = false) =
     pkgMaps(Seq(file), perms = perms, gzipped = gzipped)
