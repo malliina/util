@@ -4,12 +4,14 @@ import java.nio.file._
 import com.mle.util.FileVisitors.FileCollectingVisitor
 import Implicits._
 import org.apache.commons.io.IOUtils
+import java.io.{FileWriter, BufferedWriter, PrintWriter}
+import Util._
 
 /**
  *
  * @author mle
  */
-object FileUtilities extends Log {
+object FileUtilities {
 
   val userDir = sys.props("user.dir")
   var basePath = Paths get sys.props.getOrElse("app.home", userDir)
@@ -19,9 +21,29 @@ object FileUtilities extends Log {
   def pathTo(location: String) = basePath / location
 
   def listFiles(srcDir: Path, visitor: FileCollectingVisitor): Seq[Path] = {
-    log debug "Reading " + srcDir.toAbsolutePath.toString
+    //    log debug "Reading " + srcDir.toAbsolutePath.toString
     Files.walkFileTree(srcDir, visitor)
     visitor.files
+  }
+
+  /**
+   * @see <a href="http://stackoverflow.com/a/4608061">http://stackoverflow.com/a/4608061</a>
+   * @param filename the file to write to
+   * @param op the file writing code
+   */
+  def writerTo(filename: String)(op: PrintWriter => Unit): Path = {
+    val path = FileUtilities.pathTo(filename)
+    writerTo(path)(op)
+    path
+  }
+
+  /**
+   * @see <a href="http://stackoverflow.com/a/4608061">http://stackoverflow.com/a/4608061</a>
+   * @param filename the file to write to
+   * @param op the file writing code
+   */
+  def writerTo(filename: Path)(op: PrintWriter => Unit) {
+    using(new PrintWriter(new BufferedWriter(new FileWriter(filename.toFile))))(op)
   }
 
   /**

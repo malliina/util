@@ -1,3 +1,4 @@
+import com.mle.util.FileUtilities
 import com.typesafe.packager.PackagerPlugin._
 import com.typesafe.packager._
 import java.nio.file.Path
@@ -8,7 +9,7 @@ import Packaging._
 import Implicits._
 import xml.NodeSeq
 
-object NativePackaging {
+object NativePackaging extends com.mle.util.Log {
   val linuxSettings: Seq[Setting[_]] = Seq(
     // Flat copy of libs to /lib on destination system
     libMappings <<= (libs, unixLibDest) map ((libFiles, destDir) => {
@@ -65,15 +66,23 @@ object NativePackaging {
     rpm.Keys.rpmPreRemove <<= (preRemove)(Some(_)),
     rpm.Keys.rpmPostRemove <<= (postRemove)(Some(_))
   )
+  // need to set the WIX environment variable to the wix installation dir e.g. program files\wix
   val windowsMappings = mappings in windows.Keys.packageMsi in Windows
   val windowsSettings: Seq[Setting[_]] = Seq(
-    windows.Keys.wixConfig <<= (windowsPkgHome, name, appJarName, libs) map (
-      (winDir: Path, appName: String, jarName: String, libz: Seq[Path]) =>
-        makeWindowsXml(winDir, appName, jarName, libz)
+    windowsMappings <+= (windowsJarPath, name, exePath) map (
+      (jar, appName, exeP) => {
+        val exeFileName = exeP.getFileName.toString
+        val exeFile = exeWrapper(jar, "com.mle.wicket.WicketStart", appName, exeP)
+        exeFile.toFile -> exeFileName
+      }),
+    windows.Keys.wixConfig <<= (windowsPkgHome, name, appJarName, libs, exePath) map (
+      (winDir: Path, appName: String, jarName: String, libz: Seq[Path], exe) =>
+        makeWindowsXml(winDir, appName, jarName, libz, exe)
       ),
-    //    windows.Keys.wixFile := new File("doesnotexist"),
     windowsMappings <+= (appJar, appJarName) map ((jar: Path, jarName: String) => jar.toFile -> jarName),
-    windowsMappings <++= (libs) map ((libz: Seq[Path]) => libz.map(libPath => (libPath.toFile -> ("lib/" + libPath.getFileName.toString)))),
+    windowsMappings <++= (libs) map ((libz: Seq[Path]) =>
+      libz.map(libPath => (libPath.toFile -> ("lib/" + libPath.getFileName.toString)))
+      ),
     windows.Keys.lightOptions ++= Seq("-ext", "WixUIExtension", "-cultures:en-us")
   )
   val defaultNativeProject: Seq[Setting[_]] = linuxSettings ++ debianSettings ++ rpmSettings ++ windowsSettings
@@ -88,7 +97,7 @@ object NativePackaging {
    * @param windowsSrcDir
    * @return
    */
-  def makeWindowsXml(windowsSrcDir: Path, appName: String, jarName: String, libz: Seq[Path]): scala.xml.Node = {
+  def makeWindowsXml(windowsSrcDir: Path, appName: String, jarName: String, libz: Seq[Path], exe: Path): scala.xml.Node = {
     val appVersion = "1.0.0"
     val windowsSrc = windowsSrcDir.toAbsolutePath.toString
     val wixXml = toWixFragment(libz)
@@ -116,13 +125,15 @@ object NativePackaging {
               <Directory Id="lib_dir" Name="lib">
                 {libsXml}
               </Directory>
-              <Component Id='WicketLauncherScript' Guid='*'>
+              <Component Id='LauncherScript' Guid='*'>
                 <File Id='wicket_bat' Name='wicket.bat' DiskId='1' Source={windowsSrc + "\\" + appName + ".bat"}>
-                  <!-- <util:PermissionEx User="Users" Domain="[LOCAL_MACHINE_NAME]" GenericRead="yes" Read="yes" GenericExecute="yes" ChangePermission="yes"/> -->
                 </File>
               </Component>
-              <Component Id='WicketLauncherJar' Guid='*'>
+              <Component Id='LauncherJar' Guid='*'>
                 <File Id='wicket_jar' Name='wicket.jar' DiskId='1' Source={jarName}/>
+              </Component>
+              <Component Id='ApplicationExecutable' Guid='*'>
+                <File Id='app_exe' Name={exe.getFileName.toString} DiskId='1' Source={exe.toAbsolutePath.toString}/>
               </Component>
               <Component Id='WicketLauncherPath' Guid='24241F02-194C-4AAD-8BD4-379B26F1C661'>
                 <CreateFolder/>
@@ -143,8 +154,9 @@ object NativePackaging {
                    Description='The application which and launches wicket test.'
                    Level='1'
                    Absent='disallow'>
-            <ComponentRef Id='WicketLauncherScript'/>
-            <ComponentRef Id='WicketLauncherJar'/>{compRefXml}
+            <ComponentRef Id='LauncherScript'/>
+            <ComponentRef Id='ApplicationExecutable'/>
+            <ComponentRef Id='LauncherJar'/>{compRefXml}
           </Feature>
           <Feature Id='WicketLauncherPath'
                    Title='Add wicket to windows system PATH'
@@ -152,10 +164,7 @@ object NativePackaging {
                    Level='1'>
             <ComponentRef Id='WicketLauncherPath'/>
           </Feature>
-        </Feature> <!--<Property Id="JAVAVERSION">
-        <RegistrySearch Id="JavaVersion" Root="HKLM" Key="SOFTWARE\Javasoft\Java Runtime Environment" Name="CurrentVersion" Type="raw"/>
-        </Property><Condition Message="This application requires a JVM available.  Please install Java, then run this installer again.">
-        <![CDATA[Installed OR JAVAVERSION]]>      </Condition>-->
+        </Feature>
         <MajorUpgrade AllowDowngrades="no"
                       Schedule="afterInstallInitialize"
                       DowngradeErrorMessage="A later version of [ProductName] is already installed.  Setup will no exit."/>
@@ -234,4 +243,61 @@ object NativePackaging {
 
   def rebase(files: Seq[Path], maybeSrcBase: Option[Path], destBase: Path): Seq[(Path, String)] =
     maybeSrcBase.map(srcBase => rebase(files, srcBase, destBase)).getOrElse(Seq.empty[(Path, String)])
+
+  def exeWrapper(jarFile: Path, mainClass: String, appName: String, exe: Path) = {
+    val config = launcherConfig(jarFile, mainClass, appName, exe)
+    buildLauncher(config)
+  }
+
+  def launcherConfig(jarFile: Path, mainClass: String, appName: String, exe: Path) = {
+    val jarFileName = jarFile.getFileName.toString
+    val xmlConf = (<launch4jConfig>
+      <dontWrapJar>false</dontWrapJar>
+      <headerType>gui</headerType>
+      <jar>{jarFile.toAbsolutePath.toString}</jar>
+      <outfile>{exe.toAbsolutePath.toString}</outfile>
+      <errTitle></errTitle>
+      <cmdLine></cmdLine>
+      <chdir></chdir>
+      <priority>normal</priority>
+      <downloadUrl>http://java.com/download</downloadUrl>
+      <supportUrl></supportUrl>
+      <customProcName>false</customProcName>
+      <stayAlive>false</stayAlive>
+      <manifest></manifest>
+      <icon></icon>
+      <singleInstance>
+        <mutexName>{appName}</mutexName>
+        <windowTitle></windowTitle>
+      </singleInstance>
+      <classPath>
+        <mainClass>{mainClass}</mainClass>
+        <cp>{jarFileName};lib/*</cp>
+      </classPath>
+      <jre>
+        <path></path>
+        <minVersion>1.7.0</minVersion>
+        <maxVersion></maxVersion>
+        <jdkPreference>preferJre</jdkPreference>
+      </jre>
+    </launch4jConfig>)
+    LauncherConfig(exe, xmlConf)
+  }
+
+  def buildLauncher(config: LauncherConfig) = {
+    val cmd = """C:\Program Files (x86)\Launch4j\launch4jc.exe"""
+    val confString = config.launch4jConfig.toString()
+    //    println("Conf: " + confString)
+    val confFile = FileUtilities.writerTo("conf.xml")(_.println(confString))
+    confFile.deleteOnExit()
+    println("Executing: " + cmd + " " + confFile.toAbsolutePath.toString)
+    Process(cmd, Seq(confFile.toAbsolutePath.toString)).! match {
+      case 0 => config.exePath
+      case errorValue => throw new Exception("Unable to create .exe wrapper: "
+        + config.exePath.toAbsolutePath + ". Launch4j exit value: " + errorValue)
+    }
+  }
+
+  case class LauncherConfig(exePath: Path, launch4jConfig: NodeSeq)
+
 }

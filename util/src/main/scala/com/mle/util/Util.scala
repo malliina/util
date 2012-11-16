@@ -20,15 +20,6 @@ object Util {
   }
 
   /**
-   * @see <a href="http://stackoverflow.com/a/4608061">http://stackoverflow.com/a/4608061</a>
-   * @param filename the file to write to
-   * @param op the file writing code
-   */
-  def writerTo(filename: String)(op: PrintWriter => Unit) {
-    using(new PrintWriter(new BufferedWriter(new FileWriter(filename))))(op)
-  }
-
-  /**
    * Performs the given operation on the provided closeable resource after which the resource is closed.
    * @see [[com.mle.util.Util]].using
    * @param resource the resource to operate on: a file reader, database connection, ...

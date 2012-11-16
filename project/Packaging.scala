@@ -66,12 +66,17 @@ object Packaging extends Plugin {
   val scriptMappings = TaskKey[Seq[(Path, String)]]("script-mappings", "Scripts mapped to paths")
   val debFiles = TaskKey[Seq[String]]("deb-files", "Files on Debian")
   val rpmFiles = TaskKey[Seq[String]]("rpm-files", "Files on RPM")
-  val appJarName = TaskKey[String]("app-jar-name", "Main app jar on destination")
+  val appJarName = SettingKey[String]("app-jar-name", "Main app jar on destination")
+  val exePath = SettingKey[Path]("exe-name", "Application executable path on windows during packaging")
+  val windowsJarPath = SettingKey[Path]("win-jar-path", "Path to jar on windows during packaging")
+
   // Codify what the tasks do
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
-    appJarName <<= (appJar, name) map ((jar: Path, appName: String) => (appName + ".jar")),
+    appJarName <<= (name)(_ + ".jar"),
+    windowsJarPath <<= (target in Windows, appJarName)((t, n) => t.toPath / n),
+    exePath <<= (target in Windows, name)((t, n) => t.toPath / (n + ".exe")),
     basePath <<= (baseDirectory)(_.toPath),
     // Standard directory layout
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
