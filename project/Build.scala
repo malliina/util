@@ -64,7 +64,8 @@ object GitBuild extends Build {
     CloudBees.apiKey := beesConfig get "bees.api.key",
     CloudBees.apiSecret := beesConfig get "bees.api.secret",
     CloudBees.username := beesConfig get "bees.project.app.domain",
-    webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
+    webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb"),
+  mainClass := Some("com.mle.wicket.WicketStart")
   )
 
   def myProject(id: String) = Project(id, file(id), settings = commonSettings)

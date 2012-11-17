@@ -67,8 +67,15 @@ object Packaging extends Plugin {
   val debFiles = TaskKey[Seq[String]]("deb-files", "Files on Debian")
   val rpmFiles = TaskKey[Seq[String]]("rpm-files", "Files on RPM")
   val appJarName = SettingKey[String]("app-jar-name", "Main app jar on destination")
-  val exePath = SettingKey[Path]("exe-name", "Application executable path on windows during packaging")
+  val exePath = SettingKey[Path]("exe-path", "Application .exe path on windows during packaging")
+  val batPath = SettingKey[Path]("bat-path", "Application .bat path on windows during packaging")
   val windowsJarPath = SettingKey[Path]("win-jar-path", "Path to jar on windows during packaging")
+  val licenseRtf = SettingKey[Path]("license-rtf", "Path to license RTF for windows")
+  val launch4jcExe = SettingKey[Path]("launch4jc-exe", "Path to launch4jc.exe")
+  val appIcon = SettingKey[Path]("app-icon", "Path to icon (.ico) file for the application on windows")
+  val winSwExe = SettingKey[Path]("winsw-exe", "Windows Service Wrapper .exe path")
+
+  //  val mainClass = SettingKey[String]("main-class","The main class (for .exe wrapper)")
 
   // Codify what the tasks do
   // Enables "package-war" to create a .war of the whole app, and creates static content out of src/main/resources/publicweb (in addition to the default of src/main/webapp)
@@ -77,6 +84,11 @@ object Packaging extends Plugin {
     appJarName <<= (name)(_ + ".jar"),
     windowsJarPath <<= (target in Windows, appJarName)((t, n) => t.toPath / n),
     exePath <<= (target in Windows, name)((t, n) => t.toPath / (n + ".exe")),
+    batPath <<= (windowsPkgHome, name)((w, n) => w / (n + ".bat")),
+    licenseRtf <<= (windowsPkgHome)(_ / "license.rtf"),
+    appIcon <<= (windowsPkgHome)(_ / "app.ico"),
+    winSwExe <<= (windowsPkgHome)(_ / "winsw-1.9-bin.exe"),
+    launch4jcExe := Paths get """C:\Program Files (x86)\Launch4j\launch4jc.exe""",
     basePath <<= (baseDirectory)(_.toPath),
     // Standard directory layout
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),

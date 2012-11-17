@@ -3,7 +3,7 @@ package com.mle.wicket
 import com.mle.util.{AppUtils, FileUtilities, Scheduling, Log}
 import com.mle.wicket.JettyUtil._
 import java.nio.file.Paths
-import com.mle.rmi.{RmiUtil, RmiServer}
+import com.mle.rmi.{RmiClient, RmiUtil, RmiServer}
 import org.eclipse.jetty.server.Server
 import ch.qos.logback.classic.Level
 import com.mle.util.security.ServerKeystoreSettings
@@ -18,14 +18,19 @@ object WicketStart extends Log {
   var rmi: Option[RmiServer] = None
 
   def main(args: Array[String]) {
-    init()
-    rmi = Some(new RmiServer(keySettings = RmiUtil.keySettings) {
-      override def onClosed() {
-        WicketStart.this.close()
-      }
-    })
-    AppUtils setLogLevel Level.INFO
-    jetty = Some(startWebApps(8889))
+    if (args.size > 0 && args(0) == "stop")
+      RmiClient.launchClient()
+    else {
+      init()
+      rmi = Some(new RmiServer(keySettings = RmiUtil.keySettings) {
+        override def onClosed() {
+          WicketStart.this.close()
+        }
+      })
+      AppUtils setLogLevel Level.INFO
+      jetty = Some(startWebApps(8889))
+    }
+
   }
 
   def init() {

@@ -14,6 +14,7 @@ set APP_JAR=wicket.jar
 set MAIN_CLASS=com.mle.wicket.WicketStart
 rem We use the value of the JAVACMD environment variable if defined
 set _JAVACMD=%JAVACMD%
+if "%1" == "stop" (set ARG=stop) else (set ARG=start)
 if "%_JAVACMD%"=="" (
     if not "%JAVA_HOME%"=="" (
         if exist "%JAVA_HOME%\bin\java.exe" set "_JAVACMD=%JAVA_HOME%\bin\java.exe"
@@ -27,7 +28,7 @@ if "%_JAVA_OPTS%"=="" set _JAVA_OPTS=-Xmx512M -XX:MaxPermSize=256m -XX:ReservedC
 
 :run
 
-"%_JAVACMD%" %_JAVA_OPTS% %APP_OPTS% -cp "%APP_HOME%%APP_JAR%;%APP_HOME%lib/*" %MAIN_CLASS% %*
+"%_JAVACMD%" %_JAVA_OPTS% %APP_OPTS% -cp "%APP_HOME%%APP_JAR%;%APP_HOME%lib/*" %MAIN_CLASS% %ARG% %*
 if ERRORLEVEL 1 goto error
 goto end
 
