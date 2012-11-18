@@ -39,7 +39,6 @@ object Packaging extends Plugin {
   val unixLogDir = SettingKey[Path]("unix-log-home", "Log dir on unix")
   val pkgHome = SettingKey[Path]("pkg-home", "Packaging home directory")
   val unixPkgHome = SettingKey[Path]("unix-pkg-home", "Unix packaging directory")
-  val windowsPkgHome = SettingKey[Path]("win-pkg-home", "Windows packaging directory")
   val controlDir = SettingKey[Path]("control-dir", "Directory for control files for native packaging")
   val preInstall = SettingKey[Path]("pre-install", "Preinstall script")
   val postInstall = SettingKey[Path]("post-install", "Postinstall script")
@@ -67,13 +66,8 @@ object Packaging extends Plugin {
   val debFiles = TaskKey[Seq[String]]("deb-files", "Files on Debian")
   val rpmFiles = TaskKey[Seq[String]]("rpm-files", "Files on RPM")
   val appJarName = SettingKey[String]("app-jar-name", "Main app jar on destination")
-  val exePath = SettingKey[Path]("exe-path", "Application .exe path on windows during packaging")
-  val batPath = SettingKey[Path]("bat-path", "Application .bat path on windows during packaging")
-  val windowsJarPath = SettingKey[Path]("win-jar-path", "Path to jar on windows during packaging")
-  val licenseRtf = SettingKey[Path]("license-rtf", "Path to license RTF for windows")
-  val launch4jcExe = SettingKey[Path]("launch4jc-exe", "Path to launch4jc.exe")
-  val appIcon = SettingKey[Path]("app-icon", "Path to icon (.ico) file for the application on windows")
-  val winSwExe = SettingKey[Path]("winsw-exe", "Windows Service Wrapper .exe path")
+  val homeVar = SettingKey[String]("home-var", "Application home environment variable")
+
 
   //  val mainClass = SettingKey[String]("main-class","The main class (for .exe wrapper)")
 
@@ -82,13 +76,8 @@ object Packaging extends Plugin {
   //  val warSettings = webSettings ++ Seq(webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")) ++ Seq(libraryDependencies ++= Seq(Dependencies.jettyContainer))
   val newSettings = Seq(
     appJarName <<= (name)(_ + ".jar"),
-    windowsJarPath <<= (target in Windows, appJarName)((t, n) => t.toPath / n),
-    exePath <<= (target in Windows, name)((t, n) => t.toPath / (n + ".exe")),
-    batPath <<= (windowsPkgHome, name)((w, n) => w / (n + ".bat")),
-    licenseRtf <<= (windowsPkgHome)(_ / "license.rtf"),
-    appIcon <<= (windowsPkgHome)(_ / "app.ico"),
-    winSwExe <<= (windowsPkgHome)(_ / "winsw-1.9-bin.exe"),
-    launch4jcExe := Paths get """C:\Program Files (x86)\Launch4j\launch4jc.exe""",
+    homeVar <<= (name)(_.toUpperCase + "_HOME"),
+    //    winSwConf <<= (windowsPkgHome,name)(_ / "winsw-1.9-bin.exe"),
     basePath <<= (baseDirectory)(_.toPath),
     // Standard directory layout
     unixHome <<= (name)(pkgName => Paths get "/opt/" + pkgName),
@@ -98,7 +87,6 @@ object Packaging extends Plugin {
     unixLogDir <<= (unixHome)(_ / "logs"),
     pkgHome <<= (basePath)(_ / "src" / "pkg"),
     unixPkgHome <<= (pkgHome)(_ / "unix"),
-    windowsPkgHome <<= (pkgHome)(_ / "windows"),
     // rpm/deb postinst control files
     controlDir <<= (unixPkgHome)(_ / "control"),
     preInstall <<= (controlDir)(_ / "preinstall.sh"),

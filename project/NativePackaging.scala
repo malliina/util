@@ -64,28 +64,7 @@ object NativePackaging extends Plugin with com.mle.util.Log {
     rpm.Keys.rpmPreRemove <<= (preRemove)(Some(_)),
     rpm.Keys.rpmPostRemove <<= (postRemove)(Some(_))
   )
-  // need to set the WIX environment variable to the wix installation dir e.g. program files\wix
-  val windowsMappings = mappings in windows.Keys.packageMsi in Windows
-  val windowsSettings: Seq[Setting[_]] = Seq(
-    windowsMappings <+= (appJar, appJarName) map ((jar, jarName) => jar.toFile -> jarName),
-    windowsMappings <+= (appJar,appJar, name, exePath,mainClass,launch4jcExe,appIcon) map (
-      (bin,jar, appName, exeP,m,l,i) => {
-        val exeFileName = exeP.getFileName.toString
-        val mClass = m.getOrElse(throw new Exception("No mainClass specified; cannot create .exe"))
-        val exeFile = Launch4jWrapper.exeWrapper(l,jar, mClass, appName, exeP,i)
-        exeFile.toFile -> exeFileName
-      }),
-    windowsMappings <++= (libs,name) map ((libz,name) =>
-      libz.map(libPath => (libPath.toFile -> ("lib/" + libPath.getFileName.toString)))
-      ),
-    windows.Keys.wixConfig <<= (name, appJarName, libs, exePath,batPath,licenseRtf,appIcon) map (
-      (appName, jarName, libz, exe,bat,license,i) =>
-        WindowsPackaging.makeWindowsXml(appName, jarName, libz, exe,bat,license,i)
-      ),
-
-    windows.Keys.lightOptions ++= Seq("-ext", "WixUIExtension", "-cultures:en-us")
-  )
-  val defaultNativeProject: Seq[Setting[_]] = linuxSettings ++ debianSettings ++ rpmSettings ++ windowsSettings
+  val defaultNativeProject: Seq[Setting[_]] = linuxSettings ++ debianSettings ++ rpmSettings ++ WixPackaging.windowsSettings
 
   def pkgMap(file: (Path, String), perms: String = "0644", gzipped: Boolean = false) =
     pkgMaps(Seq(file), perms = perms, gzipped = gzipped)

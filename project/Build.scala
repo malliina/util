@@ -37,6 +37,7 @@ object GitBuild extends Build {
 //    myWebSettings ++
     PackagerPlugin.packagerSettings ++
     Packaging.newSettings ++
+    WindowsPlugin.windowsSettings ++
     NativePackaging.defaultNativeProject ++
     webSettings
   lazy val parent = Project("parent", file("."))

@@ -2,8 +2,7 @@ An exploration of Scala. Test code for wicket, play!, web sockets, actors, funct
 
 To do:
 
+- Evaluate whether it makes sense to have DB operations that return Promise[ResultSet]
 - Evaluate Slick after 2.10 is released
-- MSI installer option to install as a windows service
 - A sane container class for sbt-native-packager mappings that spits out settings for rpm, deb, windows
-- DB operations that return Promise[ResultSet]
 - Play fucks up the logback configuration jesus christ

@@ -1,8 +1,10 @@
 import java.nio.file.Path
+import scalaz.Free.Return
+import sys.process.Process
+import xml.NodeSeq
 
 object WindowsServiceWrapper{
-  def init(appName:String,batFile:Path,winswExe:Path,homeVar:String){
-    val conf =
+  def conf(appName:String,batFile:Path,winswExe:Path,homeVar:String)={
     <service>
       <id>{appName}</id>
       <name>{appName} service</name>
@@ -15,12 +17,64 @@ object WindowsServiceWrapper{
       <stopargument>stop</stopargument>
     </service>
   }
-  def wixFragment(winswExe:Path) = {
-     <CustomAction Id="service_install"
-                   Directory="INSTALLLOCATION"
-                   ExeCommand={winswExe.toAbsolutePath.toString+" install"}
-                   Execute="immediate"
+
+  /**
+   * This is dangerous.
+   *
+   * TODO: create a ServiceInstall fragment instead; see http://avinashkt.blogspot.fi/2007/05/how-to-install-windows-service-using.html
+   *
+   * @param winswExeName winsw.exe on target
+   * @return a wix fragment
+   */
+  def wixFragment(winswExeName:String) = {
+     (<CustomAction Id="ServiceInstall"
+                    FileKey={winswExeName}
+                    ExeCommand="install"
+                    Execute="deferred"
+                    Return="check"
+                    HideTarget="no"
+                    Impersonate="no"/>
+         <CustomAction Id="ServiceUninstall"
+                       FileKey={winswExeName}
+                       ExeCommand="uninstall"
+                       Execute="deferred"
+                       Return="check"
+                       HideTarget="no"
+                       Impersonate="no"/>
+       <InstallExecuteSequence>
+         <Custom Action="ServiceInstall" Before="InstallFinalize">NOT Installed</Custom>
+         <Custom Action="ServiceUninstall" Before="RemoveFiles">REMOVE="ALL"</Custom>
+       </InstallExecuteSequence>
+      )
+  }
+
+  /**
+   *
+   *
+  <InstallExecuteSequence>
+         <Custom Action="ServiceInstall" Before="InstallFinalize">NOT Installed</Custom>
+         <Custom Action="ServiceUninstall" Before="InstallFiles">Installed</Custom>
+       </InstallExecuteSequence>
+
+
+  <InstallExecuteSequence>
+         <Custom Action="ServiceInstall" After="InstallFinalize">NOT Installed</Custom>
+         <Custom Action="ServiceUninstall" Before="InstallInitialize">Installed</Custom>
+       </InstallExecuteSequence>
+
+  <InstallExecuteSequence>
+         <Custom Action="ServiceInstall" Before="InstallFinalize">NOT Installed</Custom>
+         <Custom Action="ServiceUninstall" Before="InstallFiles">REMOVE="ALL"</Custom>
+       </InstallExecuteSequence>
+
+  <CustomAction Id="ServiceInstall"
+                    FileKey={winswExeName}
+                   ExeCommand="install"
+                   Execute="deferred"
                    Return="asyncNoWait"/>
 
-  }
+  <InstallExecuteSequence>
+       <Custom Action="ServiceInstall" After="InstallFiles" />
+     </InstallExecuteSequence>
+   */
 }
