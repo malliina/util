@@ -40,7 +40,7 @@ object GitBuild extends Build {
     WindowsPlugin.windowsSettings ++
     NativePackaging.defaultNativeProject ++
     webSettings
-  lazy val parent = Project("parent", file("."))
+  lazy val parent = Project("parent", file("."))  //
   lazy val util = myProject("util")
     .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson))
   lazy val utilActor = myProject("util-actor")
