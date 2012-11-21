@@ -2,7 +2,6 @@ package com.mle.wicket.component.bootstrap
 
 import com.mle.wicket.model.ReadOnlyModel
 import com.mle.wicket.{BasicWebApplication, Bootstrapping}
-import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ButtonPosition
 import de.agilecoders.wicket.markup.html.bootstrap.navbar.{NavbarButton, Navbar, NavbarDropDownButton}
 import org.apache.wicket.{Page, MarkupContainer}
 import org.apache.wicket.model.Model
@@ -13,7 +12,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget
 import org.apache.wicket.ajax.markup.html.AjaxLink
 import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonType, ButtonBehavior}
 import de.agilecoders.wicket.Bootstrap
-import org.apache.wicket.markup.head.IHeaderResponse
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ButtonPosition
 
 /**
  * test: tooltibhehavior, popoverbehavior

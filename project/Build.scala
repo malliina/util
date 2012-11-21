@@ -1,3 +1,10 @@
+//import com.mle.sbt.GenericPackaging
+//import com.mle.sbt.NativePackaging
+//import com.mle.sbt.Packaging
+//import com.mle.sbt.WindowsPlugin
+
+import com.mle.sbt.unix.{UnixZipPackaging, LinuxPackaging}
+import com.mle.sbt.win.WindowsPlugin
 import Dependencies._
 import com.github.siasia.WebPlugin.webSettings
 import com.github.siasia.PluginKeys._
@@ -22,7 +29,7 @@ object GitBuild extends Build {
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
-//    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt"),
+    //    credentials += Credentials(Path.userHome / ".sbt" / "credentials.txt"),
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
@@ -34,13 +41,14 @@ object GitBuild extends Build {
     MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
   ).getOrElse(Map.empty)
   lazy val wicketSettings: Seq[Setting[_]] = commonSettings ++
-//    myWebSettings ++
     PackagerPlugin.packagerSettings ++
-    Packaging.newSettings ++
     WindowsPlugin.windowsSettings ++
-    NativePackaging.defaultNativeProject ++
+    LinuxPackaging.rpmSettings ++
+    LinuxPackaging.debianSettings ++
+    UnixZipPackaging.unixZipSettings ++
     webSettings
-  lazy val parent = Project("parent", file("."))  //
+  lazy val parent = Project("parent", file("."))
+  //
   lazy val util = myProject("util")
     .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson))
   lazy val utilActor = myProject("util-actor")
@@ -66,7 +74,7 @@ object GitBuild extends Build {
     CloudBees.apiSecret := beesConfig get "bees.api.secret",
     CloudBees.username := beesConfig get "bees.project.app.domain",
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb"),
-  mainClass := Some("com.mle.wicket.WicketStart")
+    mainClass := Some("com.mle.wicket.WicketStart")
   )
 
   def myProject(id: String) = Project(id, file(id), settings = commonSettings)

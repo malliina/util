@@ -23,7 +23,7 @@ object Dependencies {
   // wicket-auth-roles contains AuthenticatedWebApplication
   val wicketAuthRoles = "org.apache.wicket" % "wicket-auth-roles" % wicketVersion
   val bootstrap = "org.apache.wicket" % "wicket-bootstrap" % "[0.2,)"
-  val bootstrap2 = "de.agilecoders.wicket" % "bootstrap" % "[0.6.1,)"
+  val bootstrap2 = "de.agilecoders.wicket" % "bootstrap" % "0.6.2"
   val warDep = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
   val webDeps = Seq(wicket, wicketExt, wicketWebSockets, wicketAtmosphere, wicketAuthRoles, bootstrap2, warDep, jettyHack, jettyServer, jettyServlet, jettyWebSocket)
   val wiQueryCore = "org.odlabs.wiquery" % "wiquery-core" % wicketVersion
@@ -33,7 +33,7 @@ object Dependencies {
   val hashing = "commons-codec" % "commons-codec" % "1.7"
   val scalaTest = "org.scalatest" %% "scalatest" % "[1.8,)" % "test"
   val mysql = "mysql" % "mysql-connector-java" % "[5.1.21,)"
-  val tomcatJdbc = "org.apache.tomcat" % "tomcat-jdbc" % "[7.0.30,)"
+  val tomcatJdbc = "org.apache.tomcat" % "tomcat-jdbc" % "7.0.32"
   val boneCp = "com.jolbox" % "bonecp" % "0.7.1.RELEASE"
   val jerkson = "io.backchat.jerkson" %% "jerkson" % "0.7.0"
 }

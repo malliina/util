@@ -1,10 +1,10 @@
 package com.mle.jdbc.auth
 
-import org.apache.tomcat.jdbc.pool.{DataSource, PoolProperties}
 import com.mle.util.Log
 import java.util.Properties
 import collection.JavaConversions._
 import com.mle.util.security.IKeystoreSettings
+import org.apache.tomcat.jdbc.pool.{DataSource, PoolProperties}
 
 /**
  * Uses tomcat jdbc pools.
