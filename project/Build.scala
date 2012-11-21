@@ -40,13 +40,6 @@ object GitBuild extends Build {
   val beesConfig = MyUtil.optionally(
     MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
   ).getOrElse(Map.empty)
-  lazy val wicketSettings: Seq[Setting[_]] = commonSettings ++
-    PackagerPlugin.packagerSettings ++
-    WindowsPlugin.windowsSettings ++
-    LinuxPackaging.rpmSettings ++
-    LinuxPackaging.debianSettings ++
-    UnixZipPackaging.unixZipSettings ++
-    webSettings
   lazy val parent = Project("parent", file("."))
   //
   lazy val util = myProject("util")
@@ -64,6 +57,13 @@ object GitBuild extends Build {
     .settings(libraryDependencies ++= Seq(hashing, scalaTest))
   lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
     .dependsOn(util, utilActor, utilJdbc)
+  lazy val wicketSettings: Seq[Setting[_]] = commonSettings ++
+    PackagerPlugin.packagerSettings ++
+    WindowsPlugin.windowsSettings ++
+    LinuxPackaging.rpmSettings ++
+    LinuxPackaging.debianSettings ++
+    UnixZipPackaging.unixZipSettings ++
+    webSettings
   lazy val wicket = Project("wicket", file("wicket"), settings = wicketSettings)
     .dependsOn(util, utilActor, rmi, auth, utilJdbc)
     .settings(cloudBeesSettings: _*)
