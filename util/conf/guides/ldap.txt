@@ -3,7 +3,7 @@ Online guides (Ubuntu Server Guide, etc) suck, so here it is:
 Disable apparmor and reboot
 
 Create pass:
-slappasswd -H {SSHA}
+slappasswd -h {SSHA}
 
 Create test.ldif:
 
@@ -75,5 +75,36 @@ gecos: John Doe
 loginShell: /bin/bash
 homeDirectory: /home/john
 
+(endof add_content.ldif)
+
 Add add_content.ldif with:
 ldapadd -x -D cn=admin,dc=mle,dc=com -W -f add_content.ldif
+
+Examples:
+
+http://www.zytrax.com/books/ldap/ch5/index.html
+
+testuser.ldif contents:
+
+dn: uid=test,ou=People,dc=mle,dc=com
+objectClass: inetOrgPerson
+uid: test
+userPassword: test
+sn: Doe
+cn: Test Doe
+
+Add user 'test':
+ldapadd -Y EXTERNAL -H ldapi:/// -f testuser.ldif
+ldapadd -x -D cn=admin,dc=mle,dc=com -W -f testuser.ldif
+
+Remove user 'test':
+ldapdelete -x -W -D 'cn=admin,dc=mle,dc=com' "uid=test,ou=People,dc=mle,dc=com"
+
+List config:
+sudo ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config
+
+List users:
+ldapsearch -Y EXTERNAL -H ldapi:/// -b ou=People,dc=mle,dc=com
+
+List user 'john':
+ldapsearch -D "cn=admin,dc=mle,dc=com" -W -p 389 -h cent -s base -b "uid=john,ou=People,dc=mle,dc=com" "objectclass=*"

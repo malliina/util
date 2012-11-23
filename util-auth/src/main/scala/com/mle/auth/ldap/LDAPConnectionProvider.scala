@@ -27,7 +27,10 @@ class LDAPConnectionProvider(uri: String,
   extends ConnectionProvider[InitialDirContext] with Log {
   // Context.SECURITY_PROTOCOL is redundant if using ldaps uris
   private val sslProperties = keySettings.map(_ =>
-    Map(Context.SECURITY_PROTOCOL -> "ssl", "java.naming.ldap.factory.socket" -> classOf[LdapSocketFactory].getName)
+    Map(
+      Context.SECURITY_PROTOCOL -> "ssl",
+      "java.naming.ldap.factory.socket" -> classOf[LdapSocketFactory].getName
+    )
   ).getOrElse(Map.empty[String, String])
 
   val noUserProperties = sslProperties ++ Map(
@@ -59,7 +62,7 @@ class LDAPConnectionProvider(uri: String,
     withConnection(_.getAttributes(uri, Array("supportedSASLMechanisms")))
   }
 
-  // if SSL is used, uses this custom SSL socket factory derived from the supplied keystore settings
+  // if SSL is used, uses this custom SSL socket factory
   class LdapSocketFactory(keySettings: IKeystoreSettings) extends MySocketFactory(keySettings)
 
   object LdapSocketFactory {
