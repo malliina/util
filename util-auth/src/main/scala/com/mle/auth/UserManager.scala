@@ -36,6 +36,11 @@ trait UserManager[T] {
     groups foreach addGroup
   }
 
+  /**
+   *
+   * @param group the group to remove
+   * @throws UserManagementException if the group is not empty
+   */
   def removeGroup(group: String)
 
   def removeGroups(groups: String*) {

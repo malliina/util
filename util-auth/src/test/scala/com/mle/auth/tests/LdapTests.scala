@@ -19,7 +19,7 @@ class LdapTests extends UserManagementTests with Log {
   val peopleInfo = DnInfo("uid", "ou=People,dc=mle,dc=com")
   val groupInfo = DnInfo("cn", "ou=Groups,dc=mle,dc=com")
   val schema = LdapDirInfo(uri, adminInfo, peopleInfo, groupInfo)
-  // Fix if we use START_TLS with ldap:// uris
+  // Fix if we ever use START_TLS with ldap:// uris
   val keySettings = if (uri startsWith "ldaps") Some(ClientKeystoreSettings) else None
   val connProvider = new LDAPConnectionProvider(
     schema.uri,

@@ -80,6 +80,31 @@ homeDirectory: /home/john
 Add add_content.ldif with:
 ldapadd -x -D cn=admin,dc=mle,dc=com -W -f add_content.ldif
 
+maxUid.ldif:
+
+dn: cn=maxUid,dc=mle,dc=com
+objectClass: extensibleObject
+objectClass: top
+uidNumber: 10000
+
+maxGid.ldif:
+
+dn: cn=maxGid,dc=mle,dc=com
+objectClass: extensibleObject
+objectClass: top
+uidNumber: 5000
+
+when adding a user:
+
+dn: cn=maxUid,dc=mle,dc=com
+changetype: modify
+delete: uidNumber
+uidNumber: 500
+-
+add: uidNumber
+uidNumber: 501
+
+
 Examples:
 
 http://www.zytrax.com/books/ldap/ch5/index.html
@@ -93,7 +118,7 @@ userPassword: test
 sn: Doe
 cn: Test Doe
 
-Add user 'test':
+Add user 'test' (or any ldif):
 ldapadd -Y EXTERNAL -H ldapi:/// -f testuser.ldif
 ldapadd -x -D cn=admin,dc=mle,dc=com -W -f testuser.ldif
 
@@ -108,3 +133,10 @@ ldapsearch -Y EXTERNAL -H ldapi:/// -b ou=People,dc=mle,dc=com
 
 List user 'john':
 ldapsearch -D "cn=admin,dc=mle,dc=com" -W -p 389 -h cent -s base -b "uid=john,ou=People,dc=mle,dc=com" "objectclass=*"
+
+
+LDAP authentication on unix:
+
+http://www.server-world.info/en/note?os=CentOS_6&p=ldap&f=2
+
+cp system-auth password-auth

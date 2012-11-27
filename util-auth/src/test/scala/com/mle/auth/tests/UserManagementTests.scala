@@ -12,6 +12,8 @@ import com.mle.util.Util
 abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
   val testUser = "testUser"
   val testGroup = "testGroup"
+  val testGroup2 = "testGroup2"
+  val testGroup3 = "testGroup3"
   val testPassword = "TOP_SECRET_CLASSIFIED_X-GRADE"
 
   def manager: UserManager[String]
@@ -19,8 +21,14 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
   def authenticator: PasswordAuthenticator[_]
 
   after {
+    cleanup()
+  }
+
+  def cleanup() {
     Util optionally (manager removeUser testUser)
     Util optionally (manager removeGroup testGroup)
+    Util optionally (manager removeGroup testGroup2)
+    Util optionally (manager removeGroup testGroup3)
   }
 
   test("server is reachable") {
@@ -34,7 +42,6 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
       // MySQLIntegrityConstraintViolationException (SQLException) for MySQL
       manager addUser(testUser, testPassword)
     }
-    //    println(e.getClass.getSimpleName + ": " + e.getMessage)
     assert(manager.users contains testUser)
     manager removeUser testUser
     assert(usersBefore === manager.users)
@@ -42,6 +49,7 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
   test("group add/remove") {
     val groupsBefore = manager.groups
     manager addGroup testGroup
+    // group already exists
     intercept[Exception] {
       // NameAlreadyBoundException for LDAP
       // SQLException for MySQL
@@ -50,6 +58,14 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
     assert(manager.groups contains testGroup)
     manager removeGroup testGroup
     assert(groupsBefore === manager.groups)
+  }
+  test("remove non-empty group") {
+    manager addGroup testGroup
+    manager addUser(testUser, testPassword)
+    manager assign(testUser, testGroup)
+    intercept[Exception] {
+      manager removeGroup testGroup
+    }
   }
 
   test("group membership") {
@@ -83,11 +99,12 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
   }
   test("group setter") {
     manager addUser(testUser, testPassword)
-    manager addGroups("a", "b", "c", testGroup)
-    val testGroups = Seq("a", "b", "c")
+    val aTeam = Seq(testGroup2, testGroup3)
+    manager addGroups(testGroup2, testGroup3, testGroup)
     manager assign(testUser, testGroup)
-    manager groups(testUser, testGroups)
-    assert(manager.groups(testUser) === testGroups)
-    manager removeGroups (testGroups: _*)
+    manager groups(testUser, aTeam)
+    assert(manager.groups(testUser) === aTeam)
+    aTeam foreach (g => manager revoke(testUser, g))
+    manager removeGroups (aTeam: _*)
   }
 }

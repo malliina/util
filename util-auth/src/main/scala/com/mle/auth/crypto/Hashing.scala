@@ -12,4 +12,5 @@ trait Hashing {
 
 object Hashing {
   def MD5(clearText: String) = DigestUtils.md5Hex(clearText)
+//  def SSHA(clearText:String)=DigestUtils.sh
 }
