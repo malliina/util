@@ -77,6 +77,52 @@ homeDirectory: /home/john
 
 (endof add_content.ldif)
 
+Password policy:
+
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: /usr/lib64/openldap/
+olcModuleLoad: ppolicy.la
+
+dn: ou=pwpolicies,dc=mle,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: policies
+
+dn: cn=default,ou=pwpolicies,dc=mle,dc=com
+cn: default
+objectClass: pwdPolicyChecker
+objectClass: pwdPolicy
+objectClass: person
+objectClass: top
+pwdAllowUserChange: TRUE
+pwdAttribute: 2.5.4.35
+pwdCheckModule: crackcheck.so
+pwdCheckQuality: 2
+pwdExpireWarning: 604800
+pwdFailureCountInterval: 30
+pwdGraceAuthNLimit: 0
+pwdInHistory: 10
+pwdLockout: TRUE
+pwdLockoutDuration: 3600
+pwdMaxAge: 7776000
+pwdMaxFailure: 5
+pwdMinAge: 3600
+pwdMinLength: 12
+pwdMustChange: FALSE
+pwdSafeModify: FALSE
+sn: dummy value
+
+dn: olcOverlay=ppolicy,olcDatabase={1}bdb,cn=config
+olcOverlay: ppolicy
+objectClass: olcOverlayConfig
+objectClass: olcPPolicyConfig
+olcPPolicyDefault: cn=default,ou=pwpolicies,dc=mle,dc=com
+olcPPolicyHashCleartext: TRUE
+olcPPolicyUseLockout: FALSE
+
+
 Add add_content.ldif with:
 ldapadd -x -D cn=admin,dc=mle,dc=com -W -f add_content.ldif
 
@@ -104,6 +150,7 @@ uidNumber: 500
 add: uidNumber
 uidNumber: 501
 
+Password policy:
 
 Examples:
 
@@ -126,7 +173,7 @@ Remove user 'test':
 ldapdelete -x -W -D 'cn=admin,dc=mle,dc=com' "uid=test,ou=People,dc=mle,dc=com"
 
 List config:
-sudo ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config
+ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config
 
 List users:
 ldapsearch -Y EXTERNAL -H ldapi:/// -b ou=People,dc=mle,dc=com
