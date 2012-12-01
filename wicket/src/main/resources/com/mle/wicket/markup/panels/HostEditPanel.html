@@ -1,0 +1,28 @@
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<wicket:head>
+</wicket:head>
+<wicket:panel>
+    <form wicket:id="editForm" class="form-horizontal">
+        <fieldset>
+            <legend><span wicket:id="header"></span></legend>
+            <div class="control-group">
+                <label class="control-label" for="hostname">Hostname:</label>
+
+                <div class="controls">
+                    <input type="text" wicket:id="hostname" id="hostname" class="input-medium">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="ip">IP address:</label>
+
+                <div class="controls">
+                    <input type="text" wicket:id="ip" id="ip" class="input-medium">
+                </div>
+            </div>
+            <div class="form-actions">
+                <input wicket:id="submitButton" type="button" class="btn">
+            </div>
+        </fieldset>
+    </form>
+</wicket:panel>
+</html>

@@ -1,5 +1,6 @@
 package com.mle.wicket.markup
 
+
 /**
  * Page classes for cases where we have [[org.apache.wicket.markup.html.panel.Panel]]s but want [[org.apache.wicket.Page]]s.
  *
@@ -28,5 +29,10 @@ object Pages {
   class UsersPage extends BootstrapPage(new Users(_))
 
   class GroupsPage extends BootstrapPage(new Groups(_))
+
+  class HostsPage extends BootstrapPage(new Hosts(_))
+
+  class LdapUsersPage extends BootstrapPage(new LdapUsers(_))
+
 
 }

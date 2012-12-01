@@ -54,6 +54,10 @@ dn: ou=Groups,dc=mle,dc=com
 objectClass: organizationalUnit
 ou: Groups
 
+dn: ou=Hosts,dc=mle,dc=com
+objectClass: organizationalUnit
+ou: Hosts
+
 dn: cn=admins,ou=Groups,dc=mle,dc=com
 objectClass: posixGroup
 cn: admins
@@ -178,8 +182,9 @@ ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config
 List users:
 ldapsearch -Y EXTERNAL -H ldapi:/// -b ou=People,dc=mle,dc=com
 
-List user 'john':
-ldapsearch -D "cn=admin,dc=mle,dc=com" -W -p 389 -h cent -s base -b "uid=john,ou=People,dc=mle,dc=com" "objectclass=*"
+List user 'x':
+ldapsearch -D "cn=admin,dc=mle,dc=com" -W -p 389 -h cent -s base -b "uid=ddd,ou=People,dc=mle,dc=com" "objectclass=*"
+ldapsearch -D "cn=admin,dc=mle,dc=com" -W -p 389 -h cent -s base -b "cn=ubuntu,ou=Hosts,dc=mle,dc=com" "objectclass=*"
 
 
 LDAP authentication on unix:
@@ -187,3 +192,10 @@ LDAP authentication on unix:
 http://www.server-world.info/en/note?os=CentOS_6&p=ldap&f=2
 
 cp system-auth password-auth
+
+LDAP PAM auth in unix over TLS:
+user nslcd must be able to read client-key.pem either through ownership or primary group membership. supplementary groups make no difference.
+
+LDAP host-specific authorization:
+on ubuntu, set "shadow compat" in /etc/nsswitch.conf, not "shadow compat ldap"
+on centos, no change in nsswitch.conf seems necessary

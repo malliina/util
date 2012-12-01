@@ -2,7 +2,7 @@ package com.mle.wicket.component.bootstrap
 
 import com.mle.wicket.model.ReadOnlyModel
 import com.mle.wicket.{BasicWebApplication, Bootstrapping}
-import de.agilecoders.wicket.markup.html.bootstrap.navbar.{NavbarButton, Navbar, NavbarDropDownButton}
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.{ImmutableNavbarComponent, NavbarButton, Navbar, NavbarDropDownButton}
 import org.apache.wicket.{Page, MarkupContainer}
 import org.apache.wicket.model.Model
 import org.apache.wicket.protocol.http.WebApplication
@@ -12,7 +12,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget
 import org.apache.wicket.ajax.markup.html.AjaxLink
 import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonType, ButtonBehavior}
 import de.agilecoders.wicket.Bootstrap
-import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ButtonPosition
+import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ComponentPosition
+import collection.JavaConversions._
 
 /**
  * test: tooltibhehavior, popoverbehavior
@@ -21,17 +22,15 @@ import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ButtonPosition
 trait BootstrapNav extends MarkupContainer with Log {
 
   val navbar = new Navbar("navBar")
-//  navbar.set
+  //  navbar.set
   navbar.fluid()
   navbar.brandName(ReadOnlyModel("My app"))
-  navbar.addButton(ButtonPosition.LEFT,
-    BasicWebApplication.get.tabs.map(tab => navButton(tab.pageClass, tab.title, tab.icon)): _*
-  )
-  navbar.addButton(ButtonPosition.RIGHT,
-    new NavbarDropDownButton("button", Model.of("BootstrapThemes"))
-      .addButtons(BootstrapNav.themes.themeNames.map(themeDropDownButton): _*)
-  )
+  navbar.addComponents(toNavbarComps)
+  navbar.addComponents(new ImmutableNavbarComponent(new NavbarDropDownButton(Model.of("BootstrapThemes"))
+    .addButtons(BootstrapNav.themes.themeNames.map(themeDropDownButton): _*), ComponentPosition.RIGHT))
   add(navbar)
+
+  def toNavbarComps = BasicWebApplication.get.tabs.map(tab => navButton(tab.pageClass, tab.title, tab.icon)).map(comp => new ImmutableNavbarComponent(comp))
 
   def navButton[T <: Page](pageClass: Class[T], label: String, iconType: Option[IconType]) = {
     val button = new NavbarButton(pageClass, Model.of(label))

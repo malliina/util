@@ -37,7 +37,8 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
   test("user add/remove") {
     val usersBefore = manager.users
     manager addUser(testUser, testPassword)
-    val e = intercept[Exception] {
+
+    intercept[Exception] {
       // NameAlreadyBoundException for LDAP
       // MySQLIntegrityConstraintViolationException (SQLException) for MySQL
       manager addUser(testUser, testPassword)
@@ -102,7 +103,7 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
     val aTeam = Seq(testGroup2, testGroup3)
     manager addGroups(testGroup2, testGroup3, testGroup)
     manager assign(testUser, testGroup)
-    manager groups(testUser, aTeam)
+    manager replaceGroups(testUser, aTeam)
     assert(manager.groups(testUser) === aTeam)
     aTeam foreach (g => manager revoke(testUser, g))
     manager removeGroups (aTeam: _*)

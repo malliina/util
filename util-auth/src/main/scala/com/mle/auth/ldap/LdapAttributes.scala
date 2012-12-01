@@ -15,7 +15,9 @@ object LdapAttributes extends Enumeration {
   // misc
   val objectClass = Value
   // objectClasses
-  val posixAccount, shadowAccount, posixGroup, inetOrgPerson = Value
+  val posixAccount, shadowAccount, posixGroup, inetOrgPerson, groupOfNames, ipHost = Value
   // inetOrgPerson
   val sn = Value
+  // PAM groupdn
+  val member, ipHostNumber = Value
 }

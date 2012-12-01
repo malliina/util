@@ -6,7 +6,8 @@ import com.mle.auth.crypto.PasswordHashing
 /**
  * @author Mle
  */
-class DefaultLdapUserManager(connectionProvider: LDAPConnectionProvider, userInfo: DnInfo, groupInfo: DnInfo)
+class DefaultLdapUserManager(connectionProvider: LDAPConnectionProvider,
+                             userInfo: DnInfo, groupInfo: GroupDnInfo)
   extends AbstractLdapUserManager(connectionProvider, userInfo, groupInfo)
   with ChangeLogging[String]
 //  with PasswordHashing[String]

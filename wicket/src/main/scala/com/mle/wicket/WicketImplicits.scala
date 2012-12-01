@@ -9,7 +9,7 @@ import org.apache.wicket.markup.html.form.IChoiceRenderer
 /**
  * @author Mle
  */
-object Implicits {
+object WicketImplicits {
   /**
    * Usage: <code>5.seconds</code>
    * @param i amount

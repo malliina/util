@@ -2,15 +2,13 @@ package com.mle.wicket.markup.panels
 
 import org.apache.wicket.model.IModel
 import org.apache.wicket.markup.html.form.{ListMultipleChoice, PasswordTextField, TextField, Form}
-import org.apache.wicket.markup.html.basic.Label
-import org.apache.wicket.markup.html.panel.Fragment
 import com.mle.util.Log
 import com.mle.wicket.model.{LDModel, RWModel}
-import com.mle.wicket.markup.EditableUser
 import java.util.{List => JList, ArrayList => JArrayList}
 import collection.JavaConversions._
 import com.mle.wicket.component.EnabledToggle
 import com.mle.auth.UserManager
+import com.mle.wicket.markup.AbstractUsers.EditableUser
 
 /**
  * @author mle
@@ -19,6 +17,7 @@ abstract class UserEditPanel(id: String, editModel: IModel[EditableUser], updati
   extends UpdateAwareEditPanel(id, editModel, updating) with Log {
   def userManager: UserManager[String]
 
+  //  def hostManager: LdapHostManager
   val form = new Form("editForm")
   add(form)
   // http://technically.us/code/x/the-escape-hatch/
@@ -29,15 +28,19 @@ abstract class UserEditPanel(id: String, editModel: IModel[EditableUser], updati
     RWModel(item.password.getOrElse(""), pass => item.password = Some(pass))
   ).setRequired(false)
   val groupsModel: IModel[JList[String]] = LDModel(userManager.groups)
-  val assignedGroups: IModel[JArrayList[String]] = RWModel(new JArrayList(item.groups), newGroups => item.groups = newGroups)
+  val assignedGroups: IModel[JArrayList[String]] = RWModel(new JArrayList(item.groups),
+    newGroups => item.groups = newGroups)
   val groups = new ListMultipleChoice[String]("groups", assignedGroups, groupsModel)
   form add(usernameField, passwordField, groups, submitButton, headerLabel)
 
   def onUpdate(updatedUser: EditableUser) {
     val username = updatedUser.username
-    userManager setPassword(username, updatedUser.password.getOrElse(""))
+    updatedUser.password.foreach(pass => {
+      if (pass != null && pass.nonEmpty)
+        userManager setPassword(username, pass)
+    })
     // Revoke/assign group membership
-    userManager groups(username, updatedUser.groups)
+    userManager replaceGroups(username, updatedUser.groups)
     info("Updated user: " + username)
   }
 
@@ -55,14 +58,14 @@ abstract class UserEditPanel(id: String, editModel: IModel[EditableUser], updati
   //      new EditUserFragment("username", "userText")
   //    else
   //      new ReadUserFragment("username", "userLabel")
-  private class EditUserFragment(id: String, markupId: String)
-    extends Fragment(id, markupId, UserEditPanel.this) {
-    add(new TextField("username", editModel))
-  }
-
-  private class ReadUserFragment(id: String, markupId: String)
-    extends Fragment(id, markupId, UserEditPanel.this) {
-    add(new Label("username", editModel))
-  }
+  //  private class EditUserFragment(id: String, markupId: String)
+  //    extends Fragment(id, markupId, UserEditPanel.this) {
+  //    add(new TextField("username", editModel))
+  //  }
+  //
+  //  private class ReadUserFragment(id: String, markupId: String)
+  //    extends Fragment(id, markupId, UserEditPanel.this) {
+  //    add(new Label("username", editModel))
+  //  }
 
 }

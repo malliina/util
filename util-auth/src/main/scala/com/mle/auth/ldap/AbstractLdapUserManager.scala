@@ -10,6 +10,7 @@ import com.mle.util.Util._
 import com.mle.util.Log
 import LdapAttributes._
 import LdapImplicits._
+import LdapHelper._
 
 
 /**
@@ -20,9 +21,12 @@ import LdapImplicits._
  */
 abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionProvider,
                                        val userInfo: DnInfo,
-                                       groupInfo: DnInfo)
+                                       val groupInfo: GroupDnInfo)
   extends CertUserManager
-  with PasswordAuthenticator[String] with Log {
+  with PasswordAuthenticator[String]
+  with LdapManager
+  with MembershipManagerImpl
+  with Log {
 
   def authenticate(user: String, password: String) = {
     val connectionProps = (connectionProvider.noUserProperties ++ Map(
@@ -38,6 +42,7 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     addGroup(user)
     val gid = read(groupInfo.toDN(user), gidNumber)
     val objClassAttribute = attribute(objectClass, posixAccount, shadowAccount, inetOrgPerson)
+    // also assigns the user to the group referenced by gidNumber; i.e. the primary group
     val userAttrs = attributes(
       uid -> user,
       uidNumber -> (maxUid + 1).toString,
@@ -53,9 +58,8 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     addUser(user, userAttrs)
   }
 
-  def addUser(user: String, attrs: BasicAttributes) {
-    val dn = userInfo.toDN(user)
-    connectionProvider.withConnection(_.bind(dn, null, attrs))
+  def addUser(user: String, attributes: BasicAttributes) {
+    addEntry(userInfo.toDN(user), attributes)
   }
 
   def removeUser(user: String) {
@@ -67,7 +71,7 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     } catch {
       case e: Exception => log warn "Unable to remove user's group: " + user
     }
-    connectionProvider.withConnection(_.unbind(dn))
+    removeEntry(dn)
   }
 
   def addGroup(group: String) {
@@ -77,49 +81,19 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     )
     val objClasses = attribute(objectClass, posixGroup)
     groupAttrs put objClasses
-    val dn = groupInfo.toDN(group)
-    connectionProvider.withConnection(_.bind(dn, null, groupAttrs))
+    addGroup(group, groupAttrs)
+  }
+
+  def addGroup(group: String, attributes: BasicAttributes) {
+    addEntry(groupInfo.toDN(group), attributes)
   }
 
   def removeGroup(group: String) {
     val groupMembers = users(group)
     if (groupMembers.nonEmpty)
       throw new UserManagementException("Cannot remove non-empty group: " + group + ", members: " + groupMembers.mkString(", "))
-    val dn = groupInfo.toDN(group)
-    connectionProvider.withConnection(_.unbind(dn))
+    removeEntry(groupInfo.toDN(group))
   }
-
-  private def arrayModification(modAttribute: Int, kv: (String, String)) = {
-    val (key, value) = kv
-    Array(new ModificationItem(modAttribute, attributeStr(key, value)))
-  }
-
-  private def modifyGroup(modAttribute: Int, user: String, group: String) {
-    val mod = arrayModification(modAttribute, memberuid.toString -> userInfo.toDN((user)))
-    connectionProvider.withConnection(_.modifyAttributes(groupInfo.toDN(group), mod))
-  }
-
-  def assign(user: String, group: String) {
-    if (existsUser(user))
-      modifyGroup(DirContext.ADD_ATTRIBUTE, user, group)
-    else
-      throw new UserManagementException("User doesn't exist: " + user)
-  }
-
-  def revoke(user: String, group: String) {
-    modifyGroup(DirContext.REMOVE_ATTRIBUTE, user, group)
-  }
-
-  def belongs(user: String, group: String) = users(group) contains user
-
-  def groups(user: String) = {
-    val filter = "(&(" + objectClass + "=" + posixGroup + ")(" + memberuid + "=" + userInfo.toDN(user) + "))"
-    val controls = new SearchControls()
-    controls setSearchScope SearchControls.ONELEVEL_SCOPE
-    val results = connectionProvider.withConnection(_.search(groupInfo.branch, filter, controls))
-    results.map(group => groupInfo.toName(group.getName)).toSeq
-  }
-
 
   def uidOf(user: String) = read(userInfo.toDN(user), LdapAttributes.uidNumber).toInt
 
@@ -129,6 +103,18 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     controls setSearchScope SearchControls.ONELEVEL_SCOPE
     val results = connectionProvider.withConnection(_.search(tree, filter, controls))
     results.map(_.getAttributes.get(attributeName).get()).toSeq
+  }
+
+  def searchMulti(tree: String, attributeNames: LdapAttributes.LdapAttribute*) = {
+    val filters = attributeNames.map(attr => "(" + attr + "=*)")
+    val filter = "(&" + filters.mkString + ")"
+    val controls = new SearchControls()
+    controls setSearchScope SearchControls.ONELEVEL_SCOPE
+    val results = connectionProvider.withConnection(_.search(tree, filter, controls))
+    results.map(res => {
+      val attrs = res.getAttributes
+      attributeNames.map(attr => (attr -> attrs.get(attr).get)).toMap
+    }).toSeq
   }
 
   def maxUid = {
@@ -141,63 +127,18 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
     gidNumbers.max
   }
 
-  def users(group: String) = {
-    val attrs = connectionProvider.withConnection(_.getAttributes(groupInfo.toDN(group), Array(memberuid.toString)))
-    // uniqueMember contains DNs of users
-    Option(attrs get memberuid.toString)
-      .map(_.getAll.map(dn => userInfo toName String.valueOf(dn)).filter(_.size > 0).toSeq)
-      .getOrElse(Seq.empty)
-  }
-
   def read(dn: String, attribute: LdapAttributes.LdapAttribute) = {
     val attrStr = attribute.toString
     val attr = Array[String](attrStr)
     connectionProvider.withConnection(_.getAttributes(dn, attr).get(attrStr).get().toString)
   }
 
-  def users = {
-    //    val maxUid = read("cn=maxUid,dc=mle,dc=com", LdapAttributes.uidNumber).toInt
-    //    println(maxUid)
-    list(userInfo.branch, userInfo.key)
-  }
+  def users = list(userInfo.branch, userInfo.key)
 
   def groups = list(groupInfo.branch, groupInfo.key)
 
-  private def list(branch: String, keyPrefix: String) = connectionProvider.withConnection(_.list(branch)
-    .map(_.getName.stripPrefix(keyPrefix + "="))).toSeq
-
   def setPassword(user: String, newPassword: String) {
-    val mod = arrayModification(DirContext.REPLACE_ATTRIBUTE, userPassword.toString -> newPassword)
-    connectionProvider.withConnection(_.modifyAttributes(userInfo.toDN(user), mod))
-  }
-
-  private def attributesStr(keyValues: (String, String)*): BasicAttributes = {
-    val attrs = new BasicAttributes()
-    keyValues foreach (kv => {
-      val (key, value) = kv
-      attrs put new BasicAttribute(key, value)
-    })
-    attrs
-  }
-
-  private def attributes(keyValues: (LdapAttributes.LdapAttribute, String)*): BasicAttributes = {
-    val stringified = keyValues.map(kv => kv._1.toString -> kv._2)
-    attributesStr(stringified: _*)
-  }
-
-  private def attributeStr(attributeName: String, values: String*) = {
-    val attr = new BasicAttribute(attributeName)
-    values foreach attr.add
-    attr
-  }
-
-  private def attribute2(attributeName: LdapAttributes.LdapAttribute,
-                         value: String*): BasicAttribute = {
-    attributeStr(attributeName.toString, value: _*)
-  }
-
-  private def attribute(attributeName: LdapAttributes.LdapAttribute,
-                        value: LdapAttributes.LdapAttribute*): BasicAttribute = {
-    attribute2(attributeName, value.map(_.toString): _*)
+    val mod = arrayModification(DirContext.REPLACE_ATTRIBUTE, userPassword -> newPassword)
+    modifyEntry(userInfo.toDN(user), mod)
   }
 }

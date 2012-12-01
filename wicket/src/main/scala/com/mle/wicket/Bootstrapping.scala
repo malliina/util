@@ -22,7 +22,9 @@ trait Bootstrapping extends WebApplication with Log {
     ("MOTD", classOf[MessagePage], None),
     ("Account", classOf[AccountPage], Some(IconType.User)),
     ("Users", classOf[UsersPage], Some(IconType.User)),
-    ("Groups", classOf[GroupsPage], Some(IconType.User))
+    ("Unix Users", classOf[LdapUsersPage], Some(IconType.User)),
+    ("Groups", classOf[GroupsPage], Some(IconType.User)),
+    ("Hosts", classOf[HostsPage], Some(IconType.User))
   )
 
   def tabs: Seq[BootTab[_ <: WebPage]] = defaultTabs

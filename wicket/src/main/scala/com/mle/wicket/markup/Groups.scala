@@ -6,13 +6,14 @@ import java.util.{List => JList}
 import com.mle.wicket.model.LDModel
 import collection.JavaConversions._
 import com.mle.ldap.LdapSettings
+import com.mle.wicket.backend.WicketUserManager
 
 /**
  *
  * @author mle
  */
 class Groups(id: String) extends ManagementPanel(id) {
-  def userManager = LdapSettings.manager //DatabaseSettings.userManager
+  def userManager: WicketUserManager = LdapSettings.userManager //DatabaseSettings.userManager
 
   val groups: IModel[JList[String]] = LDModel(userManager.groups)
   val selectedGroup = Model.of(newEmptyItem)
