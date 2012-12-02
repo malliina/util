@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Level
 import collection.JavaConversions._
 import com.mle.util.{Log, AppUtils}
 import com.mle.wicket.behavior.OnChangeAjaxFormBehavior
-import com.mle.wicket.model.RWModel
 import org.apache.wicket.markup.html.form.DropDownChoice
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.model.Model
@@ -13,6 +12,7 @@ import de.agilecoders.wicket.markup.html.bootstrap.components.{TooltipConfig, To
 import org.apache.wicket.markup.html.WebMarkupContainer
 import org.apache.wicket.markup.head.IHeaderResponse
 import com.mle.wicket.component.bootstrap.ThemeDropDown
+import com.mle.web.wicket.model.RWModel
 
 /**
  * @author Mle

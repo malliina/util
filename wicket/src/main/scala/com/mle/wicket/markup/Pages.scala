@@ -1,5 +1,7 @@
 package com.mle.wicket.markup
 
+import com.mle.web.wicket.markup.PanelPage
+
 
 /**
  * Page classes for cases where we have [[org.apache.wicket.markup.html.panel.Panel]]s but want [[org.apache.wicket.Page]]s.
@@ -9,10 +11,6 @@ package com.mle.wicket.markup
 object Pages {
 
   class LoginPage extends PanelPage(new LoginPanel(_))
-
-  class MyHome extends PanelPage(new Home(_))
-
-  class HomePage extends BootstrapPage(new Home(_))
 
   class WebSocketsPage extends BootstrapPage(new WebSocketTabs(_))
 

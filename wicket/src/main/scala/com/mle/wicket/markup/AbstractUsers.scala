@@ -2,12 +2,12 @@ package com.mle.wicket.markup
 
 import panels.{SelectPanel, ManagementPanel}
 import org.apache.wicket.model.IModel
-import com.mle.wicket.model.RWModel
 import com.mle.wicket.backend.WicketUserManager
 import java.util.{List => JList}
-import com.mle.wicket.WicketImplicits._
 import com.mle.wicket.EditableItem
 import com.mle.wicket.markup.AbstractUsers.{User, EditableUser}
+import com.mle.web.wicket.model.RWModel
+import com.mle.web.wicket.WicketImplicits._
 
 
 /**

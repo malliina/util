@@ -3,12 +3,12 @@ package com.mle.wicket.markup
 import panels.{HostEditPanel, SelectPanel, ManagementPanel}
 import org.apache.wicket.model.IModel
 import java.util.{List => JList}
-import com.mle.wicket.model.{RWModel, LDModel}
 import com.mle.ldap.LdapSettings
 import com.mle.wicket.markup.Hosts.Host
 import collection.JavaConversions._
-import com.mle.wicket.WicketImplicits._
 import com.mle.wicket.EditableItem
+import com.mle.web.wicket.model.{LDModel, RWModel}
+import com.mle.web.wicket.WicketImplicits._
 
 /**
  *

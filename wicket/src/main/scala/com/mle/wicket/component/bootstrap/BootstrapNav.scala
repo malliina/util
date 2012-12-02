@@ -1,6 +1,5 @@
 package com.mle.wicket.component.bootstrap
 
-import com.mle.wicket.model.ReadOnlyModel
 import com.mle.wicket.{BasicWebApplication, Bootstrapping}
 import de.agilecoders.wicket.markup.html.bootstrap.navbar.{ImmutableNavbarComponent, NavbarButton, Navbar, NavbarDropDownButton}
 import org.apache.wicket.{Page, MarkupContainer}
@@ -14,6 +13,7 @@ import de.agilecoders.wicket.markup.html.bootstrap.button.{ButtonType, ButtonBeh
 import de.agilecoders.wicket.Bootstrap
 import de.agilecoders.wicket.markup.html.bootstrap.navbar.Navbar.ComponentPosition
 import collection.JavaConversions._
+import com.mle.web.wicket.model.ReadOnlyModel
 
 /**
  * test: tooltibhehavior, popoverbehavior

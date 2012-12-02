@@ -5,9 +5,9 @@ import org.apache.wicket.model.IModel
 import java.util.{List => JList}
 import org.apache.wicket.markup.html.form.{ListChoice, Form}
 import com.mle.util.Log
-import com.mle.wicket.model.{ReadOnlyModel, LDModel}
 import com.mle.wicket.component.{SAjaxButton, EnabledToggle}
 import org.apache.wicket.markup.html.basic.Label
+import com.mle.web.wicket.model.{LDModel, ReadOnlyModel}
 
 /**
  *

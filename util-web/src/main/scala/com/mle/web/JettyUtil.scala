@@ -1,4 +1,4 @@
-package com.mle.wicket
+package com.mle.web
 
 import com.mle.util.{Util, Log}
 import java.util.EnumSet
@@ -62,13 +62,14 @@ object JettyUtil extends Log {
    * @param resourceDir a directory containing static files
    * @param webPath the path spec
    * @param context context for the servlet
+   * @param dirAllowed whether directory listing is allowed
    * @return the static servlet
    */
-  def serveStatic(resourceDir: String, webPath: String = "/*")(implicit context: ServletContextHandler) = {
+  def serveStatic(resourceDir: String, webPath: String = "/*", dirAllowed: Boolean = false)(implicit context: ServletContextHandler) = {
     val staticUrl = Util.resource(resourceDir).toExternalForm
     log info "Mapping static files in: " + staticUrl + " to: " + webPath
     val resourceServlet = new ServletHolder(classOf[DefaultServlet])
-    resourceServlet.setInitParameter("dirAllowed", "true")
+    resourceServlet.setInitParameter("dirAllowed", dirAllowed.toString)
     resourceServlet.setInitParameter("resourceBase", staticUrl)
     resourceServlet.setInitParameter("pathInfoOnly", "true")
     context.addServlet(resourceServlet, webPath)

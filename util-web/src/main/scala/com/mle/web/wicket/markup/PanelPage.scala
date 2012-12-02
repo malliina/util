@@ -1,4 +1,4 @@
-package com.mle.wicket.markup
+package com.mle.web.wicket.markup
 
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.markup.html.WebPage

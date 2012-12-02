@@ -3,9 +3,9 @@ package com.mle.wicket.markup
 import com.mle.util.Log
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.markup.html.form.{PasswordTextField, TextField, Form}
-import com.mle.wicket.model.RWModel
 import com.mle.wicket.{BasicWebApplication, MySession}
 import de.agilecoders.wicket.markup.html.bootstrap.common.NotificationPanel
+import com.mle.web.wicket.model.RWModel
 
 /**
  * @author Mle

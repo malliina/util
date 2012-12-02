@@ -2,12 +2,12 @@ package com.mle.wicket.markup.panels
 
 import org.apache.wicket.model.IModel
 import java.util.{ArrayList => JArrayList, List => JList}
-import com.mle.wicket.model.{LDModel, RWModel}
 import collection.JavaConversions._
 import com.mle.ldap.LdapSettings
 import org.apache.wicket.markup.html.form.ListMultipleChoice
 import com.mle.util.Log
 import com.mle.wicket.markup.AbstractUsers.EditableUser
+import com.mle.web.wicket.model.{RWModel, LDModel}
 
 /**
  *

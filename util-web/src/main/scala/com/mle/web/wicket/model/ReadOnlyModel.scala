@@ -1,4 +1,4 @@
-package com.mle.wicket.model
+package com.mle.web.wicket.model
 
 import org.apache.wicket.model.AbstractReadOnlyModel
 

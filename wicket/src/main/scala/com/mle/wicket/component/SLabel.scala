@@ -1,8 +1,8 @@
 package com.mle.wicket.component
 
 import org.apache.wicket.model.IModel
-import com.mle.wicket.model.LDModel
 import org.apache.wicket.markup.html.basic.Label
+import com.mle.web.wicket.model.LDModel
 
 /**
  *

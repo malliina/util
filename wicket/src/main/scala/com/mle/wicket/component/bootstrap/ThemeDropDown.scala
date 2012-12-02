@@ -1,9 +1,9 @@
 package com.mle.wicket.component.bootstrap
 
 import org.apache.wicket.markup.html.form.DropDownChoice
-import com.mle.wicket.model.RWModel
 import com.mle.wicket.Bootstrapping
 import collection.JavaConversions._
+import com.mle.web.wicket.model.RWModel
 
 /**
  * @author Mle

@@ -5,7 +5,7 @@ import org.apache.wicket.markup.html.form.{RequiredTextField, Form}
 import com.mle.wicket.component.EnabledToggle
 import com.mle.wicket.markup.Hosts.Host
 import com.mle.ldap.LdapSettings.LdapHostManager
-import com.mle.wicket.model.RWModel
+import com.mle.web.wicket.model.RWModel
 
 /**
  *

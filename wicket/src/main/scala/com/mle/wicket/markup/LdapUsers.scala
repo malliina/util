@@ -4,10 +4,10 @@ import panels.LdapUnixUserEditPanel
 import com.mle.ldap.LdapSettings
 import com.mle.wicket.backend.WicketUserManager
 import org.apache.wicket.model.IModel
-import com.mle.wicket.model.LDModel
 import java.util.{List => JList}
 import com.mle.wicket.markup.AbstractUsers.EditableUser
 import collection.JavaConversions._
+import com.mle.web.wicket.model.LDModel
 
 
 /**

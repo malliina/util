@@ -3,12 +3,12 @@ package com.mle.wicket.markup.panels
 import org.apache.wicket.model.IModel
 import org.apache.wicket.markup.html.form.{ListMultipleChoice, PasswordTextField, TextField, Form}
 import com.mle.util.Log
-import com.mle.wicket.model.{LDModel, RWModel}
 import java.util.{List => JList, ArrayList => JArrayList}
 import collection.JavaConversions._
 import com.mle.wicket.component.EnabledToggle
 import com.mle.auth.UserManager
 import com.mle.wicket.markup.AbstractUsers.EditableUser
+import com.mle.web.wicket.model.{LDModel, RWModel}
 
 /**
  * @author mle

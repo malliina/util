@@ -3,10 +3,10 @@ package com.mle.wicket.markup
 import panels.{GroupEditPanel, SelectPanel, ManagementPanel}
 import org.apache.wicket.model.{Model, IModel}
 import java.util.{List => JList}
-import com.mle.wicket.model.LDModel
 import collection.JavaConversions._
 import com.mle.ldap.LdapSettings
 import com.mle.wicket.backend.WicketUserManager
+import com.mle.web.wicket.model.LDModel
 
 /**
  *

@@ -1,7 +1,6 @@
 package com.mle.wicket.markup
 
 import com.mle.util.Log
-import com.mle.wicket.model.LDModel
 import org.apache.wicket.model.IModel
 import java.util.{List => JList}
 import panels.UserEditPanel
@@ -9,6 +8,7 @@ import com.mle.wicket.backend.WicketUserManager
 import com.mle.ldap.LdapSettings
 import com.mle.wicket.markup.AbstractUsers.EditableUser
 import collection.JavaConversions._
+import com.mle.web.wicket.model.LDModel
 
 /**
  * @author Mle

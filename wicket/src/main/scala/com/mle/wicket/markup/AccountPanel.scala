@@ -3,10 +3,10 @@ package com.mle.wicket.markup
 import com.mle.util.Log
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest
-import com.mle.wicket.model.LDModel
 import com.mle.auth.CertificateContainer
 import com.mle.wicket.component.SLabel
 import org.apache.wicket.request.Request
+import com.mle.web.wicket.model.LDModel
 
 /**
  * @author Mle

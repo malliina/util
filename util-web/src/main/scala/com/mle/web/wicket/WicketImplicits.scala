@@ -1,10 +1,9 @@
-package com.mle.wicket
+package com.mle.web.wicket
 
 import model.LDModel
 import org.apache.wicket.util.time.Duration
 import org.apache.wicket.model.IModel
 import org.apache.wicket.markup.html.form.IChoiceRenderer
-
 
 /**
  * @author Mle

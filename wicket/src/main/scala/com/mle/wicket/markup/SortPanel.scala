@@ -4,10 +4,10 @@ import collection.JavaConversions._
 import com.mle.util.Log
 import com.mle.wicket.behavior.SortableListBehavior
 import com.mle.wicket.component.{AjaxMarkup, SListView}
-import com.mle.wicket.model.LDModel
 import java.util.{ArrayList => JArrayList}
 import org.apache.wicket.markup.html.basic.Label
 import org.apache.wicket.markup.html.panel.Panel
+import com.mle.web.wicket.model.LDModel
 
 /**
  * @author Mle

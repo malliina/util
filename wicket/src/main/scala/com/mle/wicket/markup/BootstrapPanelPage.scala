@@ -12,7 +12,6 @@ import com.mle.wicket.component.bootstrap.LRBootstrapTabbedPanel
  */
 class BootstrapPanelPage extends WebPage {
   val leftTabs =
-    STab("Home", new Home(_)) ::
       new PanelCachingTab(STab("Bootstrap", new BootstrapPanel(_))) ::
       STab("Web Sockets", new WebSockets(_)) ::
       Nil

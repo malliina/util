@@ -16,7 +16,6 @@ import org.apache.wicket.protocol.http.WebApplication
 trait Bootstrapping extends WebApplication with Log {
   var themeService: BootstrapThemes = null
   private val defaultTabs = buildTabs(
-    ("Home", classOf[HomePage], Some(IconType.Home)),
     ("Sorting", classOf[SortPage], None),
     ("Bootstrap", classOf[SettingsPage], Some(IconType.Cog)),
     ("MOTD", classOf[MessagePage], None),
