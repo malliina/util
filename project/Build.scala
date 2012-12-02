@@ -82,7 +82,8 @@ object GitBuild extends Build {
   )
   lazy val homePage = webProject("homepage")
     .settings(cloudBeesSettings: _*)
-    .settings(CloudBees.applicationId := Some("home"),
+    .settings(com.typesafe.sbt.SbtStartScript.startScriptForClassesSettings: _*)
+  .settings(CloudBees.applicationId := Some("home"),
     CloudBees.apiKey := beesConfig get "bees.api.key",
     CloudBees.apiSecret := beesConfig get "bees.api.secret",
     CloudBees.username := beesConfig get "bees.project.app.domain",
