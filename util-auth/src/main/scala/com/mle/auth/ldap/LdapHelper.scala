@@ -1,7 +1,6 @@
 package com.mle.auth.ldap
 
-import javax.naming.directory.{ModificationItem, BasicAttribute, BasicAttributes}
-import LdapImplicits._
+import javax.naming.directory.{DirContext, ModificationItem, BasicAttribute, BasicAttributes}
 
 /**
  *
@@ -38,8 +37,16 @@ object LdapHelper {
     attrs
   }
 
-  def arrayModification(modAttribute: Int, kv: (LdapAttributes.LdapAttribute, String)) = {
-    val (key, value) = kv
-    Array(new ModificationItem(modAttribute, attributeStr(key, value)))
+  /**
+   * @see DirContext.REMOVE_ATTRIBUTE etc.
+   */
+  def arrayModification(modAttribute: Int, kvs: (LdapAttributes.LdapAttribute, String)*): Array[ModificationItem] = {
+    kvs.map(kv => {
+      val (key, value) = kv
+      new ModificationItem(modAttribute, attribute2(key, value))
+    }).toArray
   }
+
+  def updateModification(kv: (LdapAttributes.LdapAttribute, String)*): Array[ModificationItem] =
+    arrayModification(DirContext.REPLACE_ATTRIBUTE, kv: _*)
 }

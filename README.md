@@ -1,6 +1,7 @@
 An exploration of Scala. Test code for wicket, play!, web sockets, actors, functional programming, and whatever seems interesting.
 
 To do:
+- /etc/hosts entries from LDAP
 - Push wicket to heroku
 - Play fucks up the logback configuration jesus christ
 - Evaluate whether it makes sense to have DB operations that return Promise[ResultSet]

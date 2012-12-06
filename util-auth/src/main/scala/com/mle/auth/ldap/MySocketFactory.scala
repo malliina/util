@@ -47,6 +47,6 @@ class MySocketFactory(keySettings: IKeystoreSettings) extends SSLSocketFactory {
 
 object MySocketFactory {
   val socketFactory = new MySocketFactory(ClientKeystoreSettings)
-
+  // do not remove. need a "static" getDefault method for compat with java jndi
   val getDefault: SocketFactory = socketFactory
 }

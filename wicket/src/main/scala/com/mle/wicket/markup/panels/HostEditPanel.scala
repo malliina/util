@@ -7,6 +7,7 @@ import com.mle.wicket.markup.Hosts.Host
 import com.mle.ldap.LdapSettings.LdapHostManager
 import com.mle.web.wicket.model.RWModel
 
+
 /**
  *
  * @author mle
@@ -27,10 +28,11 @@ abstract class HostEditPanel(id: String, model: IModel[Host], updating: IModel[B
 
   def onCreate(newItem: Host) {
     userManager.addHost(newItem.hostname, newItem.ip)
-    info("Added group: " + newItem)
+    info("Added host: " + newItem)
   }
 
   def onUpdate(updatedItem: Host) {
-    info("Update not implemented")
+    userManager.updateHost(updatedItem.hostname, updatedItem.ip)
+    info("Updated host: "+updatedItem)
   }
 }

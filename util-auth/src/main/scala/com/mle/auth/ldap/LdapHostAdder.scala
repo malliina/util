@@ -19,4 +19,9 @@ trait LdapHostAdder extends LdapManager {
     hostAttrs put attribute(objectClass, ipHost, groupOfNames)
     addEntry(groupInfo.toDN(hostname), hostAttrs)
   }
+
+  def updateHost(hostname: String, ip: String) {
+    val mods = updateModification(ipHostNumber -> ip)
+    modifyEntry(groupInfo.toDN(hostname), mods)
+  }
 }

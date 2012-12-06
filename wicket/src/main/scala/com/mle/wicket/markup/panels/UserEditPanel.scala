@@ -1,7 +1,7 @@
 package com.mle.wicket.markup.panels
 
 import org.apache.wicket.model.IModel
-import org.apache.wicket.markup.html.form.{ListMultipleChoice, PasswordTextField, TextField, Form}
+import org.apache.wicket.markup.html.form._
 import com.mle.util.Log
 import java.util.{List => JList, ArrayList => JArrayList}
 import collection.JavaConversions._
@@ -9,6 +9,8 @@ import com.mle.wicket.component.EnabledToggle
 import com.mle.auth.UserManager
 import com.mle.wicket.markup.AbstractUsers.EditableUser
 import com.mle.web.wicket.model.{LDModel, RWModel}
+import scala.Some
+import com.mle.wicket.markup.AbstractUsers.EditableUser
 
 /**
  * @author mle
@@ -21,7 +23,7 @@ abstract class UserEditPanel(id: String, editModel: IModel[EditableUser], updati
   val form = new Form("editForm")
   add(form)
   // http://technically.us/code/x/the-escape-hatch/
-  val usernameField = new TextField("username", RWModel[String](item.username, item.username = _)) with EnabledToggle {
+  val usernameField = new RequiredTextField("username", RWModel[String](item.username, item.username = _)) with EnabledToggle {
     def enabled = !updating.getObject
   }
   val passwordField = new PasswordTextField("password",

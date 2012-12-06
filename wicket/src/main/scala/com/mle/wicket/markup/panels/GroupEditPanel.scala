@@ -1,7 +1,7 @@
 package com.mle.wicket.markup.panels
 
 import org.apache.wicket.model.IModel
-import org.apache.wicket.markup.html.form.{Form, TextField}
+import org.apache.wicket.markup.html.form.{RequiredTextField, Form}
 import com.mle.wicket.component.EnabledToggle
 import com.mle.auth.UserManager
 
@@ -16,7 +16,7 @@ abstract class GroupEditPanel(id: String, model: IModel[String], updating: IMode
   val form = new Form("editForm")
   add(form)
 
-  val usernameField = new TextField("groupName", model) with EnabledToggle {
+  val usernameField = new RequiredTextField("groupName", model) with EnabledToggle {
     def enabled = !updating.getObject
   }
   form add(usernameField, submitButton, headerLabel)

@@ -89,9 +89,9 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
   }
 
   def removeGroup(group: String) {
-    val groupMembers = users(group)
-    if (groupMembers.nonEmpty)
-      throw new UserManagementException("Cannot remove non-empty group: " + group + ", members: " + groupMembers.mkString(", "))
+//    val groupMembers = users(group)
+//    if (groupMembers.nonEmpty)
+//      throw new UserManagementException("Cannot remove non-empty group: " + group + ", members: " + groupMembers.mkString(", "))
     removeEntry(groupInfo.toDN(group))
   }
 
