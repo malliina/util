@@ -199,3 +199,50 @@ user nslcd must be able to read client-key.pem either through ownership or prima
 LDAP host-specific authorization:
 on ubuntu, set "shadow compat" in /etc/nsswitch.conf, not "shadow compat ldap"
 on centos, no change in nsswitch.conf seems necessary
+
+
+Samba as primary domain controller for windows clients:
+
+Follow http://www.server-world.info/en/note?os=CentOS_6&p=samba&f=4 but change 'w' to 'W' in smb.conf as in:
+        #add machine script = /usr/sbin/smbldap-useradd -t 0 -w "%u"
+        add machine script = /usr/sbin/smbldap-useradd -t 0 -W "%u"
+
+
+perl /usr/share/doc/smbldap-tools-*/configure.pl
+...
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+backup old configuration files:
+  /etc/smbldap-tools/smbldap.conf->/etc/smbldap-tools/smbldap.conf.old
+  /etc/smbldap-tools/smbldap_bind.conf->/etc/smbldap-tools/smbldap_bind.conf.old
+writing new configuration file:
+  /etc/smbldap-tools/smbldap.conf done.
+  /etc/smbldap-tools/smbldap_bind.conf done.
+[root@cent1 tmp]#
+
+[root@cent1 tmp]# smbldap-populate
+Populating LDAP directory for domain MLEGROUP (S-1-5-21-184410074-1697016161-3073087301)
+(using builtin directory structure)
+
+entry dc=mle,dc=com already exist.
+entry ou=People,dc=mle,dc=com already exist.
+entry ou=Groups,dc=mle,dc=com already exist.
+entry ou=Hosts,dc=mle,dc=com already exist.
+adding new entry: ou=Idmap,dc=mle,dc=com
+adding new entry: uid=root,ou=People,dc=mle,dc=com
+adding new entry: uid=nobody,ou=People,dc=mle,dc=com
+adding new entry: cn=Domain Admins,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Domain Users,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Domain Guests,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Domain Computers,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Administrators,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Account Operators,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Print Operators,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Backup Operators,ou=Groups,dc=mle,dc=com
+adding new entry: cn=Replicators,ou=Groups,dc=mle,dc=com
+entry sambaDomainName=MLEGROUP,dc=mle,dc=com already exist. Updating it...
+
+Please provide a password for the domain root:
+Changing UNIX and samba passwords for root
+New password:
+Retype new password:
+[root@cent1 tmp]#
