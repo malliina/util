@@ -46,6 +46,13 @@ object GitBuild extends Build {
   val beesConfig = MyUtil.optionally(
     MyUtil.props((Path.userHome / ".bees" / "bees.config").toString)
   ).getOrElse(Map.empty)
+
+  def beesSettings = Seq(
+    CloudBees.apiKey := beesConfig get "bees.api.key",
+    CloudBees.apiSecret := beesConfig get "bees.api.secret",
+    CloudBees.username := beesConfig get "bees.project.app.domain"
+  )
+
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("util")
     .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson))
@@ -70,32 +77,40 @@ object GitBuild extends Build {
   lazy val wicket = webProject("wicket")
     .dependsOn(utilActor, rmi, auth, utilJdbc)
     .settings(wicketSettings: _*)
-    .settings(cloudBeesSettings: _*)
     .settings(
-    libraryDependencies ++= wiQuery ++ Seq(jerkson),
     CloudBees.applicationId := Some("wicket"),
     CloudBees.apiKey := beesConfig get "bees.api.key",
     CloudBees.apiSecret := beesConfig get "bees.api.secret",
-    CloudBees.username := beesConfig get "bees.project.app.domain",
+    CloudBees.username := beesConfig get "bees.project.app.domain")
+    .settings(
+    libraryDependencies ++= wiQuery ++ Seq(jerkson),
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb"),
     mainClass := Some("com.mle.wicket.WicketStart")
   )
   lazy val homePage = webProject("homepage")
     .settings(cloudBeesSettings: _*)
-    .settings(com.typesafe.sbt.SbtStartScript.startScriptForClassesSettings: _*)
-    .settings(CloudBees.applicationId := Some("home"),
+    .settings(
+    CloudBees.applicationId := Some("home"),
     CloudBees.apiKey := beesConfig get "bees.api.key",
     CloudBees.apiSecret := beesConfig get "bees.api.secret",
-    CloudBees.username := beesConfig get "bees.project.app.domain",
+    CloudBees.username := beesConfig get "bees.project.app.domain")
+    .settings(com.typesafe.sbt.SbtStartScript.startScriptForClassesSettings: _*)
+    .settings(
     // TODO DRY but test with .war packaging; myWebSettings doesn't cut it
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
   )
+  // does not work
+  def cloudBeesAppSettings(appId: String): Seq[Project.Setting[_]] = {
+    Seq(CloudBees.applicationId := Some(appId)) ++ beesSettings ++ cloudBeesSettings
+  }
 
-  def myProject(id: String) = Project(id, file(id), settings = commonSettings)
+  def myProject(id: String, customSettings: Seq[Project.Setting[_]] = Seq.empty) = Project(id, file(id), settings = commonSettings ++ customSettings)
 
-  def basicProject(id: String) = myProject(id).dependsOn(util).settings(libraryDependencies += scalaTest)
+  def basicProject(id: String, customSettings: Seq[Project.Setting[_]] = Seq.empty) = myProject(id, customSettings)
+    .dependsOn(util)
+    .settings(libraryDependencies += scalaTest)
 
-  def webProject(id: String) = basicProject(id)
+  def webProject(id: String, customSettings: Seq[Project.Setting[_]] = Seq.empty) = basicProject(id, customSettings)
     .dependsOn(utilWeb)
     .settings(myWebSettings: _*)
 }
