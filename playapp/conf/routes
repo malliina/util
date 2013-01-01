@@ -33,3 +33,5 @@ GET     /chat/room/chat             controllers.ChatApp.chat(username)
 
 # Async test pages
 GET     /async                      controllers.Async.index
+
+#GET /rest                           controllers.
