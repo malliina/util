@@ -36,7 +36,7 @@ object HelloWorld extends Controller with PlayLog {
       helloForm.bindFromRequest.fold(
         formErrors => BadRequest(html.helloIndex(formErrors)),
         formSuccess => formSuccess match {
-          case (name, repeat, color) => Ok(html.hello(name, repeat.toInt, color))
+          case (name, repeat, color) => Ok(html.hello(name, repeat, color))
         }
       )
   }
