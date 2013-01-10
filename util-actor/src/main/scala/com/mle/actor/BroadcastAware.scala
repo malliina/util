@@ -2,14 +2,14 @@ package com.mle.actor
 
 
 import com.mle.actor.Messages.{Start, Stop}
-import actors.Actor
 import com.mle.util.Log
+import akka.actor.ActorRef
 
 /**
  * @author Mle
  */
 trait BroadcastAware[T] extends KingActor[T] with Log {
-  def broadcaster: Actor
+  def broadcaster: ActorRef
 
   override def onConnect(clientAddress: T) = {
     val conns = super.onConnect(clientAddress)

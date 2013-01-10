@@ -18,10 +18,10 @@ object WebSockets extends Controller with PlayLog {
   }
 
   def webSocket = WebSocket.using(request => {
-    val (e, channel) = Concurrent.broadcast[String]
+    val (out, channel) = Concurrent.broadcast[String]
     onConnect(channel, request)
     val in = Iteratee.foreach[String](onMessage(_, channel)).mapDone(_ => onClose(channel))
-    (in, e)
+    (in, out)
   })
 
   def onConnect(channel: ClientChannel, request: RequestHeader) {
@@ -41,6 +41,6 @@ object WebSockets extends Controller with PlayLog {
 
   def onMessage(msg: String, channel: ClientChannel) {
     log info "Server got msg: " + msg + " from: " + channel
-    channel push "Welcome"
+    channel push "Thanks for your message. I will repeat what you said: " + msg
   }
 }

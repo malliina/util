@@ -21,15 +21,16 @@ import Dependencies._
 
 object GitBuild extends Build {
   // hack to make sbt-idea and play 2.1 plugins work
-  override lazy val settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings
+  override lazy val settings = super.settings ++ com.typesafe.sbtidea.SbtIdeaPlugin.ideaSettings
   val credentialPath = Path.userHome / ".sbt" / "credentials.txt"
   val credentialSettings =
     if (credentialPath.exists())
       Seq(credentials += Credentials(credentialPath))
     else Seq.empty
   val commonSettings = Defaults.defaultSettings ++ Seq(
-    scalaVersion := "2.9.2",
-    version := "0.3-SNAPSHOT",
+    organization := "com.mle",
+    version := "0.5-SNAPSHOT",
+    scalaVersion := "2.10.0",
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
     publishMavenStyle := false,
@@ -55,8 +56,9 @@ object GitBuild extends Build {
 
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("util")
-    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, jerkson))
+    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest))
   lazy val utilActor = basicProject("util-actor")
+    .settings(libraryDependencies ++= Seq(akkaActor, akkaTestKit))
   lazy val utilJdbc = basicProject("util-jdbc")
     // Kids, watch and learn. test->test means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
@@ -67,8 +69,9 @@ object GitBuild extends Build {
   lazy val rmi = basicProject("util-rmi")
   lazy val auth = basicProject("util-auth")
     .settings(libraryDependencies ++= Seq(hashing))
-  lazy val play = PlayProject("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, mainLang = SCALA)
+  lazy val pp = play.Project("playapp", path = file("playapp"), applicationVersion = "0.1", dependencies = Nil, settings = commonSettings)
     .dependsOn(util, utilActor, utilJdbc)
+    .settings(exportJars := false)
   lazy val wicketSettings: Seq[Setting[_]] = PackagerPlugin.packagerSettings ++
     WindowsPlugin.windowsSettings ++
     LinuxPackaging.rpmSettings ++
@@ -83,7 +86,7 @@ object GitBuild extends Build {
     CloudBees.apiSecret := beesConfig get "bees.api.secret",
     CloudBees.username := beesConfig get "bees.project.app.domain")
     .settings(
-    libraryDependencies ++= wiQuery ++ Seq(jerkson),
+    libraryDependencies ++= wiQuery,
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb"),
     mainClass := Some("com.mle.wicket.WicketStart")
   )
@@ -99,6 +102,7 @@ object GitBuild extends Build {
     // TODO DRY but test with .war packaging; myWebSettings doesn't cut it
     webappResources in Compile <+= (sourceDirectory in Runtime)(sd => sd / "resources" / "publicweb")
   )
+
   // does not work
   def cloudBeesAppSettings(appId: String): Seq[Project.Setting[_]] = {
     Seq(CloudBees.applicationId := Some(appId)) ++ beesSettings ++ cloudBeesSettings

@@ -11,5 +11,5 @@ class WSKingActor extends KingActor[Address] with BroadcastAware[Address] {
   val broadcaster = new Broadcaster(this) {
     override def transformer = JsonUtils.toJson(_)
   }.start()
-  val clientBuilder = new WicketClient(_)
+  val clientActorBuilder = new WicketClient(_)
 }

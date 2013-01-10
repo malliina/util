@@ -2,17 +2,24 @@ package models
 
 import com.mle.actor._
 import controllers.WebSockets
+import akka.actor.{ActorSystem, ActorRef, ActorDSL}
+import com.mle.util.Util
 
 /**
  *
  * @author Mle
  */
-object WebSocketsManager extends ActorManager(new King)
 
-class King extends KingActor[WebSockets.ClientChannel] with BroadcastAware[WebSockets.ClientChannel] {
-  val clientBuilder = new PlayClient(_)
+object WebSocketsManager extends ActorManager[WebSockets.ClientChannel] {
+  private val system = ActorSystem("actor-system")
+  Util.addShutdownHook(system.shutdown())
 
-  val broadcaster = new Broadcaster(this).start()
+  val king = ActorDSL.actor(system)(new PlayKing(messages))
+
+  class PlayKing(messages: MessageTypes[WebSockets.ClientChannel]) extends KingActor[WebSockets.ClientChannel](messages) {
+    val clientActorBuilder = (channel: WebSockets.ClientChannel) => ActorDSL.actor(system)(new PlayClient(channel))
+  }
+
 }
 
 class PlayClient(channel: WebSockets.ClientChannel)

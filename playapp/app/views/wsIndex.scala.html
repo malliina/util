@@ -1,4 +1,4 @@
-@(msg:String)(implicit request: RequestHeader)
+@(msg: String)(implicit request: RequestHeader)
 
 @import helper._
 
@@ -7,26 +7,26 @@
     <h1>Welcome to WebSockets in Play 2.1</h1>
     <fieldset id="sender">
         <legend>Send to server</legend>
-        <input type="text" id="message"/>
+    <input type="text" id="message"/>
         <button class="send">Send</button>
     </fieldset>
 
     <fieldset id="sentMessages">
-        <legend>Messages sent by server</legend>
+        <legend>Messages received from server</legend>
         <div id="messages"></div>
     </fieldset>
 
     <script type="text/javascript" charset="utf-8">
-        $(function() {
-            var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-            var chatSocket = new WS(" @routes.WebSockets.webSocket().webSocketURL() ")
-            chatSocket.onmessage = function(event) {
-                $('#messages').prepend('<span>' + event.data + '</span><br/>');
-            }
-            $('button.send').click(function() {
-                chatSocket.send($('#message').val())
-                $('#message').val('')
-            });
-    })
-    </script>
+    $(function() {
+    var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+    var chatSocket = new WS(" @routes.WebSockets.webSocket().webSocketURL() ")
+    chatSocket.onmessage = function(event) {
+    $('#messages').prepend(' <span>' + event.data + '</span> <br/> ');
 }
+    $('button.send').click(function() {
+    chatSocket.send($('#message').val())
+    $('#message').val('')
+    });
+    })
+</script>
+    }

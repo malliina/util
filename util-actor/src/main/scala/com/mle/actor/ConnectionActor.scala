@@ -1,8 +1,8 @@
 package com.mle.actor
 
-import actors.Actor
 import com.mle.util.Log
 import com.mle.actor.Messages.{StringMessage, Stop}
+import akka.actor.Actor
 
 /**
  *
@@ -16,16 +16,12 @@ abstract class ConnectionActor[T](val address: T) extends Actor with Log {
    */
   val pushMessage: String => Unit
 
-  def act() {
-    loop {
-      react {
-        case StringMessage(msg) =>
-          log debug "Client got message: " + msg
-          pushMessage(msg)
-        case Stop =>
-          log debug "Client exiting"
-          exit()
-      }
-    }
+  def receive = {
+    case StringMessage(msg) =>
+      log debug "Client got message: " + msg
+      pushMessage(msg)
+    case Stop =>
+      log debug "Client exiting"
+      context.stop(self)
   }
 }

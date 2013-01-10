@@ -1,9 +1,8 @@
 package com.mle.actor
 
-import actors.Actor
 import com.mle.util.Log
 import com.mle.actor.Messages.{Broadcast, Stop, StringMessage}
-
+import akka.actor._
 
 /**
  * A manager of actors.
@@ -15,24 +14,20 @@ import com.mle.actor.Messages.{Broadcast, Stop, StringMessage}
  * @tparam T client address
  * @author Mle
  */
-abstract class KingActor[T] extends Actor with Log {
-  private var connections = Set.empty[ConnectionActor[T]]
-  protected val clientBuilder: T => ConnectionActor[T]
+abstract class KingActor[T](messages: MessageTypes[T]) extends Actor with Log {
+  private var connections = Set.empty[ActorBundle[T]]
+  val clientActorBuilder: T => ActorRef
 
-  def act() {
-    loop {
-      react {
-        case Connect(client) =>
-          onConnect(client)
-        case Disconnect(client) =>
-          onDisconnect(client)
-        case Broadcast(msg) =>
-          connections.foreach(_ ! StringMessage(msg))
-        case Stop =>
-          connections foreach (_ ! Stop)
-          exit()
-      }
-    }
+  def receive = {
+    case messages.Connect(client) =>
+      onConnect(client)
+    case messages.Disconnect(client) =>
+      onDisconnect(client)
+    case Broadcast(msg) =>
+      connections.foreach(_.actor ! StringMessage(msg))
+    case Stop =>
+      connections foreach (_.actor ! Stop)
+      context.stop(self)
   }
 
   /**
@@ -41,8 +36,7 @@ abstract class KingActor[T] extends Actor with Log {
    * @return the number of connections
    */
   protected def onConnect(clientAddress: T): Int = {
-    val clientActor = clientBuilder(clientAddress)
-    clientActor.start()
+    val clientActor = new ActorBundle(clientActorBuilder(clientAddress), clientAddress)
     connections += clientActor
     val conns = connections.size
     log info "Client connected. Open connections: " + conns
@@ -57,15 +51,13 @@ abstract class KingActor[T] extends Actor with Log {
   protected def onDisconnect(clientAddress: T): Int = {
     connections.find(_.address == clientAddress).foreach(clientActor => {
       connections -= clientActor
-      clientActor ! Stop
+      clientActor.actor ! Stop
     })
     val remainingConnections = connections.size
     log info "Client disconnected. Open connections: " + remainingConnections
     remainingConnections
   }
 
-  case class Connect(client: T)
-
-  case class Disconnect(client: T)
-
 }
+
+case class ActorBundle[T](actor: ActorRef, address: T)
