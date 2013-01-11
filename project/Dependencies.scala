@@ -37,5 +37,5 @@ object Dependencies {
   val boneCp = "com.jolbox" % "bonecp" % "0.7.1.RELEASE"
   val jerkson = "io.backchat.jerkson" %% "jerkson" % "0.7.0"
   val akkaActor = "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0"
-  val akkaTestKit = "com.typesafe.akka" % "akka-testkit_2.10" % "2.1.0"
+  val akkaTestKit = "com.typesafe.akka" % "akka-testkit_2.10" % "2.1.0" % "test"
 }
