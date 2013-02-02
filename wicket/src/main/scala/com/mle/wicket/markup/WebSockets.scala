@@ -3,10 +3,9 @@ package com.mle.wicket.markup
 import com.mle.util.{JsonUtils, Log}
 import com.mle.wicket.component.SAjaxLink
 import com.mle.wicket.wsactor.{Address, WsActors}
-import org.apache.wicket.ajax.WebSocketRequestHandler
 import org.apache.wicket.markup.html.panel.Panel
 import org.apache.wicket.protocol.ws.api.message.{ClosedMessage, ConnectedMessage, TextMessage}
-import org.apache.wicket.protocol.ws.api.{WicketWebSocketJQueryResourceReference, SimpleWebSocketConnectionRegistry, WebSocketBehavior}
+import org.apache.wicket.protocol.ws.api.{WebSocketRequestHandler, WicketWebSocketJQueryResourceReference, SimpleWebSocketConnectionRegistry, WebSocketBehavior}
 import org.apache.wicket.markup.head.{JavaScriptHeaderItem, IHeaderResponse}
 import org.apache.wicket.request.resource.PackageResourceReference
 import collection.JavaConversions._
@@ -25,7 +24,8 @@ class WebSockets(id: String) extends Panel(id) with Log {
     val maybeConn = Option(registry.getConnection(getApplication, sessionId, pageId))
     maybeConn.foreach(conn => {
       val handler = new WebSocketRequestHandler(this, conn)
-      val msg = JsonUtils.toJson("This message has been pushed as a response to an ajax request")
+      val msg = "This message has been pushed as a response to an ajax request"
+      //      val msg = JsonUtils.toJson("This message has been pushed as a response to an ajax request")
       //      conn sendMessage msg
       handler push msg
       log info "Server pushed message: " + msg
@@ -53,10 +53,10 @@ class WebSockets(id: String) extends Panel(id) with Log {
         case Seq('B', msg@_*) =>
           // Broadcast
           //          val srcIP = RequestCycle.get().getRequest.asInstanceOf[WebSocketRequest].getContainerRequest.asInstanceOf[HttpServletRequest].getRemoteAddr
-          WsActors.king ! Broadcast(JsonUtils.toJson(msg.toString()))
+//          WsActors.king ! Broadcast(msg.toString())
         case Seq('U', msg@_*) =>
           // Unicast
-          val pushMsg = JsonUtils.toJson("This is a reply to: " + msg)
+          val pushMsg = "This is a reply to: " + msg
           handler push pushMsg
           log info "Pushed this response: " + pushMsg
         case anythingElse =>

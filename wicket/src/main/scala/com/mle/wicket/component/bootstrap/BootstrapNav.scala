@@ -34,7 +34,7 @@ trait BootstrapNav extends MarkupContainer with Log {
 
   def navButton[T <: Page](pageClass: Class[T], label: String, iconType: Option[IconType]) = {
     val button = new NavbarButton(pageClass, Model.of(label))
-    iconType foreach (iType => button.setIcon(new Icon(iType)))
+    iconType foreach (it => button.setIconType(it))
     button
   }
 

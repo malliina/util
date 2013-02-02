@@ -17,13 +17,13 @@ trait Bootstrapping extends WebApplication with Log {
   var themeService: BootstrapThemes = null
   private val defaultTabs = buildTabs(
     ("Sorting", classOf[SortPage], None),
-    ("Bootstrap", classOf[SettingsPage], Some(IconType.Cog)),
+    ("Bootstrap", classOf[SettingsPage], Some(IconType.cog)),
     ("MOTD", classOf[MessagePage], None),
-    ("Account", classOf[AccountPage], Some(IconType.User)),
-    ("Users", classOf[UsersPage], Some(IconType.User)),
-    ("Unix Users", classOf[LdapUsersPage], Some(IconType.User)),
-    ("Groups", classOf[GroupsPage], Some(IconType.User)),
-    ("Hosts", classOf[HostsPage], Some(IconType.User))
+    ("Account", classOf[AccountPage], Some(IconType.user)),
+    ("Users", classOf[UsersPage], Some(IconType.user)),
+    ("Unix Users", classOf[LdapUsersPage], Some(IconType.user)),
+    ("Groups", classOf[GroupsPage], Some(IconType.user)),
+    ("Hosts", classOf[HostsPage], Some(IconType.user))
   )
 
   def tabs: Seq[BootTab[_ <: WebPage]] = defaultTabs

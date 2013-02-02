@@ -17,8 +17,8 @@ object LdapSettings {
   val uri = ldapProps("ldap.uri")
   val adminUser = ldapProps("ldap.user")
   val adminPass = ldapProps("ldap.pass")
-  val adminInfo = DnInfo("cn", "dc=mle,dc=com")
-  val peopleInfo = DnInfo("uid", "ou=People,dc=mle,dc=com")
+  val adminInfo = new DnInfo("cn", "dc=mle,dc=com")
+  val peopleInfo = new DnInfo("uid", "ou=People,dc=mle,dc=com")
   val groupInfo = GroupDnInfo("cn", "ou=Groups,dc=mle,dc=com", LdapAttributes.memberuid)
   val hostInfo = GroupDnInfo("cn", "ou=Hosts,dc=mle,dc=com", LdapAttributes.member)
   val maybeKeySettings = if (uri startsWith "ldaps") Some(ClientKeystoreSettings) else None

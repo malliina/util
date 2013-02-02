@@ -14,7 +14,8 @@ import collection.JavaConversions._
 import com.mle.util.security.IKeystoreSettings
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector
 import org.eclipse.jetty.util.ssl.SslContextFactory
-import org.apache.wicket.protocol.http.{ContextParamWebApplicationFactory, WicketFilter, Jetty7WebSocketFilter, WebApplication}
+import org.apache.wicket.protocol.http.{ContextParamWebApplicationFactory, WicketFilter, WebApplication}
+import org.apache.wicket.protocol.ws.jetty.Jetty7WebSocketFilter
 
 /**
  * https://cwiki.apache.org/WICKET/wicket-without-webxml-embedded-jetty.html
@@ -24,7 +25,7 @@ import org.apache.wicket.protocol.http.{ContextParamWebApplicationFactory, Wicke
 object JettyUtil extends Log {
 
   /**
-   * Valid filters are e.g. [[org.apache.wicket.protocol.http.Jetty7WebSocketFilter]]
+   * Valid filters are e.g. [[org.apache.wicket.protocol.ws.jetty.Jetty7WebSocketFilter]]
    * or [[org.apache.wicket.protocol.http.WicketFilter]]
    */
   def addWicket[T <: WebApplication, U <: Filter](webApp: Class[T],

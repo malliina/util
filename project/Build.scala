@@ -1,15 +1,9 @@
-//import com.mle.sbt.GenericPackaging
-//import com.mle.sbt.NativePackaging
-//import com.mle.sbt.Packaging
-//import com.mle.sbt.WindowsPlugin
-
 import com.mle.sbt.unix.{UnixZipPackaging, LinuxPackaging}
 import com.mle.sbt.win.WindowsPlugin
 import com.github.siasia.WebPlugin.webSettings
 import com.github.siasia.PluginKeys._
 import com.typesafe.packager.PackagerPlugin
 import sbt.Keys._
-import sbt.PlayProject._
 import sbt._
 import cloudbees.Plugin.{CloudBees, cloudBeesSettings}
 import com.mle.util.{Util => MyUtil}
@@ -29,7 +23,7 @@ object GitBuild extends Build {
     else Seq.empty
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.mle",
-    version := "0.5-SNAPSHOT",
+    version := "0.63-SNAPSHOT",
     scalaVersion := "2.10.0",
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
@@ -56,7 +50,11 @@ object GitBuild extends Build {
 
   lazy val parent = Project("parent", file("."))
   lazy val util = myProject("util")
-    .settings(libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest))
+    .settings(
+    libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest),
+    scalaVersion := "2.9.2",
+    crossScalaVersions := Seq("2.9.2", "2.10")
+  )
   lazy val utilActor = basicProject("util-actor")
     .settings(libraryDependencies ++= Seq(akkaActor, akkaTestKit))
   lazy val utilJdbc = basicProject("util-jdbc")
