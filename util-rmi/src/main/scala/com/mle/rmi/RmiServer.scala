@@ -11,7 +11,9 @@ import com.mle.util.security.{MultiKeyStoreManager, IKeystoreSettings}
  *
  * @author Mle
  */
-class RmiServer(registryPort: Int = RmiRegistry.DEFAULT_PORT, keySettings: IKeystoreSettings) extends Closeable with Log {
+class RmiServer(registryPort: Int = RmiRegistry.DEFAULT_PORT,
+                keySettings: IKeystoreSettings = RmiUtil.keySettings)
+  extends Closeable with Log {
   private val sslContext = MultiKeyStoreManager.newSslContext(keySettings)
   val remoteObject = new RmiImpl(this)
   val stub = toStub(remoteObject)

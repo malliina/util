@@ -23,7 +23,7 @@ object GitBuild extends Build {
     else Seq.empty
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.mle",
-    version := "0.63-SNAPSHOT",
+    version := "0.64-SNAPSHOT",
     scalaVersion := "2.10.0",
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
@@ -52,7 +52,7 @@ object GitBuild extends Build {
   lazy val util = myProject("util")
     .settings(
     libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest),
-    scalaVersion := "2.9.2",
+//    scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.10")
   )
   lazy val utilActor = basicProject("util-actor")
@@ -74,7 +74,7 @@ object GitBuild extends Build {
     WindowsPlugin.windowsSettings ++
     LinuxPackaging.rpmSettings ++
     LinuxPackaging.debianSettings ++
-    UnixZipPackaging.unixZipSettings ++ tmpSettings
+    UnixZipPackaging.unixZipSettings
   lazy val wicket = webProject("wicket")
     .dependsOn(utilActor, rmi, auth, utilJdbc)
     .settings(wicketSettings: _*)
