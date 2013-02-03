@@ -2,7 +2,7 @@ import com.mle.sbt.unix.{UnixZipPackaging, LinuxPackaging}
 import com.mle.sbt.win.WindowsPlugin
 import com.github.siasia.WebPlugin.webSettings
 import com.github.siasia.PluginKeys._
-import com.typesafe.packager.PackagerPlugin
+import com.typesafe.packager.{windows, PackagerPlugin}
 import sbt.Keys._
 import sbt._
 import cloudbees.Plugin.{CloudBees, cloudBeesSettings}
@@ -74,7 +74,7 @@ object GitBuild extends Build {
     WindowsPlugin.windowsSettings ++
     LinuxPackaging.rpmSettings ++
     LinuxPackaging.debianSettings ++
-    UnixZipPackaging.unixZipSettings
+    UnixZipPackaging.unixZipSettings ++ tmpSettings
   lazy val wicket = webProject("wicket")
     .dependsOn(utilActor, rmi, auth, utilJdbc)
     .settings(wicketSettings: _*)
