@@ -1,1 +1,1 @@
-java -Xmx1024m -jar project\sbt\sbt-launch.jar
+java -Xmx1024m -XX:MaxPermSize=512m -jar project\sbt\sbt-launch.jar
