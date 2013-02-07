@@ -1,1 +1,0 @@
-echo Install script for Windows

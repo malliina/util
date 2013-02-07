@@ -25,7 +25,7 @@ object Dependencies {
   val bootstrap = "org.apache.wicket" % "wicket-bootstrap" % "[0.2,)"
   val bootstrap2 = "de.agilecoders.wicket" % "bootstrap" % "[0.6.2,)"
   val warDep = "org.mortbay.jetty" % "jetty" % "6.1.22" % "container"
-  val webDeps = Seq(wicket, wicketExt, wicketWebSockets, wicketAtmosphere, wicketAuthRoles, bootstrap2, warDep, jettyHack, jettyServer, jettyServlet, jettyWebSocket)
+  val webDeps = Seq(wicket, wicketExt, wicketWebSockets, wicketAtmosphere, wicketAuthRoles, bootstrap2, jettyHack, jettyServer, jettyServlet, jettyWebSocket)
   val wiQueryCore = "org.odlabs.wiquery" % "wiquery-core" % wicketVersion
   val wiQueryUi = "org.odlabs.wiquery" % "wiquery-jquery-ui" % wicketVersion
   val wiQuery = Seq(wiQueryCore, wiQueryUi)
