@@ -15,7 +15,7 @@ object BuildBuild extends Build {
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/", // for play plugin
     libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.12.0-0.2.11.1")),
-    addSbtPlugin("play" % "sbt-plugin" % "2.1-RC2"),
+    addSbtPlugin("play" % "sbt-plugin" % "2.1.0"),
     addSbtPlugin("eu.getintheloop" %% "sbt-cloudbees-plugin" % "0.4.1"),
     addSbtPlugin("com.mle" % "sbt-packager" % "0.6-SNAPSHOT"),
     addSbtPlugin("com.typesafe.sbt" % "sbt-start-script" % "0.6.0")
