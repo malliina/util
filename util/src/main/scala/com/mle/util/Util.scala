@@ -4,6 +4,7 @@ import java.io.{FileWriter, BufferedWriter, PrintWriter}
 import java.net.URL
 import com.mle.exception.ResourceNotFoundException
 import java.nio.file.Files
+import reflect.Manifest
 
 /**
  * Utility methods.
@@ -48,15 +49,17 @@ object Util {
     }
 
   /**
-   * Attempts to compute <code>attempt</code>, suppressing any exceptions
+   * Attempts to compute <code>attempt</code>, suppressing the specified exception.
+   * todo: consider using either
+   *
    * @param attempt
-   * @return attempt wrapped in an [[scala.Option]], or [[scala.None]] if any exception is thrown
+   * @return attempt wrapped in an [[scala.Option]], or [[scala.None]] if an exception of type U is thrown
    */
-  def optionally[T](attempt: => T): Option[T] =
+  def optionally[T,U <: Throwable](attempt: => T)(implicit manifest: Manifest[U]): Option[T] =
     try {
       Some(attempt)
     } catch {
-      case e: Exception => None
+      case e: U => None
     }
 
   def addShutdownHook(code: => Unit) {

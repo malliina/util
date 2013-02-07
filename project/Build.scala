@@ -23,7 +23,7 @@ object GitBuild extends Build {
     else Seq.empty
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.mle",
-    version := "0.63-SNAPSHOT",
+    version := "0.66-SNAPSHOT",
     scalaVersion := "2.10.0",
     retrieveManaged := true,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
