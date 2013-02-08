@@ -16,11 +16,11 @@ import Dependencies._
 object GitBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.mle",
-    version := "0.68-SNAPSHOT",
+    version := "0.69-SNAPSHOT",
     scalaVersion := "2.10.0",
     retrieveManaged := false,
     publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
-    publishMavenStyle := false,
+    publishMavenStyle := true,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
@@ -29,7 +29,7 @@ object GitBuild extends Build {
     exportJars := true
   )
 
-  lazy val parent = Project("parent", file("."))
+  lazy val parent = Project("parent", file("."),settings = commonSettings)
     .aggregate(util, actor, jdbc, utilWeb, rmi, auth)
   // last 2.9.2 is 0.67-SNAPSHOT
   // 0.67-SNAPSHOT is an sbt plugin
