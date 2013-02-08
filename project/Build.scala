@@ -30,6 +30,7 @@ object GitBuild extends Build {
   )
 
   lazy val parent = Project("parent", file("."))
+    .aggregate(util, actor, jdbc, utilWeb, rmi, auth)
   // last 2.9.2 is 0.67-SNAPSHOT
   // 0.67-SNAPSHOT is an sbt plugin
   lazy val util = myProject("util")
@@ -38,9 +39,9 @@ object GitBuild extends Build {
     libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest),
     crossScalaVersions := Seq("2.9.2", "2.10")
   )
-  lazy val utilActor = basicProject("util-actor")
+  lazy val actor = basicProject("util-actor")
     .settings(libraryDependencies ++= Seq(akkaActor, akkaTestKit))
-  lazy val utilJdbc = basicProject("util-jdbc")
+  lazy val jdbc = basicProject("util-jdbc")
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
     .settings(libraryDependencies ++= Seq(tomcatJdbc, boneCp, mysql))
