@@ -1,11 +1,5 @@
-import com.mle.sbt.unix.{UnixZipPackaging, LinuxPackaging}
-import com.mle.sbt.win.WindowsPlugin
-import com.github.siasia.WebPlugin.webSettings
-import com.github.siasia.PluginKeys._
-import com.typesafe.packager.{windows, PackagerPlugin}
 import sbt.Keys._
 import sbt._
-import cloudbees.Plugin.{CloudBees, cloudBeesSettings}
 import com.mle.util.{Util => MyUtil}
 import Dependencies._
 
@@ -15,7 +9,7 @@ import Dependencies._
 
 object GitBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
-    organization := "com.mle",
+    organization := "com.github.malliina",
     version := "0.69-SNAPSHOT",
     scalaVersion := "2.10.0",
     retrieveManaged := false,
@@ -29,7 +23,7 @@ object GitBuild extends Build {
     exportJars := true
   )
 
-  lazy val parent = Project("parent", file("."),settings = commonSettings)
+  lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, jdbc, utilWeb, rmi, auth)
   // last 2.9.2 is 0.67-SNAPSHOT
   // 0.67-SNAPSHOT is an sbt plugin
