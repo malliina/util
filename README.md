@@ -2,3 +2,4 @@ An exploration of Scala. Test code for actors, functional programming, and whate
 
 To do:
 - Evaluate Slick
+- Publish binaries to a repo
