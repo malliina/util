@@ -1,6 +1,5 @@
 import sbt.Keys._
 import sbt._
-import com.mle.util.{Util => MyUtil}
 import Dependencies._
 
 /**
@@ -13,8 +12,13 @@ object GitBuild extends Build {
     version := "0.69-SNAPSHOT",
     scalaVersion := "2.10.0",
     retrieveManaged := false,
-    publishTo := Some(Resolver.url("my-sbt-releases", new URL("http://xxx/artifactory/my-sbt-releases/"))(Resolver.ivyStylePatterns)),
+    resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
+    publishTo := Some("sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
+    credentials += Credentials(Path.userHome / ".ivy2" / "sonatype.txt"),
     publishMavenStyle := true,
+    publishArtifact in Test := false,
+    pomIncludeRepository := (_ => false),
+    pomExtra := extraPom,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
@@ -23,15 +27,37 @@ object GitBuild extends Build {
     exportJars := true
   )
 
+  def extraPom = (
+    <url>https://github.com/malliina/util</url>
+      <licenses>
+        <license>
+          <name>BSD-style</name>
+          <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+      <scm>
+        <url>git@github.com:malliina/util.git</url>
+        <connection>scm:git:git@github.com:malliina/util.git</connection>
+      </scm>
+      <developers>
+        <developer>
+          <id>malliina</id>
+          <name>Michael Skogberg</name>
+          <url>http://mskogberg.info</url>
+        </developer>
+      </developers>)
+
+
   lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, jdbc, utilWeb, rmi, auth)
-  // last 2.9.2 is 0.67-SNAPSHOT
-  // 0.67-SNAPSHOT is an sbt plugin
+  // last 2.9.2 is 0.63-SNAPSHOT
+  // 0.63-SNAPSHOT is an sbt plugin
   lazy val util = myProject("util")
     .settings(
-    sbtPlugin := false,
-    libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest),
-    crossScalaVersions := Seq("2.9.2", "2.10")
+//        scalaVersion := "2.9.2",
+    //    sbtPlugin := true,
+    libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest)
   )
   lazy val actor = basicProject("util-actor")
     .settings(libraryDependencies ++= Seq(akkaActor, akkaTestKit))

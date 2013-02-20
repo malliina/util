@@ -19,8 +19,9 @@ object BuildBuild extends Build {
     addSbtPlugin("play" % "sbt-plugin" % "2.1.0"),
     addSbtPlugin("eu.getintheloop" %% "sbt-cloudbees-plugin" % "0.4.1"),
     addSbtPlugin("com.mle" % "sbt-packager" % "0.6-SNAPSHOT"),
-    addSbtPlugin("com.typesafe.sbt" % "sbt-start-script" % "0.6.0")    ,
-    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.3.0-SNAPSHOT")
+    addSbtPlugin("com.typesafe.sbt" % "sbt-start-script" % "0.6.0"),
+    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.3.0-SNAPSHOT"),
+    addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8")
   )
   lazy val root = Project("plugins", file("."))
   //    .dependsOn(nativePackager)
