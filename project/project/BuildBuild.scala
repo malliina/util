@@ -15,16 +15,9 @@ object BuildBuild extends Build {
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/", // for play plugin
-    libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.12.0-0.2.11.1")),
-    addSbtPlugin("play" % "sbt-plugin" % "2.1.0"),
-    addSbtPlugin("eu.getintheloop" %% "sbt-cloudbees-plugin" % "0.4.1"),
-    addSbtPlugin("com.mle" % "sbt-packager" % "0.6-SNAPSHOT"),
     addSbtPlugin("com.typesafe.sbt" % "sbt-start-script" % "0.6.0"),
     addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.3.0-SNAPSHOT"),
     addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8")
   )
   lazy val root = Project("plugins", file("."))
-  //    .dependsOn(nativePackager)
-  //  lazy val nativePackager = uri("git://github.com/Dremora/sbt-native-packager.git")
-
 }

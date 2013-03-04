@@ -16,7 +16,9 @@ object FileUtilities {
   val userDir = sys.props("user.dir")
   var basePath = Paths get sys.props.getOrElse("app.home", userDir)
 
-  //  var basePath = Paths get sys.props.getOrElse("app.home", sys.props.getOrElse("user.dir", throw new Exception("Unable to determine home directory")))
+  def init(appName: String) {
+    basePath = Paths get sys.props.get(s"$appName.home").getOrElse(userDir)
+  }
 
   def pathTo(location: String) = basePath / location
 
@@ -94,7 +96,7 @@ object FileUtilities {
   /**
    * Creates the file referenced by the specified path and any non-existing parent directories. No-ops if the file already exists.
    * @param path the path to the file to create
-   * @see [[java.nio.file.Files.createFile()]], [[java.nio.file.Paths]]
+   * @see [[java.nio.file.Files.createFile( )]], [[java.nio.file.Paths]]
    */
   def createFile(path: String) {
     val file = pathTo(path)
