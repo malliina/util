@@ -59,8 +59,7 @@ abstract class JDBCUserManager(schema: UserMgmtSchema)
    *
    * @param user
    * @param group
-   * @throws Exception if the user already exists in the group
-   * @throws Exception if the group or user does not exist
+   * @throws Exception if the group or user does not exist or if the user already exists in the group
    */
   def assign(user: String, group: String) {
     val userId = usersTable id usernameCol -> user

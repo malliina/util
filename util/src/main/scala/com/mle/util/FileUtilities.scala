@@ -6,13 +6,14 @@ import Implicits._
 import org.apache.commons.io.IOUtils
 import java.io.{FileWriter, BufferedWriter, PrintWriter}
 import Util._
+import com.mle.exception.ResourceNotFoundException
 
 /**
  *
  * @author mle
  */
 object FileUtilities {
-
+  val lineSep = sys.props("line.separator")
   val userDir = sys.props("user.dir")
   var basePath = Paths get sys.props.getOrElse("app.home", userDir)
 
@@ -47,6 +48,31 @@ object FileUtilities {
   def writerTo(filename: Path)(op: PrintWriter => Unit) {
     using(new PrintWriter(new BufferedWriter(new FileWriter(filename.toFile))))(op)
   }
+
+  def readerFrom[T](path: Path)(code: Iterator[String] => T): T =
+    Util.resource(io.Source.fromFile(path.toFile)) {
+      source => code(source.getLines())
+    }
+
+  /**
+   * Avoids io.Source.fromURI(uri) because it seems to fail unless the supplied URI points to a file.
+   *
+   * @param resource
+   * @param code
+   * @tparam T
+   * @return
+   */
+  def readerFrom[T](resource: String)(code: Iterator[String] => T): T = {
+    val maybeFile = FileUtilities pathTo resource
+    if (Files exists maybeFile) {
+      readerFrom(maybeFile)(code)
+    } else {
+      Util.using(Util.openStream(resource))(inStream => {
+        Util.resource(io.Source.fromInputStream(inStream))(source => code(source.getLines()))
+      })
+    }
+  }
+
 
   /**
    * Calculates the amount of used disk space, in percentages, according to the formula: usable_space / total_space. For example, if a 10 GB disk contains 3 GB of data, this method returns 30 for that disk.

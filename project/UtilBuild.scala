@@ -6,10 +6,38 @@ import Dependencies._
  * @author Mle
  */
 
-object GitBuild extends Build {
+object UtilBuild extends Build {
+  lazy val util = myProject("util")
+    .settings(
+    version := "0.701-SNAPSHOT",
+    //        scalaVersion := "2.9.2",
+    //    sbtPlugin := true,
+    libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, commonsCodec)
+  )
+  lazy val actor = basicProject("util-actor")
+    .settings(libraryDependencies ++= Seq(akkaActor, akkaTestKit))
+  lazy val jdbc = basicProject("util-jdbc")
+    // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
+    .dependsOn(auth % "compile->compile;test->test")
+    .settings(libraryDependencies ++= Seq(tomcatJdbc, boneCp, mysql))
+  lazy val utilWeb = basicProject("util-web")
+    .settings(libraryDependencies ++= webDeps)
+  lazy val rmi = basicProject("util-rmi")
+  lazy val auth = basicProject("util-auth")
+    .settings(libraryDependencies ++= Seq(commonsCodec))
+  lazy val utilPlay = play.Project("util-play",
+    path = file("util-play"),
+    applicationVersion = versionString,
+    dependencies = Seq(commonsCodec),
+    settings = commonSettings)
+
+  // Hack for play compat
+  override def settings = super.settings ++ com.typesafe.sbtidea.SbtIdeaPlugin.ideaSettings
+
+  val versionString = "0.701-SNAPSHOT"
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.github.malliina",
-    version := "0.69-SNAPSHOT",
+    version := versionString,
     scalaVersion := "2.10.0",
     retrieveManaged := false,
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
@@ -53,23 +81,7 @@ object GitBuild extends Build {
     .aggregate(util, actor, jdbc, utilWeb, rmi, auth)
   // last 2.9.2 is 0.63-SNAPSHOT
   // 0.63-SNAPSHOT is an sbt plugin
-  lazy val util = myProject("util")
-    .settings(
-//        scalaVersion := "2.9.2",
-    //    sbtPlugin := true,
-    libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest)
-  )
-  lazy val actor = basicProject("util-actor")
-    .settings(libraryDependencies ++= Seq(akkaActor, akkaTestKit))
-  lazy val jdbc = basicProject("util-jdbc")
-    // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
-    .dependsOn(auth % "compile->compile;test->test")
-    .settings(libraryDependencies ++= Seq(tomcatJdbc, boneCp, mysql))
-  lazy val utilWeb = basicProject("util-web")
-    .settings(libraryDependencies ++= webDeps)
-  lazy val rmi = basicProject("util-rmi")
-  lazy val auth = basicProject("util-auth")
-    .settings(libraryDependencies ++= Seq(hashing))
+
 
   def myProject(id: String, customSettings: Seq[Project.Setting[_]] = Seq.empty) = Project(id, file(id), settings = commonSettings ++ customSettings)
 

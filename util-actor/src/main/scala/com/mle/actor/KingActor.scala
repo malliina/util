@@ -7,28 +7,34 @@ import akka.actor._
 /**
  * A manager of actors.
  *
- * KingActors can be thought of as servers that manage ConnectionActors which are clients.
- *
  * KingActors manage client connections/disconnections and can broadcast messages to all clients.
+ *
+ * Implementation note: We can't pattern match on generic containers so implementations should
+ * override messageHandler to handle other than string messages, which is the default.
  *
  * @tparam T client address
  * @author Mle
  */
 abstract class KingActor[T](messages: MessageTypes[T]) extends Actor with Log {
-  private var connections = Set.empty[ActorBundle[T]]
+  protected var connections = Set.empty[ActorBundle[T]]
   val clientActorBuilder: T => ActorRef
 
-  def receive = {
+  def managementHandler: Receive = {
     case messages.Connect(client) =>
       onConnect(client)
     case messages.Disconnect(client) =>
       onDisconnect(client)
-    case Broadcast(msg) =>
-      connections.foreach(_.actor ! StringMessage(msg))
     case Stop =>
       connections foreach (_.actor ! Stop)
       context.stop(self)
   }
+
+  def messageHandler: Receive = {
+    case Broadcast(msg) =>
+      connections.foreach(_.actor ! StringMessage(msg))
+  }
+
+  def receive = messageHandler orElse managementHandler
 
   /**
    *

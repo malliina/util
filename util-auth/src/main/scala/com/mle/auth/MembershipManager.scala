@@ -9,8 +9,7 @@ trait MembershipManager[T] {
    *
    * @param user
    * @param group
-   * @throws Exception if the user already exists in the group
-   * @throws Exception if the group or user does not exist
+   * @throws Exception if the group or user does not exist or if the user already exists in the group
    */
   def assign(user: T, group: String)
 
@@ -22,8 +21,7 @@ trait MembershipManager[T] {
    *
    * @param user
    * @param group
-   * @throws Exception if the user does not exist in the group
-   * @throws Exception if the group or user does not exist
+   * @throws Exception if the group or user does not exist or if the user does not exist in the group
    */
   def revoke(user: T, group: String)
 

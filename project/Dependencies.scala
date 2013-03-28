@@ -30,7 +30,7 @@ object Dependencies {
   val wiQueryUi = "org.odlabs.wiquery" % "wiquery-jquery-ui" % wicketVersion
   val wiQuery = Seq(wiQueryCore, wiQueryUi)
   val commonsIO = "commons-io" % "commons-io" % "2.4"
-  val hashing = "commons-codec" % "commons-codec" % "1.7"
+  val commonsCodec = "commons-codec" % "commons-codec" % "1.7"
   val scalaTest = "org.scalatest" %% "scalatest" % "1.9.1" % "test"
   val mysql = "mysql" % "mysql-connector-java" % "5.1.22"
   val tomcatJdbc = "org.apache.tomcat" % "tomcat-jdbc" % "7.0.32"
@@ -38,4 +38,8 @@ object Dependencies {
   val jerkson = "io.backchat.jerkson" %% "jerkson" % "0.7.0"
   val akkaActor = "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0"
   val akkaTestKit = "com.typesafe.akka" % "akka-testkit_2.10" % "2.1.0" % "test"
+  val utilGroup = "com.github.malliina"
+  val utilVersion = "0.69-SNAPSHOT"
+  val utilDep = utilGroup %% "util" % utilVersion
+
 }

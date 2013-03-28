@@ -1,6 +1,5 @@
 package com.mle.util
 
-import java.io.{FileWriter, BufferedWriter, PrintWriter}
 import java.net.URL
 import com.mle.exception.ResourceNotFoundException
 import java.nio.file.Files
@@ -55,7 +54,7 @@ object Util {
    * @param attempt
    * @return attempt wrapped in an [[scala.Option]], or [[scala.None]] if an exception of type U is thrown
    */
-  def optionally[T,U <: Throwable](attempt: => T)(implicit manifest: Manifest[U]): Option[T] =
+  def optionally[T, U <: Throwable](attempt: => T)(implicit manifest: Manifest[U]): Option[T] =
     try {
       Some(attempt)
     } catch {
@@ -70,10 +69,15 @@ object Util {
     })
   }
 
-  def resource(path: String): URL = Option(getClass.getClassLoader.getResource(path))
-    .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: " + path))
+  def resource(resource: String): URL = obtainResource(resource, l => l.getResource _)
 
   def resourceUri(path: String) = resource(path).toURI
+
+  def openStream(resource: String) = obtainResource(resource, l => l.getResourceAsStream _)
+
+  def obtainResource[T](resource: String, getter: ClassLoader => String => T): T =
+    Option(getter(getClass.getClassLoader)(resource))
+      .getOrElse(throw new ResourceNotFoundException(s"Unable to locate resource: $resource"))
 
   /**
    *
