@@ -77,7 +77,7 @@ object Util {
 
   def obtainResource[T](resource: String, getter: ClassLoader => String => T): T =
     Option(getter(getClass.getClassLoader)(resource))
-      .getOrElse(throw new ResourceNotFoundException(s"Unable to locate resource: $resource"))
+      .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: "+resource))
 
   /**
    *

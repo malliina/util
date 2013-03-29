@@ -6,7 +6,6 @@ import Implicits._
 import org.apache.commons.io.IOUtils
 import java.io.{FileWriter, BufferedWriter, PrintWriter}
 import Util._
-import com.mle.exception.ResourceNotFoundException
 
 /**
  *
@@ -18,7 +17,7 @@ object FileUtilities {
   var basePath = Paths get sys.props.getOrElse("app.home", userDir)
 
   def init(appName: String) {
-    basePath = Paths get sys.props.get(s"$appName.home").getOrElse(userDir)
+    basePath = Paths get sys.props.get(appName + ".home").getOrElse(userDir)
   }
 
   def pathTo(location: String) = basePath / location
