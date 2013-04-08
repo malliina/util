@@ -2,8 +2,9 @@ package com.mle.util
 
 import java.net.URL
 import com.mle.exception.ResourceNotFoundException
-import java.nio.file.Files
+import java.nio.file.{Path, Files}
 import reflect.Manifest
+import scala.io.BufferedSource
 
 /**
  * Utility methods.
@@ -77,7 +78,7 @@ object Util {
 
   def obtainResource[T](resource: String, getter: ClassLoader => String => T): T =
     Option(getter(getClass.getClassLoader)(resource))
-      .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: "+resource))
+      .getOrElse(throw new ResourceNotFoundException("Unable to locate resource: " + resource))
 
   /**
    *
@@ -102,7 +103,11 @@ object Util {
    * @return the properties as a map
    * @throws ResourceNotFoundException if neither a resource nor a file is found
    */
-  def props(path: String) = io.Source.fromURL(url(path)).getLines()
+  def props(path: String) = mappify(io.Source.fromURL(url(path)))
+
+  def props(path: Path) = mappify(io.Source.fromFile(path.toUri))
+
+  private def mappify(src: BufferedSource) = src.getLines()
     .map(line => line.split("=", 2))
     .map(arr => arr(0) -> arr(1)).toMap
 }

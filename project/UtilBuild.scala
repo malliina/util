@@ -10,31 +10,19 @@ object UtilBuild extends Build {
   val releaseVersion = "0.7.1"
   val snapshotVersion = "0.7.2-SNAPSHOT"
 
-  lazy val util = myProject("util")
-    .settings(
-    version := snapshotVersion,
-    libraryDependencies ++= loggingDeps ++ Seq(commonsIO, scalaTest, commonsCodec)
-  )
-  lazy val actor = basicProject("util-actor")
-    .settings(
-    libraryDependencies ++= Seq(akkaActor, akkaTestKit),
-    version := snapshotVersion
-  )
-  lazy val rmi = basicProject("util-rmi")
+  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec) ++ loggingDeps)
     .settings(version := snapshotVersion)
-  lazy val jdbc = basicProject("util-jdbc")
+  lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
+    .settings(version := snapshotVersion)
+  lazy val rmi = utilProject("util-rmi")
+    .settings(version := snapshotVersion)
+  lazy val jdbc = utilProject("util-jdbc", deps = Seq(tomcatJdbc, boneCp, mysql))
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
-    .settings(libraryDependencies ++= Seq(tomcatJdbc, boneCp, mysql))
-  lazy val utilWeb = basicProject("util-web")
-    .settings(libraryDependencies ++= webDeps)
-  lazy val auth = basicProject("util-auth")
-    .settings(libraryDependencies ++= Seq(commonsCodec))
-  //  lazy val utilPlay = play.Project("util-play",
-  //    path = file("util-play"),
-  //    applicationVersion = snapshotVersion,
-  //    dependencies = Seq(commonsCodec),
-  //    settings = commonSettings)
+  lazy val utilWeb = utilProject("util-web", deps = webDeps)
+  lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
+  lazy val utilPlay = utilProject("util-play", deps = Seq(playDep))
+  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, util070))
 
   // Hack for play compat
   //  override def settings = super.settings ++ com.typesafe.sbtidea.SbtIdeaPlugin.ideaSettings
@@ -42,7 +30,7 @@ object UtilBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.github.malliina",
     version := snapshotVersion,
-    scalaVersion := "2.10.0",
+    scalaVersion := "2.9.2",
     retrieveManaged := false,
     resolvers += "Sonatype snaps" at "http://oss.sonatype.org/content/repositories/snapshots/",
     publishTo <<= (version)(v => {
@@ -92,11 +80,12 @@ object UtilBuild extends Build {
   lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, jdbc, utilWeb, rmi, auth)
 
-  def myProject(id: String, customSettings: Seq[Project.Setting[_]] = Seq.empty) =
-    Project(id, file(id), settings = commonSettings ++ customSettings)
+  def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
+    Project(id, file(id), settings = commonSettings).settings(
+      libraryDependencies ++= deps ++ Seq(scalaTest)
+    )
 
-  def basicProject(id: String, customSettings: Seq[Project.Setting[_]] = Seq.empty) =
-    myProject(id, customSettings)
+  def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
+    testableProject(id, deps)
       .dependsOn(util)
-      .settings(libraryDependencies += scalaTest)
 }

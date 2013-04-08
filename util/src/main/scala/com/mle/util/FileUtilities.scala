@@ -13,11 +13,13 @@ import Util._
  */
 object FileUtilities {
   val lineSep = sys.props("line.separator")
-  val userDir = sys.props("user.dir")
-  var basePath = Paths get sys.props.getOrElse("app.home", userDir)
+  val userDirString = sys.props("user.dir")
+  val userDir = Paths get userDirString
+  val userHome = Paths get sys.props("user.home")
+  var basePath = Paths get sys.props.getOrElse("app.home", userDirString)
 
   def init(appName: String) {
-    basePath = Paths get sys.props.get(appName + ".home").getOrElse(userDir)
+    basePath = Paths get sys.props.get(appName + ".home").getOrElse(userDirString)
   }
 
   def pathTo(location: String) = basePath / location
@@ -52,6 +54,13 @@ object FileUtilities {
     Util.resource(io.Source.fromFile(path.toFile)) {
       source => code(source.getLines())
     }
+
+  /**
+   * Throws if the file doesn't exist/has no first line (?)
+   * @param path location of file
+   * @return the first line of the file at the specified location
+   */
+  def firstLine(path: Path) = readerFrom(path)(_.next())
 
   /**
    * Avoids io.Source.fromURI(uri) because it seems to fail unless the supplied URI points to a file.
