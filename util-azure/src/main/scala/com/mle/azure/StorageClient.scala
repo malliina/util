@@ -1,6 +1,7 @@
 package com.mle.azure
 
 import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount
+import scala.collection.JavaConversions._
 
 /**
  *
@@ -11,16 +12,19 @@ class StorageClient(accountName: String, accountKey: String) {
     "DefaultEndpointsProtocol=http;" +
       "AccountName=" + accountName + ";" +
       "AccountKey=" + accountKey
-  private val account = CloudStorageAccount parse connectionString
+  val account = CloudStorageAccount parse connectionString
+  val blobClient = account.createCloudBlobClient()
 
   def uris(containerName: String) =
     container(containerName).uris
+
+  def containers =
+    blobClient.listContainers().map(new StorageContainer(_))
 
   def container(name: String) =
     new StorageContainer(cloudContainer(name))
 
   private def cloudContainer(name: String) = {
-    val client = account.createCloudBlobClient()
-    client getContainerReference name
+    blobClient getContainerReference name
   }
 }

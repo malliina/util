@@ -1,5 +1,1 @@
-An exploration of Scala. Test code for actors, functional programming, and whatever seems interesting.
-
-To do:
-- Evaluate Slick
-- Publish binaries to a repo
+Utility code for Scala. Some binaries may be available as Sonatype snapshots or releases under com.github.malliina.

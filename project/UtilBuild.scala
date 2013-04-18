@@ -23,6 +23,7 @@ object UtilBuild extends Build {
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
   lazy val utilPlay = utilProject("util-play", deps = Seq(playDep))
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, util070))
+    .settings(version := releaseVersion)
 
   // Hack for play compat
   //  override def settings = super.settings ++ com.typesafe.sbtidea.SbtIdeaPlugin.ideaSettings

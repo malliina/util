@@ -1,6 +1,6 @@
 package com.mle.azure
 
-import com.microsoft.windowsazure.services.blob.client.{CloudBlockBlob, CloudBlobContainer}
+import com.microsoft.windowsazure.services.blob.client.CloudBlobContainer
 import java.nio.file.{Files, Path}
 import com.mle.util.Util
 import java.io.{FileOutputStream, FileInputStream}
@@ -12,12 +12,14 @@ import java.net.URI
  * @author mle
  */
 class StorageContainer(val cont: CloudBlobContainer) {
+  val name = cont.getName
+
   def uris = cont.listBlobs().map(_.getUri)
 
   def existsUri(uriString: String) = uris.exists(_.toString == uriString)
 
   def exists(blobName: String) =
-    withBlob(blobName)(_.exists())
+    blobNamed(blobName).exists()
 
   /**
    * Uploads the file to this azure storage container.
@@ -27,29 +29,27 @@ class StorageContainer(val cont: CloudBlobContainer) {
    * @return URI to the uploaded file
    */
   def upload(file: Path, destName: String): URI = {
-    withBlob(destName)(blob => {
-      Util.using(new FileInputStream(file.toFile))(inStream => {
-        blob.upload(inStream, Files size file)
-      })
-      blob.getUri
+    val blob = blobNamed(destName)
+    Util.using(new FileInputStream(file.toFile))(inStream => {
+      blob.upload(inStream, Files size file)
     })
+    blob.getUri
   }
 
   def upload(file: Path): URI =
     upload(file, file.getFileName.toString)
 
   def download(blobName: String, destination: Path) {
-    withBlob(blobName)(blob => {
-      Util.using(new FileOutputStream(destination.toFile))(stream => {
-        blob.download(stream)
-      })
+    val blob = blobNamed(blobName)
+    Util.using(new FileOutputStream(destination.toFile))(stream => {
+      blob.download(stream)
     })
   }
 
   def delete(blobName: String) {
-    withBlob(blobName)(_.delete())
+    blobNamed(blobName).delete()
   }
 
-  private def withBlob[T](blobName: String)(func: CloudBlockBlob => T) =
-    func(cont getBlockBlobReference blobName)
+  def blobNamed(blobName: String) =
+    cont getBlockBlobReference blobName
 }
