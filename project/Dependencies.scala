@@ -39,7 +39,7 @@ object Dependencies {
   val akkaActor = "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0"
   val akkaTestKit = "com.typesafe.akka" % "akka-testkit_2.10" % "2.1.0" % "test"
   val utilGroup = "com.github.malliina"
-  val utilVersion = "0.69-SNAPSHOT"
+  val utilVersion = "0.7.1"
   val utilDep = utilGroup %% "util" % utilVersion
   val playDep = "play" %% "play" % "2.1.1"
   val azureApi = "com.microsoft.windowsazure" % "microsoft-windowsazure-api" % "0.4.1"

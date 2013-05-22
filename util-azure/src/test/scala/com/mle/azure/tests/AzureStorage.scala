@@ -1,14 +1,11 @@
 package com.mle.azure.tests
 
 import org.scalatest.FunSuite
-import com.mle.util.Implicits._
 import java.nio.file.{Files, Paths}
-import com.mle.util.{Util => Utils, FileUtilities}
-import com.mle.azure.StorageClient
+import com.mle.util.FileUtilities
 import com.microsoft.windowsazure.services.blob.client.{BlobRequestOptions, BlobListingDetails}
 import java.util.EnumSet
 import com.microsoft.windowsazure.services.core.storage.OperationContext
-import scala.collection.JavaConversions._
 
 /**
  * Needs a credentials file in userHome/keys/azure-storage.sec
@@ -16,17 +13,7 @@ import scala.collection.JavaConversions._
  *
  * @author mle
  */
-class AzureStorage extends FunSuite {
-  val userHome = Paths get sys.props("user.home")
-  val credentialsFile = userHome / "keys" / "azure-storage.sec"
-  val credMap = Utils.props(credentialsFile.toAbsolutePath.toString)
-  val accountName = credMap("account_name")
-  val accountKey = credMap("account_key")
-  val containerName = "files"
-
-  private def newClient =
-    new StorageClient(accountName, accountKey)
-
+class AzureStorage extends FunSuite with TestBase {
   test("can read from storage") {
     val uris = newClient uris "files"
     //    uris foreach println
@@ -41,7 +28,7 @@ class AzureStorage extends FunSuite {
     val cont = client container containerName
     val uri = cont upload testFile
     assert(cont.exists(testFileName))
-    //    println("Test file uploaded to " + uri)
+    //    println("Test file: " + testFileName + " uploaded to: " + uri)
     cont.download(testFileName, downloadDest)
     val firstLine = FileUtilities.readerFrom(downloadDest)(_.next())
     assert(firstLine === testContent)
@@ -55,9 +42,27 @@ class AzureStorage extends FunSuite {
     val conts = client.containers
     //    conts.map(_.name) foreach println
     val logCont = client container "$logs"
-
     assert(logCont.cont.exists())
     val blobs = logCont.cont.listBlobs("blob", true, EnumSet.noneOf(classOf[BlobListingDetails]), new BlobRequestOptions, new OperationContext)
-    blobs.map(_.getUri) foreach println
+    //    logCont.download()
+    //      blobs.map(_.getUri) foreach println
+    // http://pimp.blob.core.windows.net/$logs/blob/2013/05/22/1400/000000.log
+  }
+  test("log exists") {
+    val logFile = "blob/2013/05/22/1400/000000.log"
+    val client = newClient
+    val logCont = client container "$logs"
+    assert(logCont.cont.exists())
+    assert(logCont exists logFile)
+  }
+  test("download log") {
+    val logFile = "blob/2013/05/22/1400/000000.log"
+    val client = newClient
+    val logCont = client container "$logs"
+    val dest = Paths get "dl-log.log"
+    logCont.download(logFile, dest)
+    val file = FileUtilities.readerFrom(dest)(_.toList)
+    file foreach println
+
   }
 }

@@ -12,6 +12,7 @@ class StorageClient(accountName: String, accountKey: String) {
     "DefaultEndpointsProtocol=http;" +
       "AccountName=" + accountName + ";" +
       "AccountKey=" + accountKey
+  private val logContainerName = "$logs"
   val account = CloudStorageAccount parse connectionString
   val blobClient = account.createCloudBlobClient()
 
@@ -23,6 +24,8 @@ class StorageClient(accountName: String, accountKey: String) {
 
   def container(name: String) =
     new StorageContainer(cloudContainer(name))
+
+  def logContainer = new LogStorageContainer(cloudContainer(logContainerName))
 
   private def cloudContainer(name: String) = {
     blobClient getContainerReference name

@@ -21,9 +21,8 @@ object UtilBuild extends Build {
     .dependsOn(auth % "compile->compile;test->test")
   lazy val utilWeb = utilProject("util-web", deps = webDeps)
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
-  lazy val utilPlay = utilProject("util-play", deps = Seq(playDep))
-  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, util070))
-    .settings(version := releaseVersion)
+  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, utilDep))
+    .settings(version := snapshotVersion)
 
   // Hack for play compat
   //  override def settings = super.settings ++ com.typesafe.sbtidea.SbtIdeaPlugin.ideaSettings
@@ -31,7 +30,7 @@ object UtilBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.github.malliina",
     version := snapshotVersion,
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.10.0",
     retrieveManaged := false,
     resolvers += "Sonatype snaps" at "http://oss.sonatype.org/content/repositories/snapshots/",
     publishTo <<= (version)(v => {
