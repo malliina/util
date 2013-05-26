@@ -7,7 +7,7 @@ import Dependencies._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "0.7.1"
+  val releaseVersion = "0.7.2"
   val snapshotVersion = "0.7.2-SNAPSHOT"
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec) ++ loggingDeps)
@@ -22,7 +22,7 @@ object UtilBuild extends Build {
   lazy val utilWeb = utilProject("util-web", deps = webDeps)
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, utilDep))
-    .settings(version := snapshotVersion)
+    .settings(version := releaseVersion)
 
   // Hack for play compat
   //  override def settings = super.settings ++ com.typesafe.sbtidea.SbtIdeaPlugin.ideaSettings

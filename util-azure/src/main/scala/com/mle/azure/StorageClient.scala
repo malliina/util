@@ -25,7 +25,8 @@ class StorageClient(accountName: String, accountKey: String) {
   def container(name: String) =
     new StorageContainer(cloudContainer(name))
 
-  def logContainer = new LogStorageContainer(cloudContainer(logContainerName))
+  def logContainer =
+    new LogStorageContainer(cloudContainer(logContainerName))
 
   private def cloudContainer(name: String) = {
     blobClient getContainerReference name
