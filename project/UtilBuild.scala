@@ -7,11 +7,12 @@ import Dependencies._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "0.7.2"
-  val snapshotVersion = "0.7.2-SNAPSHOT"
+  val releaseVersion = "1.0.0"
+  val snapshotVersion = "0.7.4-SNAPSHOT"
+  val utilDep2 = utilGroup %% "util" % releaseVersion
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec) ++ loggingDeps)
-    .settings(version := snapshotVersion)
+    .settings(version := releaseVersion)
   lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
     .settings(version := snapshotVersion)
   lazy val rmi = utilProject("util-rmi")
@@ -19,9 +20,9 @@ object UtilBuild extends Build {
   lazy val jdbc = utilProject("util-jdbc", deps = Seq(tomcatJdbc, boneCp, mysql))
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
-  lazy val utilWeb = utilProject("util-web", deps = webDeps)
+//  lazy val utilWeb = utilProject("util-web", deps = webDeps)
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
-  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, utilDep))
+  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, utilDep2))
     .settings(version := releaseVersion)
 
   // Hack for play compat
@@ -30,10 +31,10 @@ object UtilBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.github.malliina",
     version := snapshotVersion,
-    scalaVersion := "2.10.0",
+    scalaVersion := "2.10.2",
     retrieveManaged := false,
     resolvers += "Sonatype snaps" at "http://oss.sonatype.org/content/repositories/snapshots/",
-    publishTo <<= (version)(v => {
+    publishTo <<= version(v => {
       val repo =
         if (v endsWith "SNAPSHOT") {
           "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -55,8 +56,8 @@ object UtilBuild extends Build {
     exportJars := true
   )
 
-  def extraPom = (
-    <url>https://github.com/malliina/util</url>
+  def extraPom =
+    (<url>https://github.com/malliina/util</url>
       <licenses>
         <license>
           <name>BSD-style</name>
@@ -78,7 +79,7 @@ object UtilBuild extends Build {
 
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
-    .aggregate(util, actor, jdbc, utilWeb, rmi, auth)
+    .aggregate(util, actor, jdbc, rmi, auth)
 
   def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
     Project(id, file(id), settings = commonSettings).settings(

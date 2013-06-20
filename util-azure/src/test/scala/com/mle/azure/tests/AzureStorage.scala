@@ -16,7 +16,7 @@ import com.microsoft.windowsazure.services.core.storage.OperationContext
 class AzureStorage extends FunSuite with TestBase {
   test("can read from storage") {
     val uris = newClient uris "files"
-    //    uris foreach println
+    uris foreach println
   }
   test("can upload, download and delete file") {
     val testFileName = "azuretest.txt"
