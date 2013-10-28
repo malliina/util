@@ -36,7 +36,7 @@ class RmiServer(registryPort: Int = RmiRegistry.DEFAULT_PORT,
     } catch {
       case e: NoSuchObjectException => log warn("Attempted to unexport object that wasn't exported", e)
     }
-    registry.list().foreach(registry.unbind(_))
+    registry.list().foreach(registry.unbind)
     onClosed()
     log info "The RMI server has shut down"
   }

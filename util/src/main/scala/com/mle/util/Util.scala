@@ -63,15 +63,15 @@ object Util {
     })
   }
 
-  def resource(resource: String): URL = obtainResource(resource, l => l.getResource _)
+  def resource(resource: String): URL = obtainResource(resource, _.getResource)
 
-  def resourceOpt(resource: String) = obtainResourceOpt(resource, l => l.getResource _)
+  def resourceOpt(resource: String) = obtainResourceOpt(resource, _.getResource)
 
   def resourceUri(path: String) = resource(path).toURI
 
   def resourceUriOpt(path: String) = resourceOpt(path) map (_.toURI)
 
-  def openStream(resource: String) = obtainResource(resource, l => l.getResourceAsStream _)
+  def openStream(resource: String) = obtainResource(resource, _.getResourceAsStream)
 
   def obtainResource[T](resource: String, getter: ClassLoader => String => T): T =
     obtainResourceOpt(resource, getter)
@@ -119,7 +119,9 @@ object Util {
   }
 
   private def mappify(src: BufferedSource) = src.getLines()
+    .filter(line => line.contains("=") && !line.startsWith("#") && !line.startsWith("//"))
     .map(line => line.split("=", 2))
+    .filter(_.size >= 2)
     .map(arr => arr(0) -> arr(1)).toMap
 
   /**
