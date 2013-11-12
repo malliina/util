@@ -42,10 +42,9 @@ object Util {
     }
 
   /**
-   * Attempts to compute <code>attempt</code>, suppressing the specified exception.
-   * todo: consider using either
+   * Attempts to compute `attempt`, suppressing the specified exception.
+   * TODO: consider using either
    *
-   * @param attempt
    * @return attempt wrapped in an [[scala.Option]], or [[scala.None]] if an exception of type U is thrown
    */
   def optionally[T, U <: Throwable](attempt: => T)(implicit manifest: Manifest[U]): Option[T] =
@@ -82,7 +81,6 @@ object Util {
 
   /**
    *
-   * @param path
    * @return the uri of the file at the given path, or classpath resource if no classpath resource is found
    * @throws ResourceNotFoundException if neither a resource nor a file is found
    */
@@ -106,7 +104,6 @@ object Util {
   /**
    * Reads the properties of the classpath resource at the given path, or if none is found, of a file at the given path.
    *
-   * @param path
    * @return the properties as a map
    * @throws ResourceNotFoundException if neither a resource nor a file is found
    */

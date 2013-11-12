@@ -130,7 +130,7 @@ object FileUtilities {
   /**
    * Creates the file referenced by the specified path and any non-existing parent directories. No-ops if the file already exists.
    * @param path the path to the file to create
-   * @see [[java.nio.file.Files.createFile( )]], [[java.nio.file.Paths]]
+   * @see [[java.nio.file.Files]], [[java.nio.file.Paths]]
    */
   def createFile(path: String) {
     val file = pathTo(path)
