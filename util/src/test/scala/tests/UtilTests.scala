@@ -1,7 +1,7 @@
-package com.mle.util.tests
+package tests
 
 import org.scalatest.FunSuite
-import com.mle.util.{Reflection}
+import com.mle.util.Reflection
 
 /**
  *
@@ -21,8 +21,8 @@ class UtilTests extends FunSuite {
     val fields = Seq("a", "myVar")
     assert(fields.intersect(names) === fields)
     assert(Reflection.fieldName(TestObj, TestObj.myVar) === "myVar")
-    println(Reflection.objects(TestObj).mkString(", "))
-    println(TestObj.name + ", " + TestObj.ocol.name)
+//    println(Reflection.objects(TestObj).mkString(", "))
+//    println(TestObj.name + ", " + TestObj.ocol.name)
   }
 
   object TestObj {

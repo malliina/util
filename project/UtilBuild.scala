@@ -7,8 +7,8 @@ import Dependencies._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.0.0"
-  val snapshotVersion = "0.7.4-SNAPSHOT"
+  val releaseVersion = "1.1.0"
+  val snapshotVersion = "1.1.1-SNAPSHOT"
   val utilDep2 = utilGroup %% "util" % releaseVersion
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec) ++ loggingDeps)
@@ -20,7 +20,6 @@ object UtilBuild extends Build {
   lazy val jdbc = utilProject("util-jdbc", deps = Seq(tomcatJdbc, boneCp, mysql))
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
-//  lazy val utilWeb = utilProject("util-web", deps = webDeps)
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, utilDep2))
     .settings(version := releaseVersion)
@@ -31,7 +30,7 @@ object UtilBuild extends Build {
   val commonSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.github.malliina",
     version := snapshotVersion,
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.10.3",
     retrieveManaged := false,
     resolvers += "Sonatype snaps" at "http://oss.sonatype.org/content/repositories/snapshots/",
     publishTo <<= version(v => {

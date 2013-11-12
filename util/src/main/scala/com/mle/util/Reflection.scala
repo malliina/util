@@ -24,11 +24,6 @@ object Reflection {
       .getOrElse(throw new Exception("Unable to find: " + obj + " in: " + parent))
   }
 
-  def objectName(parent: AnyRef, obj: AnyRef) = {
-    val objs = declaredClasses(parent)
-    //    objs.find(_ == )
-  }
-
   def objects(parent: AnyRef) = {
     val (scalaObjects, javaClasses) = declaredClasses(parent)
       .partition(_.getName.contains('$'))

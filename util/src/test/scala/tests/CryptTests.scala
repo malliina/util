@@ -1,4 +1,4 @@
-package com.mle.util.tests
+package tests
 
 import com.mle.util.{Cryptor, Log}
 import org.scalatest.FunSuite
