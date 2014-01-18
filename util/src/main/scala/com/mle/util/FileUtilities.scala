@@ -4,7 +4,7 @@ import java.nio.file._
 import com.mle.util.FileVisitors.FileCollectingVisitor
 import Implicits._
 import org.apache.commons.io.IOUtils
-import java.io.{FileWriter, BufferedWriter, PrintWriter}
+import java.io.{FileNotFoundException, FileWriter, BufferedWriter, PrintWriter}
 import Util._
 
 /**
@@ -160,6 +160,19 @@ object FileUtilities {
       Some(Files.write(destFile, bytes))
     } else {
       None
+    }
+  }
+
+  def verifyFileReadability(file: Path): Unit = {
+    import Files._
+    if (!exists(file)) {
+      throw new FileNotFoundException(file.toString)
+    }
+    if (!isRegularFile(file)) {
+      throw new Exception(s"Not a regular file: $file")
+    }
+    if (!isReadable(file)) {
+      throw new Exception(s"File exists but is not readable: $file")
     }
   }
 
