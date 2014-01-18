@@ -24,7 +24,7 @@ trait KeyStores {
     })
   }
 
-  private def validateKeyStore(keyStore: Path, keyStorePassword: String, keyStoreType: String = defaultKeyStoreType): Unit = {
+  def validateKeyStore(keyStore: Path, keyStorePassword: String, keyStoreType: String = defaultKeyStoreType): Unit = {
     val ks = KeyStore.getInstance(keyStoreType)
     Util.using(new FileInputStream(keyStore.toFile))(keyStream => ks.load(keyStream, keyStorePassword.toCharArray))
   }
