@@ -12,7 +12,7 @@ object BuildBuild extends Build {
 
   // "build.sbt" goes here
   override lazy val settings = super.settings ++ Seq(
-    scalaVersion := "2.10.3",
+    scalaVersion := "2.10.4",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers ++= Seq(
       "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
@@ -20,8 +20,7 @@ object BuildBuild extends Build {
   ) ++ plugins
 
   def plugins = Seq(
-    "com.github.mpeltonen" % "sbt-idea" % "1.5.1",
-    "com.github.malliina" % "sbt-utils" % "0.0.2",
+    "com.github.malliina" % "sbt-utils" % "0.0.3",
     "com.timushev.sbt" % "sbt-updates" % "0.1.2"
   ) map addSbtPlugin
 
