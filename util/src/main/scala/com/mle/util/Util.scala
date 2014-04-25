@@ -13,23 +13,6 @@ import scala.io.BufferedSource
  */
 object Util {
   /**
-   * Performs the given operation on the provided closeable resource after which the resource is closed.
-   *
-   * @see [[com.mle.util.Util]].using
-   * @param resource the resource to operate on: a file reader, database connection, ...
-   * @param op the operation to perform on the resource: read/write to a file, database, ...
-   * @tparam T closeable resource
-   * @tparam U result of the operation
-   * @return the result of the operation
-   */
-  def resource[T <: {def close()}, U](resource: T)(op: T => U): U =
-    try {
-      op(resource)
-    } finally {
-      resource.close()
-    }
-
-  /**
    * try-with-resources Scala style
    *
    * @see [[com.mle.util.Util]]#resource
@@ -39,19 +22,6 @@ object Util {
       op(resource)
     } finally {
       resource.close()
-    }
-
-  /**
-   * Attempts to compute `attempt`, suppressing the specified exception.
-   * TODO: consider using either
-   *
-   * @return attempt wrapped in an [[scala.Option]], or [[scala.None]] if an exception of type U is thrown
-   */
-  def optionally[T, U <: Throwable](attempt: => T)(implicit manifest: Manifest[U]): Option[T] =
-    try {
-      Some(attempt)
-    } catch {
-      case e: U => None
     }
 
   def addShutdownHook(code: => Unit) {
@@ -107,12 +77,12 @@ object Util {
    * @return the properties as a map
    * @throws ResourceNotFoundException if neither a resource nor a file is found
    */
-  def props(path: String) = resource(io.Source.fromURL(url(path)))(mappify)
+  def props(path: String) = Utils.resource(io.Source.fromURL(url(path)))(mappify)
 
-  def props(path: Path) = resource(io.Source.fromFile(path.toUri))(mappify)
+  def props(path: Path) = Utils.resource(io.Source.fromFile(path.toUri))(mappify)
 
   def propsOpt(path: String) = {
-    uriOpt(path).map(r => resource(io.Source.fromURI(r))(mappify))
+    uriOpt(path).map(r => Utils.resource(io.Source.fromURI(r))(mappify))
   }
 
   private def mappify(src: BufferedSource) = src.getLines()

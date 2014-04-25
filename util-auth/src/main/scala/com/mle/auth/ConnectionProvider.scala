@@ -1,6 +1,6 @@
 package com.mle.auth
 
-import com.mle.util.Util._
+import com.mle.util.Utils
 
 
 /**
@@ -13,5 +13,5 @@ trait ConnectionProvider[T <: {def close()}] {
    */
   def connection: T
 
-  def withConnection[U](code: T => U): U = resource(connection)(code)
+  def withConnection[U](code: T => U): U = Utils.resource(connection)(code)
 }

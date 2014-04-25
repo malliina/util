@@ -1,4 +1,4 @@
-package com.mle.azure.tests
+package tests
 
 import org.scalatest.FunSuite
 

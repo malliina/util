@@ -12,14 +12,18 @@ object BuildBuild extends Build {
 
   // "build.sbt" goes here
   override lazy val settings = super.settings ++ Seq(
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.10.3",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
-    resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
-    resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/", // for play plugin
-    addSbtPlugin("com.typesafe.sbt" % "sbt-start-script" % "0.6.0"),
-    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.4.0"),
-    addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8")
-    //    addSbtPlugin("play" % "sbt-plugin" % "2.1.0")
-  )
+    resolvers ++= Seq(
+      "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
+      "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/")
+  ) ++ plugins
+
+  def plugins = Seq(
+    "com.github.mpeltonen" % "sbt-idea" % "1.5.1",
+    "com.github.malliina" % "sbt-utils" % "0.0.2",
+    "com.timushev.sbt" % "sbt-updates" % "0.1.2"
+  ) map addSbtPlugin
+
   lazy val root = Project("plugins", file("."))
 }

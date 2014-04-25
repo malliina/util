@@ -1,4 +1,4 @@
-package com.mle.azure.tests
+package tests
 
 import java.nio.file.Paths
 import com.mle.util.Util

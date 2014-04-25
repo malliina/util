@@ -15,7 +15,9 @@ class StorageClient(accountName: String, accountKey: String) {
   private val logContainerName = "$logs"
   val account = CloudStorageAccount parse connectionString
   val blobClient = account.createCloudBlobClient()
+  val tableClient = account.createCloudTableClient()
 
+  // Blob client operations
   def uris(containerName: String) =
     container(containerName).uris
 
@@ -31,4 +33,8 @@ class StorageClient(accountName: String, accountKey: String) {
   private def cloudContainer(name: String) = {
     blobClient getContainerReference name
   }
+
+  // Table client
+  def tables = tableClient.listTables()
+//  blobClient.get
 }

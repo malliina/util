@@ -7,7 +7,7 @@ import collection.JavaConversions._
 import javax.naming.Context
 import com.mle.util.Implicits._
 import com.mle.util.Util._
-import com.mle.util.Log
+import com.mle.util.{Utils, Log}
 import LdapAttributes._
 import LdapImplicits._
 import LdapHelper._
@@ -33,7 +33,7 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
       Context.SECURITY_PRINCIPAL -> userInfo.toDN(user),
       Context.SECURITY_CREDENTIALS -> password
     )).toProperties
-    resource(new InitialDirContext(connectionProps))(conn => {})
+    Utils.resource(new InitialDirContext(connectionProps))(conn => {})
     user
   }
 

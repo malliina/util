@@ -11,7 +11,7 @@ class Cryptor(hexKey: Array[Char]) {
   val algorithm = "AES"
   private val keySpec = new SecretKeySpec(Hex.decodeHex(hexKey), algorithm)
 
-  def encrypt(input: Array[Byte]) = {
+  def encrypt(input: Array[Byte]): Array[Byte] = {
     val cipher = Cipher getInstance algorithm
     cipher init(Cipher.ENCRYPT_MODE, keySpec)
     cipher doFinal input
@@ -19,7 +19,7 @@ class Cryptor(hexKey: Array[Char]) {
 
   def encrypt(input: String): Array[Byte] = encrypt(input.getBytes)
 
-  def encryptToHex(input: String) = new String(Hex.encodeHex(encrypt(input)))
+  def encryptToHex(input: String): String = new String(Hex.encodeHex(encrypt(input)))
 
   def decrypt(input: Array[Byte]) = {
     val cipher = Cipher getInstance algorithm
@@ -32,8 +32,8 @@ class Cryptor(hexKey: Array[Char]) {
    * @param input encrypted input
    * @return decrypted output, as a string!
    */
-  def decryptToString(input: Array[Byte]) = new String(decrypt(input))
+  def decryptToString(input: Array[Byte]): String = new String(decrypt(input))
 
-  def decryptFromHex(encryptedHexInput: String) = decryptToString(Hex.decodeHex(encryptedHexInput.toCharArray))
+  def decryptFromHex(encryptedHexInput: String): String = decryptToString(Hex.decodeHex(encryptedHexInput.toCharArray))
 }
 

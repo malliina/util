@@ -2,7 +2,7 @@ package com.mle.util
 
 import com.mle.exception.ResourceNotFoundException
 import java.nio.file.{Paths, Path}
-import com.mle.util.Implicits._
+import com.mle.util.FileImplicits.StorageFile
 
 /**
  *

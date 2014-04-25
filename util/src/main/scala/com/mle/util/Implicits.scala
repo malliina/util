@@ -29,15 +29,6 @@ object Implicits {
 
   implicit def code2callable[T](code: => T) = Scheduling.callable(code)
 
-  /**
-   * Aliases / to <code>Path.resolve</code> ala sbt
-   * @param path this
-   * @return path resolve next
-   */
-  implicit def path2path(path: Path) = new {
-    def /(next: String) = path resolve next
-  }
-
   implicit def map2props(map: collection.Map[_ <: AnyRef, _ <: AnyRef]) = new {
     def toProperties = {
       val props = new Properties

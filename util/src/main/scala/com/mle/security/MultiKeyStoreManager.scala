@@ -1,4 +1,4 @@
-package com.mle.util.security
+package com.mle.security
 
 import com.mle.util.Log
 import java.security.{NoSuchAlgorithmException, KeyStore}

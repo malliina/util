@@ -2,10 +2,10 @@ package com.mle.util
 
 import java.nio.file._
 import com.mle.util.FileVisitors.FileCollectingVisitor
-import Implicits._
 import org.apache.commons.io.IOUtils
 import java.io.{FileNotFoundException, FileWriter, BufferedWriter, PrintWriter}
 import Util._
+import FileImplicits.StorageFile
 
 /**
  *
@@ -16,6 +16,7 @@ object FileUtilities {
   val userDirString = sys.props("user.dir")
   val userDir = Paths get userDirString
   val userHome = Paths get sys.props("user.home")
+  val tempDir = Paths get sys.props("java.io.tmpdir")
   var basePath = Paths get sys.props.getOrElse("app.home", userDirString)
 
   def init(appName: String) {
@@ -36,7 +37,7 @@ object FileUtilities {
    * @param op the file writing code
    */
   def writerTo(filename: String)(op: PrintWriter => Unit): Path = {
-    val path = FileUtilities.pathTo(filename)
+    val path = pathTo(filename)
     writerTo(path)(op)
     path
   }
@@ -46,12 +47,11 @@ object FileUtilities {
    * @param filename the file to write to
    * @param op the file writing code
    */
-  def writerTo(filename: Path)(op: PrintWriter => Unit) {
+  def writerTo(filename: Path)(op: PrintWriter => Unit): Unit =
     using(new PrintWriter(new BufferedWriter(new FileWriter(filename.toFile))))(op)
-  }
 
   def readerFrom[T](path: Path)(code: Iterator[String] => T): T =
-    Util.resource(io.Source.fromFile(path.toFile)) {
+    Utils.resource(io.Source.fromFile(path.toFile)) {
       source => code(source.getLines())
     }
 
@@ -76,11 +76,16 @@ object FileUtilities {
       readerFrom(maybeFile)(code)
     } else {
       Util.using(Util.openStream(resource))(inStream => {
-        Util.resource(io.Source.fromInputStream(inStream))(source => code(source.getLines()))
+        Utils.resource(io.Source.fromInputStream(inStream))(source => code(source.getLines()))
       })
     }
   }
 
+  def fileToString(file: Path): String =
+    readerFrom(file)(_.mkString(lineSep))
+
+  def stringToFile(str: String, file: Path) =
+    writerTo(file)(_.println(str))
 
   /**
    * Calculates the amount of used disk space, in percentages, according to the formula: usable_space / total_space. For example, if a 10 GB disk contains 3 GB of data, this method returns 30 for that disk.

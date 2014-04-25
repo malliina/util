@@ -4,7 +4,7 @@ import com.mle.util.Log
 import java.rmi.server.UnicastRemoteObject
 import java.io.Closeable
 import java.rmi.NoSuchObjectException
-import com.mle.util.security.{MultiKeyStoreManager, IKeystoreSettings}
+import com.mle.security.{MultiKeyStoreManager, IKeystoreSettings}
 
 /**
  * Create a keystore with: keytool -genkey -alias rmi -keyalg RSA -validity 9999 -keystore keystore.key

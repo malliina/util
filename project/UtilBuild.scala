@@ -1,22 +1,23 @@
 import sbt.Keys._
 import sbt._
 import Dependencies._
+import com.mle.sbtutils.SbtUtils._
 
 /**
  * @author Mle
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.1.0"
-  val snapshotVersion = "1.1.1-SNAPSHOT"
-  val utilDep2 = utilGroup %% "util" % releaseVersion
+  val releaseVersion = "1.3.1"
+  val snapshotVersion = "1.2.1-SNAPSHOT"
+  val utilDep2 = "com.github.malliina" %% "util" % releaseVersion
 
-  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec) ++ loggingDeps)
+  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase) ++ loggingDeps)
     .settings(version := releaseVersion)
   lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
-    .settings(version := snapshotVersion)
+    .settings(version := releaseVersion)
   lazy val rmi = utilProject("util-rmi")
-    .settings(version := snapshotVersion)
+    .settings(version := releaseVersion)
   lazy val jdbc = utilProject("util-jdbc", deps = Seq(tomcatJdbc, boneCp, mysql))
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
@@ -24,58 +25,19 @@ object UtilBuild extends Build {
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, utilDep2))
     .settings(version := releaseVersion)
 
-  // Hack for play compat
-  //  override def settings = super.settings ++ com.typesafe.sbtidea.SbtIdeaPlugin.ideaSettings
-
-  val commonSettings = Defaults.defaultSettings ++ Seq(
-    organization := "com.github.malliina",
+  val commonSettings = Defaults.defaultSettings ++ publishSettings ++ Seq(
     version := snapshotVersion,
-    scalaVersion := "2.10.3",
+    gitUserName := "malliina",
+    developerName := "Michael Skogberg",
+    scalaVersion := "2.11.0",
+    crossScalaVersions := Seq("2.11.0", "2.10.4"),
     retrieveManaged := false,
-    resolvers += "Sonatype snaps" at "http://oss.sonatype.org/content/repositories/snapshots/",
-    publishTo <<= version(v => {
-      val repo =
-        if (v endsWith "SNAPSHOT") {
-          "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
-        } else {
-          "Sonatype releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-        }
-      Some(repo)
-    }),
-    credentials += Credentials(Path.userHome / ".ivy2" / "sonatype.txt"),
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    pomIncludeRepository := (_ => false),
-    pomExtra := extraPom,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
     sbt.Keys.fork in Test := true,
-    // the jars of modules depended on are not included unless this is true
     exportJars := true
   )
-
-  def extraPom =
-    (<url>https://github.com/malliina/util</url>
-      <licenses>
-        <license>
-          <name>BSD-style</name>
-          <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
-          <distribution>repo</distribution>
-        </license>
-      </licenses>
-      <scm>
-        <url>git@github.com:malliina/util.git</url>
-        <connection>scm:git:git@github.com:malliina/util.git</connection>
-      </scm>
-      <developers>
-        <developer>
-          <id>malliina</id>
-          <name>Michael Skogberg</name>
-          <url>http://mskogberg.info</url>
-        </developer>
-      </developers>)
-
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, jdbc, rmi, auth)
@@ -86,6 +48,5 @@ object UtilBuild extends Build {
     )
 
   def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
-    testableProject(id, deps)
-      .dependsOn(util)
+    testableProject(id, deps).dependsOn(util)
 }

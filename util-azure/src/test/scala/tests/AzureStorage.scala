@@ -1,11 +1,14 @@
-package com.mle.azure.tests
+package tests
 
 import org.scalatest.FunSuite
 import java.nio.file.{Files, Paths}
 import com.mle.util.FileUtilities
 import com.microsoft.windowsazure.services.blob.client.{BlobRequestOptions, BlobListingDetails}
 import java.util.EnumSet
-import com.microsoft.windowsazure.services.core.storage.OperationContext
+import com.microsoft.windowsazure.services.core.storage.{MetricsLevel, OperationContext}
+import collection.JavaConversions._
+import com.microsoft.windowsazure.services.table.client.{TableConstants, TableServiceEntity, TableQuery}
+import com.microsoft.windowsazure.services.table.client.TableQuery.QueryComparisons
 
 /**
  * Needs a credentials file in userHome/keys/azure-storage.sec
@@ -63,6 +66,33 @@ class AzureStorage extends FunSuite with TestBase {
     logCont.download(logFile, dest)
     val file = FileUtilities.readerFrom(dest)(_.toList)
     file foreach println
-
   }
+
+  test("list tables") {
+    val client = newClient
+    println(s"Tables: ${client.tables.size}")
+    assert(client.blobClient.downloadServiceProperties().getMetrics.getMetricsLevel === MetricsLevel.SERVICE)
+    client.tables foreach println
+    val tableClient = client.tableClient
+    val tableName = "$MetricsHourPrimaryTransactionsBlob"
+    val table = tableClient.getTableReference(tableName)
+    assert(table.exists(), "Table must exist")
+    val query = TableQuery.from(tableName, classOf[TestEntity])
+    val filter1 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.GREATER_THAN, "20140308T0800")
+    val filter2 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.LESS_THAN, "20140408T0800")
+    val filteredQuery = query.where(filter1).where(filter2)
+    val entities = tableClient.execute(filteredQuery)
+//    println(s"Got ${entities.size} entities")
+    entities.foreach(entity => println(entity.getTotalRequests))
+  }
+
+
+}
+
+class TestEntity extends TableServiceEntity {
+  private var totalRequests: Long = 0
+
+  def getTotalRequests: Long = totalRequests
+
+  def setTotalRequests(requests: Long): Unit = totalRequests = requests
 }
