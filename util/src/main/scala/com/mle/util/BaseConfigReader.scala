@@ -1,8 +1,9 @@
 package com.mle.util
 
 import com.mle.exception.ResourceNotFoundException
-import java.nio.file.{Paths, Path}
-import com.mle.util.FileImplicits.StorageFile
+import java.nio.file.Path
+import com.mle.file.FileUtilities
+import com.mle.file.StorageFile
 
 /**
  *
@@ -11,8 +12,7 @@ import com.mle.util.FileImplicits.StorageFile
  * @tparam T type of credential
  */
 trait BaseConfigReader[T] extends ConfigReader[T] {
-  protected val userHome = Paths get sys.props("user.home")
-
+  protected val userHome = FileUtilities.userHome
 
   def userHomeConfPath: Path = userHome / "config.txt"
 

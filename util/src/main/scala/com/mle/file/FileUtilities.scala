@@ -1,11 +1,12 @@
-package com.mle.util
+package com.mle.file
 
 import java.nio.file._
-import com.mle.util.FileVisitors.FileCollectingVisitor
 import org.apache.commons.io.IOUtils
 import java.io.{FileNotFoundException, FileWriter, BufferedWriter, PrintWriter}
-import Util._
-import FileImplicits.StorageFile
+import com.mle.util.Util._
+import scala.Some
+import com.mle.util.{Util, Utils}
+import com.mle.file.FileVisitors.FileCollectingVisitor
 
 /**
  *

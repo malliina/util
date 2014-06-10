@@ -16,6 +16,7 @@ object Dependencies {
   val tomcatJdbc = "org.apache.tomcat" % "tomcat-jdbc" % "7.0.52"
   val boneCp = "com.jolbox" % "bonecp" % "0.7.1.RELEASE"
   val akkaActor = "com.typesafe.akka" % "akka-actor_2.10" % "2.3.1"
+  val akkaActor224 = "com.typesafe.akka" % "akka-actor_2.10" % "2.2.4"
   val akkaTestKit = "com.typesafe.akka" % "akka-testkit_2.10" % "2.1.4" % "test"
   val azureApi = "com.microsoft.windowsazure" % "microsoft-windowsazure-api" % "0.4.6"
   val utilBase = "com.github.malliina" %% "util-base" % "0.1.1"

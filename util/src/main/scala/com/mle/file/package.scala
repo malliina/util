@@ -1,13 +1,13 @@
-package com.mle.util
+package com.mle
 
 import java.nio.file.{Files, Path}
-import com.mle.storage.{StorageSize, StorageLong}
+import com.mle.storage.StorageSize
+import com.mle.storage.StorageLong
 
 /**
- *
- * @author mle
+ * @author Michael
  */
-object FileImplicits {
+package object file {
 
   implicit final class StorageFile(val file: Path) {
     def size: StorageSize = (Files size file).bytes

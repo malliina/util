@@ -1,10 +1,11 @@
 package com.mle.security
 
-import com.mle.util.{Util, FileUtilities}
+import com.mle.util.Util
 import java.nio.file.{Path, Paths}
 import java.security.KeyStore
 import java.io.FileInputStream
 import com.mle.exception.ConfigException
+import com.mle.file.FileUtilities
 
 /**
  *

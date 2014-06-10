@@ -1,7 +1,8 @@
-package com.mle.util
+package com.mle.file
 
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
+import com.mle.util.Log
 
 /**
  * Directory listing classes using Java 7 APIs.
@@ -11,40 +12,28 @@ object FileVisitors {
   def build(srcDir: Path, recursive: Boolean = true, ageLimitHours: Option[Long] = None, sortByAge: Boolean = true) = {
     if (recursive) {
       if (sortByAge) {
-        ageLimitHours.map(age =>
-          new AgeLimitFilteringFileVisitor(age) with FileSorting
-        ).getOrElse(
-          new FilteringFileVisitor with FileSorting
-        )
+        ageLimitHours.fold(new FilteringFileVisitor with FileSorting)(age =>
+          new AgeLimitFilteringFileVisitor(age) with FileSorting)
       } else {
-        ageLimitHours.map(age =>
-          new AgeLimitFilteringFileVisitor(age)
-        ).getOrElse(
-          new FilteringFileVisitor
-        )
+        ageLimitHours.fold(new FilteringFileVisitor)(age =>
+          new AgeLimitFilteringFileVisitor(age))
       }
 
     } else {
       if (sortByAge) {
-        ageLimitHours.map(age =>
+        ageLimitHours.fold(new FilteringFileVisitor with FileSorting with NonRecursiveSearch {
+          val startDir = srcDir
+        })(age =>
           new AgeLimitFilteringFileVisitor(age) with FileSorting with NonRecursiveSearch {
             val startDir = srcDir
-          }
-        ).getOrElse(
-          new FilteringFileVisitor with FileSorting with NonRecursiveSearch {
-            val startDir = srcDir
-          }
-        )
+          })
       } else {
-        ageLimitHours.map(age =>
+        ageLimitHours.fold(new FilteringFileVisitor with NonRecursiveSearch {
+          val startDir = srcDir
+        })(age =>
           new AgeLimitFilteringFileVisitor(age) with NonRecursiveSearch {
             val startDir = srcDir
-          }
-        ).getOrElse(
-          new FilteringFileVisitor with NonRecursiveSearch {
-            val startDir = srcDir
-          }
-        )
+          })
       }
 
     }

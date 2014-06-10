@@ -5,8 +5,8 @@ import java.nio.file.Path
 /**
  * Reads configuration data from various local sources.
  *
- * Users of this class mainly use `load` to load the config when needed. The
- * rest of the methods can be overridden for customization.
+ * Users of this class mainly use `load` to load the config when needed. The rest of the methods can be overridden for
+ * customization.
  *
  * @tparam T type of config
  */

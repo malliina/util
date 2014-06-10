@@ -3,8 +3,8 @@ package com.mle.util
 import java.net.URL
 import com.mle.exception.ResourceNotFoundException
 import java.nio.file.{Path, Files}
-import reflect.Manifest
 import scala.io.BufferedSource
+import com.mle.file.FileUtilities
 
 /**
  * Utility methods.

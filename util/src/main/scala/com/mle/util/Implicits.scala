@@ -1,7 +1,6 @@
 package com.mle.util
 
 import java.util.concurrent.TimeUnit
-import java.nio.file.Path
 import java.util.Properties
 import collection.JavaConversions._
 
