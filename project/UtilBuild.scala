@@ -11,11 +11,11 @@ object UtilBuild extends Build {
   val releaseVersion = "1.4.0"
   val snapshotVersion = "1.2.1-SNAPSHOT"
   val utilDep2 = "com.github.malliina" %% "util" % releaseVersion
-  val stableUtil = "com.github.malliina" %% "util" % "1.3.1"
+  val stableUtil = "com.github.malliina" %% "util" % "1.3.2"
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase) ++ loggingDeps)
     .settings(version := releaseVersion)
-  lazy val actor = utilProject("util-actor", deps = Seq(akkaActor224, akkaTestKit))
+  lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
     .settings(version := releaseVersion)
   lazy val rmi = utilProject("util-rmi")
     .settings(version := releaseVersion)
@@ -30,8 +30,8 @@ object UtilBuild extends Build {
     version := snapshotVersion,
     gitUserName := "malliina",
     developerName := "Michael Skogberg",
-    scalaVersion := "2.11.1",
-    crossScalaVersions := Seq("2.11.1", "2.10.4"),
+    scalaVersion := "2.11.2",
+    crossScalaVersions := Seq("2.11.2", "2.10.4"),
     retrieveManaged := false,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
