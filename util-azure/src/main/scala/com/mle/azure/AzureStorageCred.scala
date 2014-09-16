@@ -1,6 +1,6 @@
 package com.mle.azure
 
-import com.mle.util.FileImplicits.StorageFile
+import com.mle.file.StorageFile
 import com.mle.util.BaseConfigReader
 
 /**

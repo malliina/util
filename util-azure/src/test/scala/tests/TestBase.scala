@@ -1,9 +1,10 @@
 package tests
 
 import java.nio.file.Paths
-import com.mle.util.Util
+
 import com.mle.azure.StorageClient
-import com.mle.util.Implicits._
+import com.mle.file.StorageFile
+import com.mle.util.Util
 
 /**
  *
@@ -17,6 +18,5 @@ trait TestBase {
   val accountKey = credMap("account_key")
   val containerName = "files"
 
-  protected def newClient =
-    new StorageClient(accountName, accountKey)
+  protected def newClient = new StorageClient(accountName, accountKey)
 }

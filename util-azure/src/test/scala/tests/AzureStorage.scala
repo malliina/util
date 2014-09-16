@@ -1,14 +1,16 @@
 package tests
 
-import org.scalatest.FunSuite
 import java.nio.file.{Files, Paths}
-import com.mle.util.FileUtilities
-import com.microsoft.windowsazure.services.blob.client.{BlobRequestOptions, BlobListingDetails}
 import java.util.EnumSet
+
+import com.microsoft.windowsazure.services.blob.client.{BlobListingDetails, BlobRequestOptions}
 import com.microsoft.windowsazure.services.core.storage.{MetricsLevel, OperationContext}
-import collection.JavaConversions._
-import com.microsoft.windowsazure.services.table.client.{TableConstants, TableServiceEntity, TableQuery}
 import com.microsoft.windowsazure.services.table.client.TableQuery.QueryComparisons
+import com.microsoft.windowsazure.services.table.client.{TableConstants, TableQuery, TableServiceEntity}
+import com.mle.file.FileUtilities
+import org.scalatest.FunSuite
+
+import scala.collection.JavaConversions._
 
 /**
  * Needs a credentials file in userHome/keys/azure-storage.sec
