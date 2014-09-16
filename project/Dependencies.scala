@@ -3,7 +3,6 @@ import sbt._
 /**
  * @author Mle
  */
-
 object Dependencies {
   val scalaTest = "org.scalatest" %% "scalatest" % "2.2.2" % "test"
   val slf4j = "org.slf4j" % "slf4j-api" % "1.7.7"
@@ -19,4 +18,6 @@ object Dependencies {
   val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % "2.3.5" % "test"
   val azureApi = "com.microsoft.windowsazure" % "microsoft-windowsazure-api" % "0.4.6"
   val utilBase = "com.github.malliina" %% "util-base" % "0.2.0"
+  val playJson = "com.typesafe.play" %% "play-json" % "2.3.4"
+  val ningHttp = "com.ning" % "async-http-client" % "1.8.13"
 }

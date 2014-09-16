@@ -1,19 +1,20 @@
+import Dependencies._
+import com.mle.sbtutils.SbtUtils
 import sbt.Keys._
 import sbt._
-import Dependencies._
-import com.mle.sbtutils.SbtUtils._
 
 /**
  * @author Mle
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.4.0"
-  val snapshotVersion = "1.2.1-SNAPSHOT"
+  val releaseVersion = "1.4.2"
+  val snapshotVersion = "1.4.1-SNAPSHOT"
   val utilDep2 = "com.github.malliina" %% "util" % releaseVersion
   val stableUtil = "com.github.malliina" %% "util" % "1.3.2"
 
-  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase) ++ loggingDeps)
+
+  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp, playJson) ++ loggingDeps)
     .settings(version := releaseVersion)
   lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
     .settings(version := releaseVersion)
@@ -26,10 +27,10 @@ object UtilBuild extends Build {
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, utilDep2))
     .settings(version := releaseVersion)
 
-  val commonSettings = Defaults.defaultSettings ++ publishSettings ++ Seq(
+  val commonSettings = SbtUtils.publishSettings ++ Seq(
     version := snapshotVersion,
-    gitUserName := "malliina",
-    developerName := "Michael Skogberg",
+    SbtUtils.gitUserName := "malliina",
+    SbtUtils.developerName := "Michael Skogberg",
     scalaVersion := "2.11.2",
     crossScalaVersions := Seq("2.11.2", "2.10.4"),
     retrieveManaged := false,
@@ -44,9 +45,9 @@ object UtilBuild extends Build {
     .aggregate(util, actor, jdbc, rmi, auth)
 
   def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
-    Project(id, file(id), settings = commonSettings).settings(
+    Project(id, file(id)).settings(
       libraryDependencies ++= deps ++ Seq(scalaTest)
-    )
+    ).settings(commonSettings: _*)
 
   def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) = testableProject(id, deps ++ Seq(stableUtil))
 }

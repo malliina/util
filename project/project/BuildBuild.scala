@@ -20,7 +20,7 @@ object BuildBuild extends Build {
   ) ++ plugins
 
   def plugins = Seq(
-    "com.github.malliina" % "sbt-utils" % "0.0.3",
+    "com.github.malliina" % "sbt-utils" % "0.0.5",
     "com.timushev.sbt" % "sbt-updates" % "0.1.2"
   ) map addSbtPlugin
 
