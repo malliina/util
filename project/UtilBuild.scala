@@ -8,7 +8,7 @@ import sbt._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.4.2"
+  val releaseVersion = "1.5.0"
   val snapshotVersion = "1.4.1-SNAPSHOT"
   val utilDep2 = "com.github.malliina" %% "util" % releaseVersion
   val stableUtil = "com.github.malliina" %% "util" % "1.4.2"
