@@ -1,5 +1,7 @@
 package com.mle.rmi
 
+import java.rmi.{ConnectException, ConnectIOException}
+
 import com.mle.util.Log
 import java.rmi.registry.LocateRegistry
 

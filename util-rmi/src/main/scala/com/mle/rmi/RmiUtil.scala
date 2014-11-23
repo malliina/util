@@ -1,7 +1,7 @@
 package com.mle.rmi
 
+import com.mle.security.{KeystoreSettings, MultiKeyStoreManager}
 import com.mle.util.Util
-import com.mle.security.{MultiKeyStoreManager, KeystoreSettings}
 
 /**
  * The security policy and/or the [[java.lang.SecurityManager]]

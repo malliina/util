@@ -14,7 +14,7 @@ import scala.concurrent.duration._
  * @author mle
  */
 class ActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike with ImplicitSender with BeforeAndAfter with BeforeAndAfterAll {
-  implicit val timeout = Timeout(100 days)
+  implicit val timeout = Timeout(100.days)
   val testMessage = "Hello, world"
 
   override def afterAll {
@@ -28,18 +28,18 @@ class ActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike wi
   }
   test("actor receives reply within reasonable time period") {
     val wall = system.actorOf(Props[TikiTakaActor])
-    val result = Await.result(wall ? testMessage, 1000 milliseconds).asInstanceOf[String]
+    val result = Await.result(wall ? testMessage, 1000.milliseconds).asInstanceOf[String]
     assert(result === testMessage)
   }
   test("actor receives reply within reasonable time period ver 2") {
     val wall = system.actorOf(Props[TikiTakaActor])
     wall ! testMessage
-    expectMsg(1000 milliseconds, testMessage)
+    expectMsg(1000.milliseconds, testMessage)
   }
   test("actor times out waiting for reply after unreasonable time period has passed") {
     val wall = system.actorOf(Props[TikiTakaActor])
     intercept[TimeoutException] {
-      Await.result(wall ? testMessage, 100 milliseconds).asInstanceOf[String]
+      Await.result(wall ? testMessage, 100.milliseconds).asInstanceOf[String]
     }
   }
 }

@@ -95,10 +95,7 @@ class AsyncHttp extends Closeable {
 
   def get(url: String): RequestBuilder = client.prepareGet(url)
 
-  def post(url: String, body: JsValue): RequestBuilder =
-    client.preparePost(url)
-      .setHeader(CONTENT_TYPE, JSON)
-      .setBody(Json stringify body)
+  def post(url: String, body: JsValue): RequestBuilder = post(url, Json stringify body).setHeader(CONTENT_TYPE, JSON)
 
   def post(url: String, body: String): RequestBuilder = client.preparePost(url).setBody(body)
 
