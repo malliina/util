@@ -14,10 +14,6 @@ import com.mle.file.StorageFile
 trait BaseConfigReader[T] extends ConfigReader[T] {
   protected val userHome = FileUtilities.userHome
 
-  def userHomeConfPath: Path = userHome / "config.txt"
-
-  def resourceCredential: String = "config/config.txt"
-
   /**
    * Attempts to read the config from the following locations, in this order:
    *
@@ -31,7 +27,7 @@ trait BaseConfigReader[T] extends ConfigReader[T] {
   def load = loadOpt
     .getOrElse(throw new ResourceNotFoundException("Unable to load config from environment, resource or user home path."))
 
-  def loadOpt = fromEnvOpt orElse fromResourceOpt(resourceCredential) orElse fromUserHomeOpt
+  def loadOpt = fromEnvOpt orElse fromUserHomeOpt
 
   def fromEnvOpt = fromMapOpt(sys.env)
 

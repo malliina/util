@@ -8,7 +8,7 @@ import sbt._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.5.0"
+  val releaseVersion = "1.6.0"
   val snapshotVersion = "1.4.1-SNAPSHOT"
   val latestUtil = "com.github.malliina" %% "util" % releaseVersion
   val stableUtil = "com.github.malliina" %% "util" % "1.5.0"
@@ -27,11 +27,11 @@ object UtilBuild extends Build {
     .settings(version := releaseVersion)
 
   val commonSettings = SbtUtils.publishSettings ++ Seq(
-    version := snapshotVersion,
+    version := releaseVersion,
     SbtUtils.gitUserName := "malliina",
     SbtUtils.developerName := "Michael Skogberg",
-    scalaVersion := "2.11.4",
-    crossScalaVersions := Seq("2.11.4", "2.10.4"),
+    scalaVersion := "2.11.5",
+    crossScalaVersions := Seq("2.11.5", "2.10.4"),
     retrieveManaged := false,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
@@ -40,7 +40,8 @@ object UtilBuild extends Build {
     exportJars := true,
     resolvers ++= Seq(
       "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
-      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/")
+      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/"),
+    scalacOptions ++= Seq("-Xlint", "-feature")
   )
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
