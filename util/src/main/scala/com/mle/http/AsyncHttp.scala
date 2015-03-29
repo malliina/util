@@ -1,6 +1,7 @@
 package com.mle.http
 
 import java.io.Closeable
+import java.nio.charset.Charset
 
 import com.mle.http.AsyncHttp._
 import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Response}
@@ -8,6 +9,7 @@ import com.ning.http.util.Base64
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success, Try}
 
 /**
  * A Scala [[Future]]s-based HTTP client. Wraps ning's async http client.
@@ -67,8 +69,10 @@ object AsyncHttp {
 
     def run(): Future[Response] = {
       val handler = new PromisingHandler
-      builder execute handler
-      handler.future
+      Try(builder execute handler) match {
+        case Success(_) => handler.future
+        case Failure(t) => Future.failed[Response](t)
+      }
     }
   }
 
@@ -95,9 +99,11 @@ class AsyncHttp extends Closeable {
 
   def get(url: String): RequestBuilder = client.prepareGet(url)
 
-  def post(url: String, body: JsValue): RequestBuilder = post(url, Json stringify body).setHeader(CONTENT_TYPE, JSON)
+  def post(url: String, body: JsValue): RequestBuilder =
+    post(url, Json stringify body).setHeader(CONTENT_TYPE, JSON)
 
-  def post(url: String, body: String): RequestBuilder = client.preparePost(url).setBody(body)
+  def post(url: String, body: String, encoding: String = "UTF-8"): RequestBuilder =
+    client.preparePost(url).setBodyEncoding(encoding).setBody(body)
 
   def close() = client.close()
 }
