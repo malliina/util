@@ -8,10 +8,10 @@ import sbt._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.6.1"
+  val releaseVersion = "1.7.0"
   val snapshotVersion = "1.6.1-SNAPSHOT"
   val latestUtil = "com.github.malliina" %% "util" % releaseVersion
-  val stableUtil = "com.github.malliina" %% "util" % "1.5.0"
+  val stableUtil = "com.github.malliina" %% "util" % "1.7.0"
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp, playJson) ++ loggingDeps)
     .settings(version := releaseVersion)
@@ -30,8 +30,8 @@ object UtilBuild extends Build {
     version := releaseVersion,
     SbtUtils.gitUserName := "malliina",
     SbtUtils.developerName := "Michael Skogberg",
-    scalaVersion := "2.11.5",
-    crossScalaVersions := Seq("2.11.5", "2.10.4"),
+    scalaVersion := "2.11.6",
+    crossScalaVersions := Seq(scalaVersion.value, "2.10.4"),
     retrieveManaged := false,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail

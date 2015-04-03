@@ -1,12 +1,13 @@
 package com.mle.actor
 
-import com.mle.util.Log
 import java.util.concurrent.ScheduledFuture
-import com.mle.util.Scheduling._
-import com.mle.util.Implicits._
-import com.mle.actor.Messages.{Broadcast, Start, Stop}
-import akka.actor.{ActorRef, Actor}
 
+import akka.actor.{Actor, ActorRef}
+import com.mle.actor.Messages.{Broadcast, Start, Stop}
+import com.mle.util.Log
+import com.mle.util.Scheduling._
+
+import scala.concurrent.duration.DurationInt
 /**
  * @author Mle
  */
@@ -16,7 +17,7 @@ class Broadcaster(king: ActorRef) extends Actor with Log {
 
   def transformer: String => String = msg => msg
 
-  private def newBroadcastTask = every(3 seconds) {
+  private def newBroadcastTask = every(3.seconds) {
     broadcastCount += 1
     val msg = transformer("Broadcast nr: " + broadcastCount)
     log info msg
