@@ -3,7 +3,7 @@ package tests
 import org.scalatest.FunSuite
 import tests.Math.NumberLike
 
-import scala.concurrent.duration.{Duration, DurationLong}
+import scala.concurrent.duration.{Duration, DurationInt, DurationLong}
 
 /**
  * @author Michael
@@ -15,9 +15,9 @@ class TypeClasses extends FunSuite {
     implicit val str = new NumberLike[String] {
       override def plus(x: String, y: String): String = x ++ y
 
-      override def divide(x: String, y: Int): String = x.take(x.size / y)
+      override def divide(x: String, y: Int): String = x.take(x.length / y)
 
-      override def minus(x: String, y: String): String = x take y.size
+      override def minus(x: String, y: String): String = x take y.length
     }
     Statistics.mean(Vector("a", "b", "c"))
 

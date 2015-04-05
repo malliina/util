@@ -8,10 +8,10 @@ import sbt._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.7.0"
+  val releaseVersion = "1.8.0"
   val snapshotVersion = "1.6.1-SNAPSHOT"
   val latestUtil = "com.github.malliina" %% "util" % releaseVersion
-  val stableUtil = "com.github.malliina" %% "util" % "1.7.0"
+  val stableUtil = "com.github.malliina" %% "util" % "1.8.0"
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp, playJson) ++ loggingDeps)
     .settings(version := releaseVersion)
@@ -41,7 +41,8 @@ object UtilBuild extends Build {
     resolvers ++= Seq(
       "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
       "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/"),
-    scalacOptions ++= Seq("-Xlint", "-feature")
+    scalacOptions ++= Seq("-Xlint", "-feature"),
+    updateOptions := updateOptions.value.withCachedResolution(true)
   )
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
