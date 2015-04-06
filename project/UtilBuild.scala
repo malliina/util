@@ -2,16 +2,15 @@ import Dependencies._
 import com.mle.sbtutils.SbtUtils
 import sbt.Keys._
 import sbt._
+import bintray.Plugin.bintraySettings
 
 /**
  * @author Mle
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.8.0"
-  val snapshotVersion = "1.6.1-SNAPSHOT"
-  val latestUtil = "com.github.malliina" %% "util" % releaseVersion
-  val stableUtil = "com.github.malliina" %% "util" % "1.8.0"
+  val releaseVersion = "1.8.1"
+  val stableUtil = "com.github.malliina" %% "util" % "1.8.1"
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp, playJson) ++ loggingDeps)
     .settings(version := releaseVersion)
@@ -23,10 +22,10 @@ object UtilBuild extends Build {
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
-  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, latestUtil))
+  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, stableUtil))
     .settings(version := releaseVersion)
 
-  val commonSettings = SbtUtils.publishSettings ++ Seq(
+  val commonSettings = SbtUtils.publishSettings ++ bintraySettings ++ Seq(
     version := releaseVersion,
     SbtUtils.gitUserName := "malliina",
     SbtUtils.developerName := "Michael Skogberg",
@@ -40,9 +39,12 @@ object UtilBuild extends Build {
     exportJars := true,
     resolvers ++= Seq(
       "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
-      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/"),
+      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
+      sbt.Resolver.jcenterRepo,
+      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
     scalacOptions ++= Seq("-Xlint", "-feature"),
-    updateOptions := updateOptions.value.withCachedResolution(true)
+    updateOptions := updateOptions.value.withCachedResolution(true),
+    licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
   )
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)

@@ -16,11 +16,16 @@ object BuildBuild extends Build {
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers ++= Seq(
       "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
-      "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/")
+      "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+      Resolver.url(
+        "bintray-sbt-plugin-releases",
+        url("http://dl.bintray.com/content/sbt/sbt-plugin-releases"))(
+          Resolver.ivyStylePatterns))
   ) ++ plugins
 
   def plugins = Seq(
-    "com.github.malliina" % "sbt-utils" % "0.1.0"
+    "com.github.malliina" % "sbt-utils" % "0.1.0",
+    "me.lessis" % "bintray-sbt" % "0.2.1"
   ) map addSbtPlugin
 
   lazy val root = Project("plugins", file("."))
