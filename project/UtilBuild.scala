@@ -38,10 +38,10 @@ object UtilBuild extends Build {
     // ... unless fork is true
     sbt.Keys.fork in Test := true,
     exportJars := true,
-//    resolvers ++= Seq(
-//      "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
-//      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
-//      sbt.Resolver.jcenterRepo,
+    resolvers ++= Seq(
+      "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
+      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
+      sbt.Resolver.jcenterRepo),
 //      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
     scalacOptions ++= Seq("-Xlint", "-feature"),
     updateOptions := updateOptions.value.withCachedResolution(true),
