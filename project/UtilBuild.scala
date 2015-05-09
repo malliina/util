@@ -1,5 +1,5 @@
 import Dependencies._
-import com.mle.sbtutils.SbtUtils
+import com.mle.sbtutils.SbtUtils.{gitUserName, developerName}
 import sbt.Keys._
 import sbt._
 import bintray.Plugin.bintraySettings
@@ -25,10 +25,11 @@ object UtilBuild extends Build {
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, stableUtil))
     .settings(version := releaseVersion)
 
-  val commonSettings = SbtUtils.publishSettings ++ bintraySettings ++ Seq(
+  val commonSettings = bintraySettings ++ Seq(
+    organization := s"com.github.${gitUserName.value}",
     version := releaseVersion,
-    SbtUtils.gitUserName := "malliina",
-    SbtUtils.developerName := "Michael Skogberg",
+    gitUserName := "malliina",
+    developerName := "Michael Skogberg",
     scalaVersion := "2.11.6",
     crossScalaVersions := Seq(scalaVersion.value, "2.10.4"),
     retrieveManaged := false,
@@ -37,11 +38,11 @@ object UtilBuild extends Build {
     // ... unless fork is true
     sbt.Keys.fork in Test := true,
     exportJars := true,
-    resolvers ++= Seq(
-      "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
-      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
-      sbt.Resolver.jcenterRepo,
-      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
+//    resolvers ++= Seq(
+//      "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
+//      "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
+//      sbt.Resolver.jcenterRepo,
+//      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
     scalacOptions ++= Seq("-Xlint", "-feature"),
     updateOptions := updateOptions.value.withCachedResolution(true),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
