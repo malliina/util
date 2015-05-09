@@ -12,7 +12,7 @@ object UtilBuild extends Build {
   val releaseVersion = "1.8.1"
   val stableUtil = "com.github.malliina" %% "util" % "1.8.1"
 
-  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp, playJson) ++ loggingDeps)
+  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp) ++ loggingDeps)
     .settings(version := releaseVersion)
   lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
     .settings(version := releaseVersion)
