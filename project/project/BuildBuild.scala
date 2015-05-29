@@ -25,7 +25,7 @@ object BuildBuild extends Build {
 
   def plugins = Seq(
     "com.github.malliina" % "sbt-utils" % "0.1.0",
-    "me.lessis" % "bintray-sbt" % "0.2.1"
+    "me.lessis" % "bintray-sbt" % "0.3.0"
   ) map addSbtPlugin
 
   lazy val root = Project("plugins", file("."))

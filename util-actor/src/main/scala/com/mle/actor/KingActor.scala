@@ -34,7 +34,7 @@ abstract class KingActor[T](messages: MessageTypes[T]) extends Actor with Log {
       connections.foreach(_.actor ! StringMessage(msg))
   }
 
-  def receive = messageHandler orElse managementHandler
+  def receive: Receive = messageHandler orElse managementHandler
 
   /**
    *

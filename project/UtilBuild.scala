@@ -2,15 +2,14 @@ import Dependencies._
 import com.mle.sbtutils.SbtUtils.{gitUserName, developerName}
 import sbt.Keys._
 import sbt._
-import bintray.Plugin.bintraySettings
 
 /**
  * @author Mle
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "1.8.1"
-  val stableUtil = "com.github.malliina" %% "util" % "1.8.1"
+  val releaseVersion = "1.9.0"
+  val stableUtil = "com.github.malliina" %% "util" % "1.9.0"
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp) ++ loggingDeps)
     .settings(version := releaseVersion)
@@ -25,7 +24,7 @@ object UtilBuild extends Build {
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi, stableUtil))
     .settings(version := releaseVersion)
 
-  val commonSettings = bintraySettings ++ Seq(
+  val commonSettings = Seq(
     organization := s"com.github.${gitUserName.value}",
     version := releaseVersion,
     gitUserName := "malliina",
@@ -52,7 +51,7 @@ object UtilBuild extends Build {
     .aggregate(util, actor, jdbc, rmi, auth)
 
   def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
-    Project(id, file(id)).settings(
+    Project(id, file(id)).enablePlugins(bintray.BintrayPlugin).settings(
       libraryDependencies ++= deps ++ Seq(scalaTest)
     ).settings(commonSettings: _*)
 

@@ -71,21 +71,21 @@ class AzureStorage extends FunSuite with TestBase {
   }
 
   test("list tables") {
-    val client = newClient
-    println(s"Tables: ${client.tables.size}")
-    assert(client.blobClient.downloadServiceProperties().getMetrics.getMetricsLevel === MetricsLevel.SERVICE)
-    client.tables foreach println
-    val tableClient = client.tableClient
-    val tableName = "$MetricsHourPrimaryTransactionsBlob"
-    val table = tableClient.getTableReference(tableName)
-    assert(table.exists(), "Table must exist")
-    val query = TableQuery.from(tableName, classOf[TestEntity])
-    val filter1 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.GREATER_THAN, "20140308T0800")
-    val filter2 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.LESS_THAN, "20140408T0800")
-    val filteredQuery = query.where(filter1).where(filter2)
-    val entities = tableClient.execute(filteredQuery)
-//    println(s"Got ${entities.size} entities")
-    entities.foreach(entity => println(entity.getTotalRequests))
+//    val client = newClient
+//    println(s"Tables: ${client.tables.size}")
+//    assert(client.blobClient.downloadServiceProperties().getMetrics.getMetricsLevel === MetricsLevel.SERVICE)
+//    client.tables foreach println
+//    val tableClient = client.tableClient
+//    val tableName = "$MetricsHourPrimaryTransactionsBlob"
+//    val table = tableClient.getTableReference(tableName)
+//    assert(table.exists(), "Table must exist")
+//    val query = TableQuery.from(tableName, classOf[TestEntity])
+//    val filter1 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.GREATER_THAN, "20140308T0800")
+//    val filter2 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.LESS_THAN, "20140408T0800")
+//    val filteredQuery = query.where(filter1).where(filter2)
+//    val entities = tableClient.execute(filteredQuery)
+////    println(s"Got ${entities.size} entities")
+//    entities.foreach(entity => println(entity.getTotalRequests))
   }
 
 
