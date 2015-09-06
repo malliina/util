@@ -2,12 +2,12 @@ package com.mle.auth.ldap
 
 import com.mle.auth.ConnectionProvider
 import javax.naming.directory.InitialDirContext
-import javax.naming.Context
+import javax.naming.{NamingSecurityException, Context}
+import com.mle.security.IKeystoreSettings
 import com.sun.jndi.ldap.LdapCtxFactory
 import java.util.Properties
 import collection.JavaConversions._
 import com.mle.util.Log
-import com.mle.util.security.IKeystoreSettings
 import javax.net.SocketFactory
 
 /**
@@ -33,7 +33,7 @@ class LDAPConnectionProvider(uri: String,
     )
   ).getOrElse(Map.empty[String, String])
 
-  val noUserProperties = sslProperties ++ Map(
+  val noUserProperties: Map[String, String] = sslProperties ++ Map(
     Context.SECURITY_AUTHENTICATION -> authMechanism,
     Context.INITIAL_CONTEXT_FACTORY -> classOf[LdapCtxFactory].getName,
     Context.PROVIDER_URL -> uri,

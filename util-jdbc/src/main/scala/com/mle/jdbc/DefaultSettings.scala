@@ -1,7 +1,7 @@
 package com.mle.jdbc
 
-import com.mle.util.security.ClientKeystoreSettings
-import auth.{MySQLConnectionProvider, BoneCpConnectionProvider}
+import com.mle.jdbc.auth.MySQLConnectionProvider
+import com.mle.security.ClientKeystoreSettings
 import com.mle.util.Util
 
 /**

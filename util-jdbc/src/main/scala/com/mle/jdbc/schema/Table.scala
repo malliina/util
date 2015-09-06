@@ -1,7 +1,10 @@
 package com.mle.jdbc.schema
 
-import com.mle.jdbc.Database
 import java.sql.ResultSet
+
+import com.mle.jdbc.Database
+
+import scala.language.{implicitConversions, reflectiveCalls}
 
 /**
  * TODO: Implement and use class Column instead of String to represent columns for obvious profit

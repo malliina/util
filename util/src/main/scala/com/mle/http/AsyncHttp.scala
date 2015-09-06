@@ -53,8 +53,16 @@ object AsyncHttp {
   }
 
   implicit class RichRequestBuilder(builder: RequestBuilder) {
-    def addParameters(parameters: (String, String)*) = {
-      parameters.foreach(pair => builder.addParameter(pair._1, pair._2))
+    def addQueryParameters(parameters: (String, String)*): RequestBuilder = {
+      parameters.foreach(pair => builder.addQueryParam(pair._1, pair._2))
+      builder
+    }
+
+    def addFormParameters(parameters: (String, String)*): RequestBuilder =
+      addParameters(parameters: _*)
+
+    def addParameters(parameters: (String, String)*): RequestBuilder = {
+      parameters.foreach(pair => builder.addFormParam(pair._1, pair._2))
       builder
     }
 

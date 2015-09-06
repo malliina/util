@@ -1,8 +1,8 @@
 package com.mle.jdbc.auth
 
-import com.mle.util.security.IKeystoreSettings
 import com.jolbox.bonecp.BoneCPDataSource
-import MySQLConnectionProvider._
+import com.mle.jdbc.auth.MySQLConnectionProvider._
+import com.mle.security.IKeystoreSettings
 
 /**
  * Got some strange lock problems. Preferring tomcat pooling for now.

@@ -12,7 +12,7 @@ import com.mle.util.Log
  * @author mle
  */
 class Database(connectionProvider: SQLConnectionProvider) extends Log {
-  implicit def rs2iter(rs: ResultSet) = Iterator.continually(if (!rs.isClosed && rs.next()) rs else null).takeWhile(_ != null)
+  implicit def rs2iter(rs: ResultSet): Iterator[ResultSet] = Iterator.continually(if (!rs.isClosed && rs.next()) rs else null).takeWhile(_ != null)
 
   def query[T](sql: String, params: Any*)(rsCode: ResultSet => T): Seq[T] =
     statement(sql, params: _*)(stmt =>

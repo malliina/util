@@ -1,16 +1,16 @@
 package com.mle.auth.ldap
 
-import com.mle.auth._
-import exception.UserManagementException
-import javax.naming.directory._
-import collection.JavaConversions._
+import java.util
 import javax.naming.Context
-import com.mle.util.Implicits._
-import com.mle.util.Util._
-import com.mle.util.{Utils, Log}
-import LdapAttributes._
-import LdapImplicits._
-import LdapHelper._
+import javax.naming.directory._
+
+import com.mle.auth._
+import com.mle.auth.ldap.LdapAttributes._
+import com.mle.auth.ldap.LdapHelper._
+import com.mle.auth.ldap.LdapImplicits._
+import com.mle.util.{Log, Utils}
+
+import scala.collection.JavaConversions._
 
 
 /**
@@ -29,10 +29,12 @@ abstract class AbstractLdapUserManager(val connectionProvider: LDAPConnectionPro
   with Log {
 
   def authenticate(user: String, password: String) = {
-    val connectionProps = (connectionProvider.noUserProperties ++ Map(
+    import collection.JavaConverters._
+    val map = connectionProvider.noUserProperties ++ Map(
       Context.SECURITY_PRINCIPAL -> userInfo.toDN(user),
       Context.SECURITY_CREDENTIALS -> password
-    )).toProperties
+    )
+    val connectionProps = new util.Hashtable[String, String](map.asJava)
     Utils.resource(new InitialDirContext(connectionProps))(conn => {})
     user
   }

@@ -1,9 +1,10 @@
 package com.mle.auth.ldap
 
+import java.net.{InetAddress, Socket}
 import javax.net.SocketFactory
-import com.mle.util.security.{IKeystoreSettings, ClientKeystoreSettings, MultiKeyStoreManager}
-import java.net.{Socket, InetAddress}
 import javax.net.ssl.SSLSocketFactory
+
+import com.mle.security.{ClientKeystoreSettings, IKeystoreSettings, MultiKeyStoreManager}
 
 /**
  * A socket factory based on custom keystore settings.

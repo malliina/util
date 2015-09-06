@@ -2,7 +2,7 @@ package com.mle.auth.tests
 
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import com.mle.auth.{PasswordAuthenticator, UserManager}
-import com.mle.util.Util
+import com.mle.util.{Utils, Util}
 
 /**
  * Use dependsOn(utilAuthModule % "test->test") to include this in other modules' test classpaths.
@@ -25,10 +25,10 @@ abstract class UserManagementTests extends FunSuite with BeforeAndAfter {
   }
 
   def cleanup() {
-    Util optionally (manager removeUser testUser)
-    Util optionally (manager removeGroup testGroup)
-    Util optionally (manager removeGroup testGroup2)
-    Util optionally (manager removeGroup testGroup3)
+    Utils optionally (manager removeUser testUser)
+    Utils optionally (manager removeGroup testGroup)
+    Utils optionally (manager removeGroup testGroup2)
+    Utils optionally (manager removeGroup testGroup3)
   }
 
   test("server is reachable") {

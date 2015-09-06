@@ -6,4 +6,4 @@ import com.mle.jdbc.{StatementLogging, Database, DefaultSettings}
  *
  * @author mle
  */
-object TestDb extends Database(DefaultSettings.connProvider) with StatementLogging
+//object TestDb extends Database(DefaultSettings.connProvider) with StatementLogging
