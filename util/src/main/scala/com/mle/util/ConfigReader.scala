@@ -27,9 +27,7 @@ trait ConfigReader[T] {
    */
   def loadOpt: Option[T]
 
-  def userHomeConfPath: Path
-
-  def resourceCredential: String
+  def filePath: Option[Path]
 
   def fromMapOpt(map: Map[String, String]): Option[T]
 

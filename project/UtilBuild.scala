@@ -8,7 +8,7 @@ import sbt._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "2.0.0"
+  val releaseVersion = "2.0.1"
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, jdbc, rmi, auth)
@@ -28,7 +28,7 @@ object UtilBuild extends Build {
     gitUserName := "malliina",
     developerName := "Michael Skogberg",
     scalaVersion := "2.11.7",
-    crossScalaVersions := Seq(scalaVersion.value, "2.10.4"),
+    crossScalaVersions := Seq(scalaVersion.value, "2.10.6"),
     retrieveManaged := false,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail

@@ -1,9 +1,10 @@
 package com.mle.util
 
-import com.mle.exception.ResourceNotFoundException
+import java.io.FileNotFoundException
 import java.nio.file.Path
+
+import com.mle.exception.ResourceNotFoundException
 import com.mle.file.FileUtilities
-import com.mle.file.StorageFile
 
 /**
  *
@@ -35,9 +36,9 @@ trait BaseConfigReader[T] extends ConfigReader[T] {
 
   def fromResourceOpt(res: String) = Util propsOpt res flatMap fromMapOpt
 
-  def fromUserHomeOpt = fromPathOpt(userHomeConfPath)
+  def fromUserHomeOpt: Option[T] = filePath.flatMap(fromPathOpt)
 
-  def fromPathOpt(path: Path) = fromMapOpt(Util props path)
+  def fromPathOpt(path: Path): Option[T] = fromMapOpt(Util props path)
 
   def fromEnv = fromEnvOpt
     .getOrElse(throw new IllegalArgumentException("Unable to read credentials from environment variables"))
@@ -45,7 +46,7 @@ trait BaseConfigReader[T] extends ConfigReader[T] {
   def fromResource(res: String) = fromResourceOpt(res)
     .getOrElse(throw new IllegalArgumentException(s"Missing parameters in: $res"))
 
-  def fromUserHome = fromPath(userHomeConfPath)
+  def fromUserHome = filePath.map(fromPath).getOrElse(throw new FileNotFoundException)
 
   def fromPath(path: Path) = fromPathOpt(path)
     .getOrElse(throw new IllegalArgumentException(s"Unable to read credentials from path: ${path.toAbsolutePath}"))

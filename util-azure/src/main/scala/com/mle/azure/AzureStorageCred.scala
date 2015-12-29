@@ -12,7 +12,7 @@ case class AzureStorageCredential(accountName: String, accountKey: String)
 object AzureStorageCredentialReader extends AzureStorageCredentialReader
 
 trait AzureStorageCredentialReader extends BaseConfigReader[AzureStorageCredential] {
-  override def userHomeConfPath = userHome / "keys" / "azure-storage.sec"
+  override def filePath = userHome / "keys" / "azure-storage.sec"
 
   override def resourceCredential = "security/azure-storage.sec"
 
