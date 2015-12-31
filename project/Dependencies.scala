@@ -17,6 +17,6 @@ object Dependencies {
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.3.13"
   val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % "test"
   val azureApi = "com.microsoft.windowsazure" % "microsoft-windowsazure-api" % "0.4.6"
-  val utilBase = "com.github.malliina" %% "util-base" % "0.8.0"
+  val utilBase = "com.malliina" %% "util-base" % "0.9.0"
   val ningHttp = "com.ning" % "async-http-client" % "1.9.31"
 }

@@ -1,6 +1,6 @@
 package tests
 
-import com.mle.util.{Cryptor, Log}
+import com.malliina.util.{Cryptor, Log}
 import org.scalatest.FunSuite
 
 /**

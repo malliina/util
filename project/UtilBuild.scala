@@ -1,5 +1,5 @@
 import Dependencies._
-import com.mle.sbtutils.SbtUtils.{gitUserName, developerName}
+import com.malliina.sbtutils.SbtUtils.{gitUserName, developerName}
 import sbt.Keys._
 import sbt._
 
@@ -8,7 +8,7 @@ import sbt._
  */
 
 object UtilBuild extends Build {
-  val releaseVersion = "2.0.1"
+  val releaseVersion = "2.1.0"
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, jdbc, rmi, auth)
@@ -23,7 +23,7 @@ object UtilBuild extends Build {
   lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi)).dependsOn(util)
 
   val commonSettings = Seq(
-    organization := s"com.github.${gitUserName.value}",
+    organization := s"com.${gitUserName.value}",
     version := releaseVersion,
     gitUserName := "malliina",
     developerName := "Michael Skogberg",

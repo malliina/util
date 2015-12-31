@@ -2,9 +2,9 @@ package tests
 
 import java.nio.file.Paths
 
-import com.mle.azure.StorageClient
-import com.mle.file.StorageFile
-import com.mle.util.Util
+import com.malliina.azure.StorageClient
+import com.malliina.file.StorageFile
+import com.malliina.util.Util
 
 /**
  *

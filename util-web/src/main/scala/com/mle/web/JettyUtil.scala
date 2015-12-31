@@ -1,6 +1,6 @@
-package com.mle.web
+package com.malliina.web
 
-import com.mle.util.{Util, Log}
+import com.malliina.util.{Util, Log}
 import java.util.EnumSet
 import javax.servlet.{DispatcherType, Filter}
 import org.atmosphere.cache.HeaderBroadcasterCache
@@ -11,7 +11,7 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.nio.SelectChannelConnector
 import org.eclipse.jetty.servlet._
 import collection.JavaConversions._
-import com.mle.util.security.IKeystoreSettings
+import com.malliina.util.security.IKeystoreSettings
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.apache.wicket.protocol.http.{ContextParamWebApplicationFactory, WicketFilter, WebApplication}

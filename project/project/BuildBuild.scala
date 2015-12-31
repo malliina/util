@@ -12,19 +12,21 @@ object BuildBuild extends Build {
 
   // "build.sbt" goes here
   override lazy val settings = super.settings ++ Seq(
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.10.6",
     scalacOptions ++= Seq("-unchecked", "-deprecation"),
     resolvers ++= Seq(
       "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
       "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-      Resolver.url(
-        "bintray-sbt-plugin-releases",
-        url("http://dl.bintray.com/content/sbt/sbt-plugin-releases"))(
-          Resolver.ivyStylePatterns))
+      ivyResolver("bintray-sbt-plugin-releases", url("https://dl.bintray.com/content/sbt/sbt-plugin-releases")),
+      ivyResolver("malliina bintray sbt", url("https://dl.bintray.com/malliina/sbt-plugins/"))
+    )
   ) ++ plugins
 
+  def ivyResolver(name: String, repoUrl: sbt.URL) =
+    Resolver.url(name, repoUrl)(Resolver.ivyStylePatterns)
+
   def plugins = Seq(
-    "com.github.malliina" % "sbt-utils" % "0.1.0",
+    "com.malliina" % "sbt-utils" % "0.3.0",
     "me.lessis" % "bintray-sbt" % "0.3.0"
   ) map addSbtPlugin
 

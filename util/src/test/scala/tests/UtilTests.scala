@@ -1,6 +1,6 @@
 package tests
 
-import com.mle.util.Reflection
+import com.malliina.util.Reflection
 import org.scalatest.FunSuite
 
 /**
@@ -24,6 +24,7 @@ class UtilTests extends FunSuite {
     //    println(Reflection.objects(TestObj).mkString(", "))
     //    println(TestObj.name + ", " + TestObj.ocol.name)
   }
+
   test("lazy values") {
     var truth = false
     val f: Unit => Unit = u => {

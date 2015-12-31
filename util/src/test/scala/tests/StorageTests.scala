@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
  */
 class StorageTests extends FunSuite {
   test("storage units print correctly") {
-    import com.mle.storage._
+    import com.malliina.storage._
     val megs = 1024 * 5
     assert(5.gigs.toString === s"$megs megabytes")
     assert(124.megs.toString === "124 megabytes")

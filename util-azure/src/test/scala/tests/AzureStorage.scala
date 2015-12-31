@@ -7,7 +7,7 @@ import com.microsoft.windowsazure.services.blob.client.{BlobListingDetails, Blob
 import com.microsoft.windowsazure.services.core.storage.{MetricsLevel, OperationContext}
 import com.microsoft.windowsazure.services.table.client.TableQuery.QueryComparisons
 import com.microsoft.windowsazure.services.table.client.{TableConstants, TableQuery, TableServiceEntity}
-import com.mle.file.FileUtilities
+import com.malliina.file.FileUtilities
 import org.scalatest.FunSuite
 
 import scala.collection.JavaConversions._
