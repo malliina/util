@@ -3,12 +3,8 @@ import com.malliina.sbtutils.SbtUtils.{gitUserName, developerName}
 import sbt.Keys._
 import sbt._
 
-/**
- * @author Mle
- */
-
 object UtilBuild extends Build {
-  val releaseVersion = "2.1.0"
+  val releaseVersion = "2.3.0"
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, jdbc, rmi, auth)
@@ -20,11 +16,20 @@ object UtilBuild extends Build {
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
-  lazy val utilAzure = testableProject("util-azure", deps = Seq(azureApi)).dependsOn(util)
+  lazy val utilAzure = baseProject("util-azure", deps = Seq(azureApi))
+    .settings(azureSettings: _*)
+    .dependsOn(util)
 
-  val commonSettings = Seq(
+  val commonSettings = baseSettings ++ Seq(
+    version := releaseVersion
+  )
+
+  val azureSettings = baseSettings ++ Seq(
+    version := "2.2.3"
+  )
+
+  def baseSettings = Seq(
     organization := s"com.${gitUserName.value}",
-    version := releaseVersion,
     gitUserName := "malliina",
     developerName := "Michael Skogberg",
     scalaVersion := "2.11.7",
@@ -40,16 +45,19 @@ object UtilBuild extends Build {
       "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
       sbt.Resolver.jcenterRepo
     ),
-//      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
+    //      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
     scalacOptions ++= Seq("-Xlint", "-feature"),
     updateOptions := updateOptions.value.withCachedResolution(true),
     licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
   )
 
   def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
-    Project(id, file(id)).enablePlugins(bintray.BintrayPlugin).settings(
-      libraryDependencies ++= deps ++ Seq(scalaTest)
-    ).settings(commonSettings: _*)
+    baseProject(id, deps).settings(commonSettings: _*)
 
-  def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) = testableProject(id, deps).dependsOn(util)
+  def baseProject(id: String, deps: Seq[ModuleID]) =
+    Project(id, file(id)).enablePlugins(bintray.BintrayPlugin)
+      .settings(libraryDependencies ++= deps ++ Seq(scalaTest))
+
+  def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
+    testableProject(id, deps).dependsOn(util)
 }

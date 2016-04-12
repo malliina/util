@@ -1,16 +1,14 @@
 package com.malliina.azure
 
-import com.microsoft.windowsazure.services.blob.client.CloudBlobContainer
-import java.nio.file.{Files, Path}
-import com.malliina.util.Util
-import java.io.{FileOutputStream, FileInputStream}
-import scala.collection.JavaConversions._
+import java.io.{FileInputStream, FileOutputStream}
 import java.net.URI
+import java.nio.file.{Files, Path}
 
-/**
- *
- * @author mle
- */
+import com.malliina.util.Util
+import com.microsoft.windowsazure.services.blob.client.CloudBlobContainer
+
+import scala.collection.JavaConversions._
+
 class StorageContainer(val cont: CloudBlobContainer) {
   val name = cont.getName
 

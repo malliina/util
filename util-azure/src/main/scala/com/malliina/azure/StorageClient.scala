@@ -3,10 +3,6 @@ package com.malliina.azure
 import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount
 import scala.collection.JavaConversions._
 
-/**
- *
- * @author mle
- */
 class StorageClient(accountName: String, accountKey: String) {
   private val connectionString =
     "DefaultEndpointsProtocol=http;" +

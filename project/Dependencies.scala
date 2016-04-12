@@ -1,8 +1,5 @@
 import sbt._
 
-/**
- * @author Mle
- */
 object Dependencies {
   val scalaTest = "org.scalatest" %% "scalatest" % "2.2.5" % "test"
   val slf4j = "org.slf4j" % "slf4j-api" % "1.7.12"
@@ -17,6 +14,6 @@ object Dependencies {
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.3.13"
   val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % "2.3.13" % "test"
   val azureApi = "com.microsoft.windowsazure" % "microsoft-windowsazure-api" % "0.4.6"
-  val utilBase = "com.malliina" %% "util-base" % "0.9.0"
+  val utilBase = "com.malliina" %% "util-base" % "1.0.0"
   val ningHttp = "com.ning" % "async-http-client" % "1.9.31"
 }
