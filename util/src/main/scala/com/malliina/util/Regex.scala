@@ -2,10 +2,6 @@ package com.malliina.util
 
 import java.util.regex.Pattern
 
-/**
- *
- * @author mle
- */
 object Regex extends Log {
   /**
    * Matches the input against the regex. If the regex matches the input and contains one or more groups,

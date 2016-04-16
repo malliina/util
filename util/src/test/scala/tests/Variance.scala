@@ -2,13 +2,10 @@ package tests
 
 import org.scalatest.FunSuite
 
-/**
- * I want to demonstrate contravariance. Contravariance is best understood by looking at functions.
- *
- * Contravariance: "A => C" is a "B => C" if B is a A
- *
- * @author Michael
- */
+/** I want to demonstrate contravariance. Contravariance is best understood by looking at functions.
+  *
+  * Contravariance: "A => C" is a "B => C" if B is a A
+  */
 class Variance extends FunSuite {
 
   sealed trait Animal

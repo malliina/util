@@ -1,11 +1,9 @@
 package com.malliina.io
 
-import com.malliina.util.Log
+import com.malliina.io.LoggingList.log
+import org.slf4j.LoggerFactory
 
-/**
- * @author Michael
- */
-trait LoggingList[T] extends PersistentList[T] with Log {
+trait LoggingList[T] extends PersistentList[T] {
   abstract override def add(item: T): Boolean = {
     val added = super.add(item)
     if (added) {
@@ -21,4 +19,8 @@ trait LoggingList[T] extends PersistentList[T] with Log {
     }
     removed
   }
+}
+
+object LoggingList {
+  private val log = LoggerFactory.getLogger(getClass)
 }

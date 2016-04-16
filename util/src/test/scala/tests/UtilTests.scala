@@ -3,10 +3,6 @@ package tests
 import com.malliina.util.Reflection
 import org.scalatest.FunSuite
 
-/**
- *
- * @author mle
- */
 class UtilTests extends FunSuite {
   //  test("JSON map is identical after serialization-deserialization") {
   //    val json = JsonUtils.toJson("name" -> "Mle", "age" -> 28, "homes" -> List("Austria", "Helsinki", "Nigeria"))
@@ -15,6 +11,7 @@ class UtilTests extends FunSuite {
   //    val secondMap = JsonUtils.parseJson(jsonSerialized)
   //    assert(firstMap === secondMap)
   //  }
+
   test("random reflection") {
     assert(Reflection.className(TestObj) === "TestObj")
     val names = Reflection.names(TestObj)

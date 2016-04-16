@@ -6,9 +6,8 @@ import tests.Math.NumberLike
 import scala.concurrent.duration.{Duration, DurationInt, DurationLong}
 
 /**
- * @author Michael
- * @see http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html
- */
+  * @see http://danielwestheide.com/blog/2013/02/06/the-neophytes-guide-to-scala-part-12-type-classes.html
+  */
 class TypeClasses extends FunSuite {
   test("mean ints") {
     Statistics.mean(Vector(1, 2, 3))
@@ -31,4 +30,3 @@ class TypeClasses extends FunSuite {
     Statistics.mean(Vector[Duration](10.nanos, 34.nanos))
   }
 }
-

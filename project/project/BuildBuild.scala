@@ -1,13 +1,10 @@
 import sbt.Keys._
 import sbt._
 
-/**
- * Build definition of the build definition. I don't like build.sbt/plugins.sbt files.
- *
- * This replacement gives better IDE support and a more consistent approach to configuration.
- *
- * @author Mle
- */
+/** Build definition of the build definition. I don't like build.sbt/plugins.sbt files.
+  *
+  * This replacement gives better IDE support and a more consistent approach to configuration.
+  */
 object BuildBuild extends Build {
 
   // "build.sbt" goes here

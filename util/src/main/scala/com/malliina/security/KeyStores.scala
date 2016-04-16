@@ -7,10 +7,6 @@ import java.io.FileInputStream
 import com.malliina.exception.ConfigException
 import com.malliina.file.FileUtilities
 
-/**
- *
- * @author mle
- */
 trait KeyStores {
   val (keyStoreKey, keyStorePassKey, keyStoreTypeKey) =
     ("https.keyStore", "https.keyStorePassword", "https.keyStoreType")

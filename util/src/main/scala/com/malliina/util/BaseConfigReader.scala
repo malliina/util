@@ -7,24 +7,20 @@ import com.malliina.exception.ResourceNotFoundException
 import com.malliina.file.FileUtilities
 
 /**
- *
- * @author mle
- *
- * @tparam T type of credential
- */
+  * @tparam T type of credential
+  */
 trait BaseConfigReader[T] extends ConfigReader[T] {
   protected val userHome = FileUtilities.userHome
 
-  /**
-   * Attempts to read the config from the following locations, in this order:
-   *
-   * environment variables
-   * a resource file packaged with the app, or else a file at the same path
-   * a file under the user home dir
-   *
-   * @return credentials
-   * @throws ResourceNotFoundException if no config is found in any of the searched locations
-   */
+  /** Attempts to read the config from the following locations, in this order:
+    *
+    * environment variables
+    * a resource file packaged with the app, or else a file at the same path
+    * a file under the user home dir
+    *
+    * @return credentials
+    * @throws ResourceNotFoundException if no config is found in any of the searched locations
+    */
   def load = loadOpt
     .getOrElse(throw new ResourceNotFoundException("Unable to load config from environment, resource or user home path."))
 

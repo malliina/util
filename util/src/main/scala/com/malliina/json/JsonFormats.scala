@@ -6,14 +6,9 @@ import play.api.libs.json.{Format, JsResult, JsValue}
 
 import scala.concurrent.duration.{Duration, DurationLong}
 
-/**
-  *
-  * @author mle
-  */
 trait JsonFormats {
 
-  /**
-    * Serializes Duration to Long (seconds), deserializes Long to Duration.
+  /** Serializes Duration to Long (seconds), deserializes Long to Duration.
     */
   implicit object durationFormat extends Format[Duration] {
     def writes(o: Duration): JsValue = toJson(o.toSeconds)
@@ -29,8 +24,7 @@ trait JsonFormats {
       json.validate[Long].map(_.bytes)
   }
 
-  /**
-    * Json reader/writer. Writes toString and reads as specified by `f`.
+  /** Json reader/writer. Writes toString and reads as specified by `f`.
     *
     * @param reader maps a name to the type
     * @tparam T type of element

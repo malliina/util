@@ -4,9 +4,7 @@ import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
 import com.malliina.util.Log
 
-/**
- * Directory listing classes using Java 7 APIs.
- * @author Mle
+/** Directory listing classes using Java 7 APIs.
  */
 object FileVisitors {
   def build(srcDir: Path, recursive: Boolean = true, ageLimitHours: Option[Long] = None, sortByAge: Boolean = true) = {

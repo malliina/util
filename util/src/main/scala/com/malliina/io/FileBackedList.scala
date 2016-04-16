@@ -28,4 +28,6 @@ class FileBackedList[T](file: Path)(implicit val jsonFormat: Format[T]) extends 
     }
 }
 
-class FileBackedSet[T](file: Path)(implicit jsonFormat: Format[T]) extends FileBackedList[T](file) with Distinctness[T]
+class FileBackedSet[T](file: Path)(implicit jsonFormat: Format[T])
+  extends FileBackedList[T](file)
+    with Distinctness[T]

@@ -1,10 +1,7 @@
 package com.malliina.util
 
-/**
- * Hacks.
- *
- * @author mle
- */
+/** Hacks.
+  */
 object Reflection {
   def declaredFields(obj: AnyRef) = obj.getClass.getDeclaredFields
 

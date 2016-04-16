@@ -1,8 +1,5 @@
 package tests
 
-/**
- * @author Michael
- */
 object Statistics {
 
   import tests.Math.NumberLike

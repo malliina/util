@@ -2,10 +2,6 @@ package tests
 
 import org.scalatest.FunSuite
 
-/**
- *
- * @author mle
- */
 class StorageTests extends FunSuite {
   test("storage units print correctly") {
     import com.malliina.storage._

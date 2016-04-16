@@ -4,15 +4,14 @@ import sbt.Keys._
 import sbt._
 
 object UtilBuild extends Build {
-  val releaseVersion = "2.3.0"
+  val releaseVersion = "2.4.1"
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
-    .aggregate(util, actor, jdbc, rmi, auth)
+    .aggregate(util, actor, rmi, auth)
 
-  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ningHttp) ++ loggingDeps)
+  lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ahc) ++ loggingDeps)
   lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
   lazy val rmi = utilProject("util-rmi")
-  lazy val jdbc = utilProject("util-jdbc", deps = Seq(tomcatJdbc, boneCp, mysql))
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))

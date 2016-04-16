@@ -4,9 +4,6 @@ import java.nio.file.{Files, Path}
 
 import com.malliina.storage.{StorageLong, StorageSize}
 
-/**
-  * @author Michael
-  */
 package object file {
 
   implicit final class StorageFile(val file: Path) {

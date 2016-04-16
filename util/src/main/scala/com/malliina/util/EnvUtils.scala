@@ -1,9 +1,5 @@
 package com.malliina.util
 
-/**
- *
- * @author mle
- */
 trait EnvUtils {
 
   sealed class OS(val name: String) {

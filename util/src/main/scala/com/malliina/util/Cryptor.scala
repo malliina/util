@@ -4,9 +4,6 @@ import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import org.apache.commons.codec.binary.Hex
 
-/**
- * @author Michael
- */
 class Cryptor(hexKey: Array[Char]) {
   val algorithm = "AES"
   private val keySpec = new SecretKeySpec(Hex.decodeHex(hexKey), algorithm)

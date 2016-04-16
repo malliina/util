@@ -4,31 +4,30 @@ import java.io.Closeable
 import java.nio.charset.Charset
 
 import com.malliina.http.AsyncHttp._
-import com.ning.http.client.{AsyncCompletionHandler, AsyncHttpClient, Response}
-import com.ning.http.util.Base64
+import org.asynchttpclient._
+import org.asynchttpclient.util.Base64
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success, Try}
 
 /**
- * A Scala [[Future]]s-based HTTP client. Wraps ning's async http client.
- *
- * Usage:
- * ```
- * import com.malliina.http.AsyncHttp._
- * val response: Future[Response] = AsyncHttp.get("http://www.google.com")
- * ```
- *
- * @author mle
- */
+  * A Scala [[Future]]s-based HTTP client. Wraps ning's async http client.
+  *
+  * Usage:
+  * ```
+  * import com.malliina.http.AsyncHttp._
+  * val response: Future[Response] = AsyncHttp.get("http://www.google.com")
+  * ```
+  */
 object AsyncHttp {
-  type RequestBuilder = AsyncHttpClient#BoundRequestBuilder
-  val AUTHORIZATION = "Authorization"
-  val BASIC = "Basic"
-  val CONTENT_TYPE = "Content-Type"
-  val JSON = "application/json"
-  val WWW_FORM_URL_ENCODED = "application/x-www-form-urlencoded"
+  val Utf8 = "UTF-8"
+  val DefaultCharset = Try(Charset.forName(Utf8)) getOrElse Charset.defaultCharset()
+  val Authorization = "Authorization"
+  val Basic = "Basic"
+  val ContentType = "Content-Type"
+  val MimeTypeJson = "application/json"
+  val WwwFormUrlEncoded = "application/x-www-form-urlencoded"
 
   def get(url: String)(implicit ec: ExecutionContext): Future[Response] = withClient(_.get(url))
 
@@ -38,41 +37,41 @@ object AsyncHttp {
   def post(url: String, body: String, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[Response] =
     execute(_.post(url, body), headers)
 
-  def execute(f: AsyncHttp => RequestBuilder, headers: Map[String, String])(implicit ec: ExecutionContext): Future[Response] =
+  def execute(f: AsyncHttp => BoundRequestBuilder, headers: Map[String, String])(implicit ec: ExecutionContext): Future[Response] =
     withClient(c => {
       val builder = f(c)
       headers.foreach(p => builder.setHeader(p._1, p._2))
       builder
     })
 
-  private def withClient(f: AsyncHttp => RequestBuilder)(implicit ec: ExecutionContext): Future[Response] = {
+  private def withClient(f: AsyncHttp => BoundRequestBuilder)(implicit ec: ExecutionContext): Future[Response] = {
     val client = new AsyncHttp
     val response = f(client).run()
     response.onComplete(_ => client.close())
     response
   }
 
-  implicit class RichRequestBuilder(builder: RequestBuilder) {
-    def addQueryParameters(parameters: (String, String)*): RequestBuilder = {
+  implicit class RichRequestBuilder(builder: BoundRequestBuilder) {
+    def addQueryParameters(parameters: (String, String)*): BoundRequestBuilder = {
       parameters.foreach(pair => builder.addQueryParam(pair._1, pair._2))
       builder
     }
 
-    def addFormParameters(parameters: (String, String)*): RequestBuilder =
+    def addFormParameters(parameters: (String, String)*): BoundRequestBuilder =
       addParameters(parameters: _*)
 
-    def addParameters(parameters: (String, String)*): RequestBuilder = {
+    def addParameters(parameters: (String, String)*): BoundRequestBuilder = {
       parameters.foreach(pair => builder.addFormParam(pair._1, pair._2))
       builder
     }
 
     def basicAuthHeaderValue(username: String, password: String) = {
       val encodedCredentials = Base64.encode(s"$username:$password".getBytes)
-      s"$BASIC $encodedCredentials"
+      s"$Basic $encodedCredentials"
     }
 
-    def setBasicAuth(username: String, password: String): RequestBuilder = {
-      builder.setHeader(AUTHORIZATION, basicAuthHeaderValue(username, password))
+    def setBasicAuth(username: String, password: String): BoundRequestBuilder = {
+      builder.setHeader(Authorization, basicAuthHeaderValue(username, password))
     }
 
     def run(): Future[Response] = {
@@ -103,15 +102,15 @@ object AsyncHttp {
 }
 
 class AsyncHttp extends Closeable {
-  val client = new AsyncHttpClient()
+  val client = new DefaultAsyncHttpClient()
 
-  def get(url: String): RequestBuilder = client.prepareGet(url)
+  def get(url: String): BoundRequestBuilder = client.prepareGet(url)
 
-  def post(url: String, body: JsValue): RequestBuilder =
-    post(url, Json stringify body).setHeader(CONTENT_TYPE, JSON)
+  def post(url: String, body: JsValue): BoundRequestBuilder =
+    post(url, Json stringify body).setHeader(ContentType, MimeTypeJson)
 
-  def post(url: String, body: String, encoding: String = "UTF-8"): RequestBuilder =
-    client.preparePost(url).setBodyEncoding(encoding).setBody(body)
+  def post(url: String, body: String, charset: Charset = AsyncHttp.DefaultCharset): BoundRequestBuilder =
+    client.preparePost(url).setCharset(charset).setBody(body)
 
   def close() = client.close()
 }

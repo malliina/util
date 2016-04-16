@@ -1,8 +1,5 @@
 package tests
 
-/**
- * @author Michael
- */
 object Math {
 
   trait NumberLike[T] {

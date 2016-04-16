@@ -1,10 +1,6 @@
 package com.malliina.security
 
 
-/**
- *
- * @author mle
- */
 trait DevelKeystoreSettings extends IKeystoreSettings {
   val keystorePass = "eternal"
   val truststore = "conf/security/ca-cert.jks"
