@@ -3,7 +3,7 @@ import com.malliina.sbtutils.SbtUtils.{gitUserName, developerName}
 import sbt.Keys._
 import sbt._
 
-object UtilBuild extends Build {
+object UtilBuild {
   val releaseVersion = "2.4.1"
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
@@ -31,9 +31,8 @@ object UtilBuild extends Build {
     organization := s"com.${gitUserName.value}",
     gitUserName := "malliina",
     developerName := "Michael Skogberg",
-    scalaVersion := "2.11.7",
+    scalaVersion := "2.11.8",
     crossScalaVersions := Seq(scalaVersion.value, "2.10.6"),
-    retrieveManaged := false,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
@@ -45,16 +44,14 @@ object UtilBuild extends Build {
       sbt.Resolver.jcenterRepo
     ),
     //      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
-    scalacOptions ++= Seq("-Xlint", "-feature"),
-    updateOptions := updateOptions.value.withCachedResolution(true),
-    licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
+    scalacOptions ++= Seq("-Xlint", "-feature")
   )
 
   def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
     baseProject(id, deps).settings(commonSettings: _*)
 
   def baseProject(id: String, deps: Seq[ModuleID]) =
-    Project(id, file(id)).enablePlugins(bintray.BintrayPlugin)
+    Project(id, file(id))
       .settings(libraryDependencies ++= deps ++ Seq(scalaTest))
 
   def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
