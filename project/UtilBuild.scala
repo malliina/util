@@ -1,10 +1,11 @@
 import Dependencies._
-import com.malliina.sbtutils.SbtUtils.{gitUserName, developerName}
+import com.malliina.sbtutils.SbtUtils
+import com.malliina.sbtutils.SbtUtils.{developerName, gitUserName}
 import sbt.Keys._
 import sbt._
 
 object UtilBuild {
-  val releaseVersion = "2.4.1"
+  val releaseVersion = "2.5.0"
 
   lazy val parent = Project("parent", file("."), settings = commonSettings)
     .aggregate(util, actor, rmi, auth)
@@ -19,11 +20,14 @@ object UtilBuild {
     .settings(azureSettings: _*)
     .dependsOn(util)
 
-  val commonSettings = baseSettings ++ Seq(
+  lazy val mavenSettings = SbtUtils.mavenSettings ++ commonSettings
+
+  lazy val commonSettings = baseSettings ++ Seq(
     version := releaseVersion
   )
 
-  val azureSettings = baseSettings ++ Seq(
+
+  lazy val azureSettings = baseSettings ++ Seq(
     version := "2.2.3"
   )
 
@@ -32,23 +36,21 @@ object UtilBuild {
     gitUserName := "malliina",
     developerName := "Michael Skogberg",
     scalaVersion := "2.11.8",
-    crossScalaVersions := Seq(scalaVersion.value, "2.10.6"),
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
-    sbt.Keys.fork in Test := true,
-    exportJars := true,
+    fork in Test := true,
     resolvers ++= Seq(
       "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
       "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
-      sbt.Resolver.jcenterRepo
+      Resolver.jcenterRepo
     ),
     //      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
     scalacOptions ++= Seq("-Xlint", "-feature")
   )
 
   def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
-    baseProject(id, deps).settings(commonSettings: _*)
+    baseProject(id, deps).settings(mavenSettings: _*)
 
   def baseProject(id: String, deps: Seq[ModuleID]) =
     Project(id, file(id))
