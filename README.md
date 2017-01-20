@@ -1,3 +1,3 @@
 # util
 
-Utility code for Scala. Some binaries may be available as Sonatype snapshots or releases under com.malliina.
+Utility code for Scala. Binaries are available as Sonatype releases under com.malliina.
