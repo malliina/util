@@ -26,8 +26,8 @@ object UtilBuild {
     version := releaseVersion
   )
 
-  lazy val azureSettings = baseSettings ++ Seq(
-    version := "2.2.3"
+  lazy val azureSettings = SbtUtils.mavenSettings ++ baseSettings ++ Seq(
+    version := "2.5.0"
   )
 
   def baseSettings = Seq(
