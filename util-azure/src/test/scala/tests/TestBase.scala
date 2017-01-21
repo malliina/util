@@ -6,10 +6,6 @@ import com.malliina.azure.StorageClient
 import com.malliina.file.StorageFile
 import com.malliina.util.Util
 
-/**
- *
- * @author mle
- */
 trait TestBase {
   val userHome = Paths get sys.props("user.home")
   val credentialsFile = userHome / "keys" / "azure-storage.sec"

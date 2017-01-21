@@ -5,7 +5,7 @@ import java.net.URI
 import java.nio.file.{Files, Path}
 
 import com.malliina.util.Util
-import com.microsoft.windowsazure.services.blob.client.CloudBlobContainer
+import com.microsoft.azure.storage.blob.CloudBlobContainer
 
 import scala.collection.JavaConversions._
 
@@ -19,18 +19,17 @@ class StorageContainer(val cont: CloudBlobContainer) {
   def exists(blobName: String) =
     blobNamed(blobName).exists()
 
-  /**
-   * Uploads the file to this azure storage container.
-   *
-   * @param file file to upload
-   * @param destName remote file name
-   * @return URI to the uploaded file
-   */
+  /** Uploads the file to this azure storage container.
+    *
+    * @param file     file to upload
+    * @param destName remote file name
+    * @return URI to the uploaded file
+    */
   def upload(file: Path, destName: String): URI = {
     val blob = blobNamed(destName)
-    Util.using(new FileInputStream(file.toFile))(inStream => {
+    Util.using(new FileInputStream(file.toFile)) { inStream =>
       blob.upload(inStream, Files size file)
-    })
+    }
     blob.getUri
   }
 
@@ -39,9 +38,9 @@ class StorageContainer(val cont: CloudBlobContainer) {
 
   def download(blobName: String, destination: Path) {
     val blob = blobNamed(blobName)
-    Util.using(new FileOutputStream(destination.toFile))(stream => {
+    Util.using(new FileOutputStream(destination.toFile)) { stream =>
       blob.download(stream)
-    })
+    }
   }
 
   def delete(blobName: String) {

@@ -1,6 +1,7 @@
 package com.malliina.azure
 
-import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount
+import com.microsoft.azure.storage.CloudStorageAccount
+
 import scala.collection.JavaConversions._
 
 class StorageClient(accountName: String, accountKey: String) {

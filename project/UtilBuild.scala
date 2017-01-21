@@ -16,7 +16,7 @@ object UtilBuild {
     // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
     .dependsOn(auth % "compile->compile;test->test")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
-  lazy val utilAzure = baseProject("util-azure", deps = Seq(azureApi))
+  lazy val utilAzure = baseProject("util-azure", deps = Seq(azureStorage))
     .settings(azureSettings: _*)
     .dependsOn(util)
 
@@ -25,7 +25,6 @@ object UtilBuild {
   lazy val commonSettings = baseSettings ++ Seq(
     version := releaseVersion
   )
-
 
   lazy val azureSettings = baseSettings ++ Seq(
     version := "2.2.3"

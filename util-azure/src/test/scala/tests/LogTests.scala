@@ -2,10 +2,6 @@ package tests
 
 import org.scalatest.FunSuite
 
-/**
- *
- * @author mle
- */
 class LogTests extends FunSuite with TestBase {
   test("list log uris") {
     val client = newClient

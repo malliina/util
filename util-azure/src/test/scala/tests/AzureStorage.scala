@@ -3,26 +3,21 @@ package tests
 import java.nio.file.{Files, Paths}
 import java.util.EnumSet
 
-import com.microsoft.windowsazure.services.blob.client.{BlobListingDetails, BlobRequestOptions}
-import com.microsoft.windowsazure.services.core.storage.{MetricsLevel, OperationContext}
-import com.microsoft.windowsazure.services.table.client.TableQuery.QueryComparisons
-import com.microsoft.windowsazure.services.table.client.{TableConstants, TableQuery, TableServiceEntity}
 import com.malliina.file.FileUtilities
+import com.microsoft.azure.storage.OperationContext
+import com.microsoft.azure.storage.blob.{BlobListingDetails, BlobRequestOptions}
+import com.microsoft.azure.storage.table.TableServiceEntity
 import org.scalatest.FunSuite
 
-import scala.collection.JavaConversions._
-
-/**
- * Needs a credentials file in userHome/keys/azure-storage.sec
- * with keys account_name and account key, and a container in Azure named "files".
- *
- * @author mle
- */
+/** Needs a credentials file in userHome/keys/azure-storage.sec
+  * with keys account_name and account key, and a container in Azure named "files".
+  */
 class AzureStorage extends FunSuite with TestBase {
   test("can read from storage") {
     val uris = newClient uris "files"
     uris foreach println
   }
+
   test("can upload, download and delete file") {
     val testFileName = "azuretest.txt"
     val testDownloadFile = "dl-" + testFileName
@@ -42,6 +37,7 @@ class AzureStorage extends FunSuite with TestBase {
     assert(!cont.exists(testFileName))
     Files delete testFile
   }
+
   test("read logs") {
     val client = newClient
     val conts = client.containers
@@ -53,6 +49,7 @@ class AzureStorage extends FunSuite with TestBase {
     //      blobs.map(_.getUri) foreach println
     // http://pimp.blob.core.windows.net/$logs/blob/2013/05/22/1400/000000.log
   }
+
   test("log exists") {
     val logFile = "blob/2013/05/22/1400/000000.log"
     val client = newClient
@@ -60,6 +57,7 @@ class AzureStorage extends FunSuite with TestBase {
     assert(logCont.cont.exists())
     assert(logCont exists logFile)
   }
+
   test("download log") {
     val logFile = "blob/2013/05/22/1400/000000.log"
     val client = newClient
@@ -71,21 +69,21 @@ class AzureStorage extends FunSuite with TestBase {
   }
 
   test("list tables") {
-//    val client = newClient
-//    println(s"Tables: ${client.tables.size}")
-//    assert(client.blobClient.downloadServiceProperties().getMetrics.getMetricsLevel === MetricsLevel.SERVICE)
-//    client.tables foreach println
-//    val tableClient = client.tableClient
-//    val tableName = "$MetricsHourPrimaryTransactionsBlob"
-//    val table = tableClient.getTableReference(tableName)
-//    assert(table.exists(), "Table must exist")
-//    val query = TableQuery.from(tableName, classOf[TestEntity])
-//    val filter1 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.GREATER_THAN, "20140308T0800")
-//    val filter2 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.LESS_THAN, "20140408T0800")
-//    val filteredQuery = query.where(filter1).where(filter2)
-//    val entities = tableClient.execute(filteredQuery)
-////    println(s"Got ${entities.size} entities")
-//    entities.foreach(entity => println(entity.getTotalRequests))
+    //    val client = newClient
+    //    println(s"Tables: ${client.tables.size}")
+    //    assert(client.blobClient.downloadServiceProperties().getMetrics.getMetricsLevel === MetricsLevel.SERVICE)
+    //    client.tables foreach println
+    //    val tableClient = client.tableClient
+    //    val tableName = "$MetricsHourPrimaryTransactionsBlob"
+    //    val table = tableClient.getTableReference(tableName)
+    //    assert(table.exists(), "Table must exist")
+    //    val query = TableQuery.from(tableName, classOf[TestEntity])
+    //    val filter1 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.GREATER_THAN, "20140308T0800")
+    //    val filter2 = TableQuery.generateFilterCondition(TableConstants.PARTITION_KEY, QueryComparisons.LESS_THAN, "20140408T0800")
+    //    val filteredQuery = query.where(filter1).where(filter2)
+    //    val entities = tableClient.execute(filteredQuery)
+    ////    println(s"Got ${entities.size} entities")
+    //    entities.foreach(entity => println(entity.getTotalRequests))
   }
 
 

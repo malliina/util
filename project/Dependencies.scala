@@ -10,7 +10,7 @@ object Dependencies {
   val commonsCodec = "commons-codec" % "commons-codec" % "1.10"
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.4.16"
   val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % "2.4.16" % Test
-  val azureApi = "com.microsoft.windowsazure" % "microsoft-windowsazure-api" % "0.4.6"
+  val azureStorage = "com.microsoft.azure" % "azure-storage" % "5.0.0"
   val utilBase = "com.malliina" %% "util-base" % "1.0.1"
   val ahc = "org.asynchttpclient" % "async-http-client" % "2.0.26"
 }
