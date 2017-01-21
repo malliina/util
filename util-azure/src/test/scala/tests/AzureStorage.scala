@@ -15,7 +15,7 @@ import org.scalatest.FunSuite
 class AzureStorage extends FunSuite with TestBase {
   test("can read from storage") {
     val uris = newClient uris "files"
-    uris foreach println
+    assert(uris.isSuccess)
   }
 
   test("can upload, download and delete file") {
@@ -25,24 +25,24 @@ class AzureStorage extends FunSuite with TestBase {
     val testContent = "Hello, there!"
     val testFile = FileUtilities.writerTo(testFileName)(_.println(testContent))
     val client = newClient
-    val cont = client container containerName
-    val uri = cont upload testFile
-    assert(cont.exists(testFileName))
+    val cont = (client container containerName).get
+    cont upload testFile
+    assert(cont.exists(testFileName).get)
     //    println("Test file: " + testFileName + " uploaded to: " + uri)
     cont.download(testFileName, downloadDest)
     val firstLine = FileUtilities.readerFrom(downloadDest)(_.next())
     assert(firstLine === testContent)
     Files.deleteIfExists(downloadDest)
     cont delete testFileName
-    assert(!cont.exists(testFileName))
+    assert(!cont.exists(testFileName).get)
     Files delete testFile
   }
 
-  test("read logs") {
+  ignore("read logs") {
     val client = newClient
     val conts = client.containers
     //    conts.map(_.name) foreach println
-    val logCont = client container "$logs"
+    val logCont = (client container "$logs").get
     assert(logCont.cont.exists())
     val blobs = logCont.cont.listBlobs("blob", true, EnumSet.noneOf(classOf[BlobListingDetails]), new BlobRequestOptions, new OperationContext)
     //    logCont.download()
@@ -50,25 +50,25 @@ class AzureStorage extends FunSuite with TestBase {
     // http://pimp.blob.core.windows.net/$logs/blob/2013/05/22/1400/000000.log
   }
 
-  test("log exists") {
+  ignore("log exists") {
     val logFile = "blob/2013/05/22/1400/000000.log"
     val client = newClient
-    val logCont = client container "$logs"
+    val logCont = (client container "$logs").get
     assert(logCont.cont.exists())
-    assert(logCont exists logFile)
+    assert((logCont exists logFile).get)
   }
 
-  test("download log") {
+  ignore("download log") {
     val logFile = "blob/2013/05/22/1400/000000.log"
     val client = newClient
-    val logCont = client container "$logs"
+    val logCont = (client container "$logs").get
     val dest = Paths get "dl-log.log"
     logCont.download(logFile, dest)
     val file = FileUtilities.readerFrom(dest)(_.toList)
     file foreach println
   }
 
-  test("list tables") {
+  ignore("list tables") {
     //    val client = newClient
     //    println(s"Tables: ${client.tables.size}")
     //    assert(client.blobClient.downloadServiceProperties().getMetrics.getMetricsLevel === MetricsLevel.SERVICE)

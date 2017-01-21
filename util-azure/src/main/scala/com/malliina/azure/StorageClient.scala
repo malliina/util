@@ -3,10 +3,11 @@ package com.malliina.azure
 import com.microsoft.azure.storage.CloudStorageAccount
 
 import scala.collection.JavaConversions._
+import scala.util.Try
 
 class StorageClient(accountName: String, accountKey: String) {
   private val connectionString =
-    "DefaultEndpointsProtocol=http;" +
+    "DefaultEndpointsProtocol=https;" +
       "AccountName=" + accountName + ";" +
       "AccountKey=" + accountKey
   private val logContainerName = "$logs"
@@ -16,22 +17,23 @@ class StorageClient(accountName: String, accountKey: String) {
 
   // Blob client operations
   def uris(containerName: String) =
-    container(containerName).uris
+    container(containerName).map(_.uris)
 
   def containers =
     blobClient.listContainers().map(new StorageContainer(_))
 
   def container(name: String) =
-    new StorageContainer(cloudContainer(name))
+    cloudContainer(name).map(new StorageContainer(_))
 
   def logContainer =
-    new LogStorageContainer(cloudContainer(logContainerName))
+    cloudContainer(logContainerName).map(new LogStorageContainer(_))
 
-  private def cloudContainer(name: String) = {
+  private def cloudContainer(name: String) = Try {
     blobClient getContainerReference name
   }
 
   // Table client
   def tables = tableClient.listTables()
-//  blobClient.get
+
+  //  blobClient.get
 }
