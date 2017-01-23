@@ -5,9 +5,7 @@ import sbt.Keys._
 import sbt._
 
 object UtilBuild {
-  val releaseVersion = "2.5.0"
-
-  lazy val parent = Project("parent", file("."), settings = commonSettings)
+  lazy val parent = Project("parent", file("."), settings = baseSettings)
     .aggregate(util, actor, rmi, auth)
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ahc) ++ loggingDeps)
@@ -17,18 +15,10 @@ object UtilBuild {
     .dependsOn(auth % "compile->compile;test->test")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
   lazy val utilAzure = baseProject("util-azure", deps = Seq(azureStorage))
-    .settings(azureSettings: _*)
+    .settings(mavenSettings: _*)
     .dependsOn(util)
 
-  lazy val mavenSettings = SbtUtils.mavenSettings ++ commonSettings
-
-  lazy val commonSettings = baseSettings ++ Seq(
-    version := releaseVersion
-  )
-
-  lazy val azureSettings = SbtUtils.mavenSettings ++ baseSettings ++ Seq(
-    version := "2.5.0"
-  )
+  lazy val mavenSettings = SbtUtils.mavenSettings ++ baseSettings
 
   def baseSettings = Seq(
     organization := s"com.${gitUserName.value}",
@@ -44,9 +34,11 @@ object UtilBuild {
       "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
       Resolver.jcenterRepo
     ),
-    //      "Bintray malliina" at "http://dl.bintray.com/malliina/maven"),
     scalacOptions ++= Seq("-Xlint", "-feature")
   )
+
+  def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
+    testableProject(id, deps).dependsOn(util)
 
   def testableProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
     baseProject(id, deps).settings(mavenSettings: _*)
@@ -54,7 +46,4 @@ object UtilBuild {
   def baseProject(id: String, deps: Seq[ModuleID]) =
     Project(id, file(id))
       .settings(libraryDependencies ++= deps ++ Seq(scalaTest))
-
-  def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
-    testableProject(id, deps).dependsOn(util)
 }
