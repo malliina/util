@@ -4,19 +4,15 @@ import java.net.InetAddress
 import javax.net.ssl.{SSLContext, SSLServerSocket}
 import javax.rmi.ssl.SslRMIServerSocketFactory
 
-/**
- * To use specific keystores/truststores, provide your own [[javax.net.ssl.SSLContext]] initialized with the stores.
- *
- * @author Mle
- */
+/** To use specific keystores/truststores, provide your own [[javax.net.ssl.SSLContext]] initialized with the stores.
+  */
 class PickyServerSocketFactory(listenAddress: String = "127.0.0.1", clientAuth: Boolean = true, context: SSLContext)
   extends SslRMIServerSocketFactory(context, null, null, clientAuth) {
-  /**
-   * Overridden to force the server socket address to the one given in the class of this constructor.
-   *
-   * @param port listen port
-   * @return a socket
-   */
+  /** Overridden to force the server socket address to the one given in the class of this constructor.
+    *
+    * @param port listen port
+    * @return a socket
+    */
   override def createServerSocket(port: Int) = {
     val factory = context.getServerSocketFactory
     // SSLServerSocketFactory.getDefault.asInstanceOf[SSLServerSocketFactory]

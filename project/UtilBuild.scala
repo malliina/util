@@ -11,8 +11,6 @@ object UtilBuild {
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ahc) ++ loggingDeps)
   lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
   lazy val rmi = utilProject("util-rmi")
-    // Kids, watch and learn. auth % "test->test" means this module's tests depend on tests in module auth
-    .dependsOn(auth % "compile->compile;test->test")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
   lazy val utilAzure = baseProject("util-azure", deps = Seq(azureStorage))
     .settings(mavenSettings: _*)

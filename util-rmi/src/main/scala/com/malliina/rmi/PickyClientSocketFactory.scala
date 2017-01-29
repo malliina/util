@@ -2,9 +2,6 @@ package com.malliina.rmi
 
 import javax.rmi.ssl.SslRMIClientSocketFactory
 
-/**
- * @author Mle
- */
 class PickyClientSocketFactory(ip: String) extends SslRMIClientSocketFactory {
   def this() = this("127.0.0.1")
 

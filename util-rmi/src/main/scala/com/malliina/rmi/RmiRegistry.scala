@@ -5,9 +5,6 @@ import java.rmi.registry.LocateRegistry
 import java.rmi.Remote
 import javax.net.ssl.SSLContext
 
-/**
- * @author Mle
- */
 object RmiRegistry extends Log {
   val DEFAULT_PORT = 2666
 

@@ -3,12 +3,9 @@ package com.malliina.rmi
 import com.malliina.security.{KeystoreSettings, MultiKeyStoreManager}
 import com.malliina.util.Util
 
-/**
- * The security policy and/or the [[java.lang.SecurityManager]]
- * must be installed BEFORE logback is used.
- *
- * @author Mle
- */
+/** The security policy and/or the [[java.lang.SecurityManager]]
+  * must be installed BEFORE logback is used.
+  */
 object RmiUtil {
   val keystore = "security/develkeys/keystore.key"
   val keySettings = KeystoreSettings(keystore, "changeme", keystore, "changeme")

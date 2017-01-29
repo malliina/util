@@ -1,16 +1,14 @@
 package com.malliina.rmi
 
-import com.malliina.util.Log
-import java.rmi.server.UnicastRemoteObject
 import java.io.Closeable
 import java.rmi.NoSuchObjectException
-import com.malliina.security.{MultiKeyStoreManager, IKeystoreSettings}
+import java.rmi.server.UnicastRemoteObject
 
-/**
- * Create a keystore with: keytool -genkey -alias rmi -keyalg RSA -validity 9999 -keystore keystore.key
- *
- * @author Mle
- */
+import com.malliina.security.{IKeystoreSettings, MultiKeyStoreManager}
+import com.malliina.util.Log
+
+/** Create a keystore with: keytool -genkey -alias rmi -keyalg RSA -validity 9999 -keystore keystore.key
+  */
 class RmiServer(registryPort: Int = RmiRegistry.DEFAULT_PORT,
                 keySettings: IKeystoreSettings = RmiUtil.keySettings)
   extends Closeable with Log {
@@ -29,7 +27,7 @@ class RmiServer(registryPort: Int = RmiRegistry.DEFAULT_PORT,
     new PickyServerSocketFactory(context = sslContext)
   ).asInstanceOf[RmiInterface]
 
-  def close() {
+  def close(): Unit = {
     UnicastRemoteObject.unexportObject(registry, true)
     try {
       UnicastRemoteObject.unexportObject(remoteObject, true)
@@ -41,7 +39,7 @@ class RmiServer(registryPort: Int = RmiRegistry.DEFAULT_PORT,
     log info "The RMI server has shut down"
   }
 
-  def onClosed() {}
+  def onClosed(): Unit = {}
 }
 
 object RmiServer {
