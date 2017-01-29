@@ -5,7 +5,7 @@ import sbt.Keys._
 import sbt._
 
 object UtilBuild {
-  lazy val parent = Project("parent", file("."), settings = baseSettings)
+  lazy val parent = Project("parent", file("."), settings = rootSettings)
     .aggregate(util, actor, rmi, auth)
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ahc) ++ loggingDeps)
@@ -31,6 +31,10 @@ object UtilBuild {
       Resolver.jcenterRepo
     ),
     scalacOptions ++= Seq("-Xlint", "-feature")
+  )
+
+  def rootSettings = baseSettings ++ Seq(
+    publishArtifact := false
   )
 
   def utilProject(id: String, deps: Seq[ModuleID] = Seq.empty) =
