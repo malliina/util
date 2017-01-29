@@ -12,9 +12,7 @@ object UtilBuild {
   lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
   lazy val rmi = utilProject("util-rmi")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
-  lazy val utilAzure = baseProject("util-azure", deps = Seq(azureStorage))
-    .settings(mavenSettings: _*)
-    .dependsOn(util)
+  lazy val utilAzure = utilProject("util-azure", deps = Seq(azureStorage))
 
   lazy val mavenSettings = SbtUtils.mavenSettings ++ baseSettings
 
