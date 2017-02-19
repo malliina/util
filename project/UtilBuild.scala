@@ -3,6 +3,7 @@ import com.malliina.sbtutils.SbtUtils
 import com.malliina.sbtutils.SbtUtils.{developerName, gitUserName}
 import sbt.Keys._
 import sbt._
+import sbtrelease.ReleasePlugin.autoImport.releaseCrossBuild
 
 object UtilBuild {
   lazy val parent = Project("parent", file("."), settings = rootSettings)
@@ -21,6 +22,8 @@ object UtilBuild {
     gitUserName := "malliina",
     developerName := "Michael Skogberg",
     scalaVersion := "2.11.8",
+    crossScalaVersions := Seq("2.10.6", scalaVersion.value),
+    releaseCrossBuild := true,
     // system properties seem to have no effect in tests,
     // causing e.g. tests requiring javax.net.ssl.keyStore props to fail
     // ... unless fork is true
