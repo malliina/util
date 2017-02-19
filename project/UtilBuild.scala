@@ -10,7 +10,8 @@ object UtilBuild {
     .aggregate(util, actor, rmi, auth)
 
   lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ahc) ++ loggingDeps)
-  lazy val actor = utilProject("util-actor", deps = Seq(akkaActor, akkaTestKit))
+  lazy val actor = utilProject("util-actor")
+    .settings(extraActorSettings)
   lazy val rmi = utilProject("util-rmi")
   lazy val auth = utilProject("util-auth", deps = Seq(commonsCodec))
   lazy val utilAzure = utilProject("util-azure", deps = Seq(azureStorage))
@@ -36,6 +37,19 @@ object UtilBuild {
     scalacOptions ++= Seq("-Xlint", "-feature")
   )
 
+  def extraActorSettings = Seq(
+    libraryDependencies ++= {
+      val actorVersion = CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, minor)) if minor >= 11 => "2.4.17"
+        case _ => "2.3.16"
+      }
+      Seq(
+        "com.typesafe.akka" %% "akka-actor" % actorVersion,
+        "com.typesafe.akka" %% "akka-testkit" % actorVersion % Test
+      )
+    }
+  )
+
   def rootSettings = baseSettings ++ Seq(
     publishArtifact := false
   )
@@ -49,4 +63,19 @@ object UtilBuild {
   def baseProject(id: String, deps: Seq[ModuleID]) =
     Project(id, file(id))
       .settings(libraryDependencies ++= deps ++ Seq(scalaTest))
+}
+
+object Dependencies {
+  val scalaTest = "org.scalatest" %% "scalatest" % "2.2.6" % Test
+  val slf4j = "org.slf4j" % "slf4j-api" % "1.7.23"
+  val logBackClassic = "ch.qos.logback" % "logback-classic" % "1.2.1"
+  val logBackCore = "ch.qos.logback" % "logback-core" % "1.2.1"
+  val loggingDeps = Seq(slf4j, logBackClassic, logBackCore)
+  val commonsIO = "commons-io" % "commons-io" % "2.4"
+  val commonsCodec = "commons-codec" % "commons-codec" % "1.10"
+  val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.4.17"
+  val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % "2.4.17" % Test
+  val azureStorage = "com.microsoft.azure" % "azure-storage" % "5.0.0"
+  val utilBase = "com.malliina" %% "util-base" % "1.0.4"
+  val ahc = "org.asynchttpclient" % "async-http-client" % "2.0.29"
 }
