@@ -7,12 +7,8 @@ import akka.util.Timeout
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuiteLike}
 
 import scala.concurrent._
-import scala.concurrent.duration._
+import scala.concurrent.duration.DurationInt
 
-/**
- *
- * @author mle
- */
 class ActorTest extends TestKit(ActorSystem("test-system")) with FunSuiteLike with ImplicitSender with BeforeAndAfter with BeforeAndAfterAll {
   implicit val timeout = Timeout(100.days)
   val testMessage = "Hello, world"
