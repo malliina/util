@@ -2,24 +2,20 @@ package com.malliina.http
 
 import java.io.Closeable
 import java.nio.charset.Charset
+import java.util.Base64
 
-import com.malliina.http.AsyncHttp._
-import org.asynchttpclient._
-import org.asynchttpclient.util.Base64
+import com.malliina.http.AsyncHttp.PromisingHandler
+import org.apache.http.client.methods.{HttpGet, HttpUriRequest, RequestBuilder}
+import org.apache.http.concurrent.FutureCallback
+import org.apache.http.entity.{ContentType, StringEntity}
+import org.apache.http.impl.nio.client.HttpAsyncClients
+import org.apache.http.util.EntityUtils
+import org.apache.http.{HttpEntity, HttpResponse}
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
-/**
-  * A Scala [[Future]]s-based HTTP client. Wraps ning's async http client.
-  *
-  * Usage:
-  * ```
-  * import com.malliina.http.AsyncHttp._
-  * val response: Future[Response] = AsyncHttp.get("http://www.google.com")
-  * ```
-  */
 object AsyncHttp {
   val Utf8 = "UTF-8"
   val DefaultCharset = Try(Charset.forName(Utf8)) getOrElse Charset.defaultCharset()
@@ -29,88 +25,85 @@ object AsyncHttp {
   val MimeTypeJson = "application/json"
   val WwwFormUrlEncoded = "application/x-www-form-urlencoded"
 
-  def get(url: String)(implicit ec: ExecutionContext): Future[Response] = withClient(_.get(url))
+  def get(url: String)(implicit ec: ExecutionContext): Future[HttpResponse] =
+    withClient(_.get(url))
 
-  def postJson(url: String, body: JsValue, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[Response] =
-    execute(_.post(url, body), headers)
+  def postJson(url: String, body: JsValue, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[HttpResponse] =
+    withClient(_.post(url, body, headers))
 
-  def post(url: String, body: String, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[Response] =
-    execute(_.post(url, body), headers)
+  def post(url: String, body: String, contentType: ContentType, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[HttpResponse] =
+    withClient(_.postAny(url, body, contentType, headers))
 
-  def execute(f: AsyncHttp => BoundRequestBuilder, headers: Map[String, String])(implicit ec: ExecutionContext): Future[Response] =
-    withClient(c => {
-      val builder = f(c)
-      headers.foreach(p => builder.setHeader(p._1, p._2))
-      builder
-    })
-
-  private def withClient(f: AsyncHttp => BoundRequestBuilder)(implicit ec: ExecutionContext): Future[Response] = {
+  def withClient(run: AsyncHttp => Future[HttpResponse])(implicit ec: ExecutionContext) = {
     val client = new AsyncHttp
-    val response = f(client).run()
+    val response = run(client)
     response.onComplete(_ => client.close())
     response
   }
 
-  implicit class RichRequestBuilder(builder: BoundRequestBuilder) {
-    def addQueryParameters(parameters: (String, String)*): BoundRequestBuilder = {
-      parameters.foreach(pair => builder.addQueryParam(pair._1, pair._2))
-      builder
-    }
+  private class PromisingHandler(url: String) extends FutureCallback[HttpResponse] {
+    val promise = Promise[HttpResponse]()
 
-    def addFormParameters(parameters: (String, String)*): BoundRequestBuilder =
-      addParameters(parameters: _*)
+    override def failed(ex: Exception): Unit =
+      promise.failure(ex)
 
-    def addParameters(parameters: (String, String)*): BoundRequestBuilder = {
-      parameters.foreach(pair => builder.addFormParam(pair._1, pair._2))
-      builder
-    }
+    override def completed(result: HttpResponse): Unit =
+      promise.success(result)
 
-    def basicAuthHeaderValue(username: String, password: String) = {
-      val encodedCredentials = Base64.encode(s"$username:$password".getBytes)
-      s"$Basic $encodedCredentials"
-    }
-
-    def setBasicAuth(username: String, password: String): BoundRequestBuilder = {
-      builder.setHeader(Authorization, basicAuthHeaderValue(username, password))
-    }
-
-    def run(): Future[Response] = {
-      val handler = new PromisingHandler
-      Try(builder execute handler) match {
-        case Success(_) => handler.future
-        case Failure(t) => Future.failed[Response](t)
-      }
-    }
+    override def cancelled(): Unit =
+      promise.failure(new Exception(s"HTTP request to '$url' cancelled."))
   }
 
-  private class PromisingHandler extends AsyncCompletionHandler[Response] {
-    private val promise = Promise[Response]()
+  implicit class RichRequestBuilder(req: HttpUriRequest) {
+    def setBasicAuth(username: String, password: String): Unit =
+      req.setHeader(Authorization, basicAuthHeaderValue(username, password))
 
-    override def onCompleted(response: Response): Response = {
-      promise success response
-      response
+    def basicAuthHeaderValue(username: String, password: String) = {
+      val encodedCredentials = Base64.getEncoder.encodeToString(s"$username:$password".getBytes)
+      s"$Basic $encodedCredentials"
     }
-
-    override def onThrowable(t: Throwable): Unit = {
-      promise failure t
-      super.onThrowable(t)
-    }
-
-    def future = promise.future
   }
 
 }
 
-class AsyncHttp extends Closeable {
-  val client = new DefaultAsyncHttpClient()
+class AsyncHttp()(implicit ec: ExecutionContext) extends Closeable {
+  val client = HttpAsyncClients.createDefault()
 
-  def get(url: String): BoundRequestBuilder = client.prepareGet(url)
+  def get(url: String): Future[HttpResponse] =
+    execute(new HttpGet(url))
 
-  def post(url: String, body: JsValue): BoundRequestBuilder =
-    post(url, Json stringify body).setHeader(ContentType, MimeTypeJson)
+  def post(url: String, body: JsValue, headers: Map[String, String] = Map.empty): Future[HttpResponse] = {
+    val entity = new StringEntity(Json.stringify(body), ContentType.APPLICATION_JSON)
+    postEntity(url, entity, headers)
+  }
 
-  def post(url: String, body: String, charset: Charset = AsyncHttp.DefaultCharset): BoundRequestBuilder =
-    client.preparePost(url).setCharset(charset).setBody(body)
+  def postAny(url: String, body: String, contentType: ContentType, headers: Map[String, String] = Map.empty): Future[HttpResponse] = {
+    val entity = new StringEntity(body, contentType)
+    postEntity(url, entity, headers)
+  }
 
-  def close() = client.close()
+  def postEntity(url: String,
+                 entity: HttpEntity,
+                 headers: Map[String, String] = Map.empty,
+                 params: Map[String, String] = Map.empty): Future[HttpResponse] = {
+    val builder = RequestBuilder.post(url)
+    builder setEntity entity
+    headers foreach { case (key, value) => builder.addHeader(key, value) }
+    params foreach { case (key, value) => builder.addParameter(key, value) }
+    execute(builder.build())
+  }
+
+  def execute(req: HttpUriRequest): Future[HttpResponse] =
+    startExecute(req).map { r =>
+      Option(r.getEntity).foreach(EntityUtils.consume)
+      r
+    }
+
+  def startExecute(req: HttpUriRequest): Future[HttpResponse] = {
+    val handler = new PromisingHandler(req.getURI.toString)
+    client.execute(req, handler)
+    handler.promise.future
+  }
+
+  def close(): Unit = client.close()
 }

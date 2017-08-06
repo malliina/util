@@ -12,12 +12,12 @@ val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.4.17"
 val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % "2.4.17" % Test
 val azureStorage = "com.microsoft.azure" % "azure-storage" % "5.0.0"
 val utilBase = "com.malliina" %% "util-base" % "1.1.5"
-val ahc = "org.asynchttpclient" % "async-http-client" % "2.0.33"
+val httpClient = "org.apache.httpcomponents" % "httpasyncclient" % "4.1.3"
 
 lazy val parent = Project("parent", file("."), settings = rootSettings)
   .aggregate(util, actor, rmi)
 
-lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, ahc) ++ loggingDeps)
+lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, httpClient) ++ loggingDeps)
 lazy val actor = utilProject("util-actor")
   .settings(extraActorSettings)
 lazy val rmi = utilProject("util-rmi")
@@ -29,7 +29,7 @@ def baseSettings = Seq(
   organization := s"com.${gitUserName.value}",
   gitUserName := "malliina",
   developerName := "Michael Skogberg",
-  scalaVersion := "2.12.2",
+  scalaVersion := "2.12.3",
   crossScalaVersions := Seq("2.10.6", "2.11.11", scalaVersion.value),
   releaseCrossBuild := true,
   // system properties seem to have no effect in tests,
