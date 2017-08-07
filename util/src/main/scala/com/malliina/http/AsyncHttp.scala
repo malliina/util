@@ -68,6 +68,7 @@ object AsyncHttp {
 
 class AsyncHttp()(implicit ec: ExecutionContext) extends Closeable {
   val client = HttpAsyncClients.createDefault()
+  client.start()
 
   def get(url: String): Future[HttpResponse] =
     execute(new HttpGet(url))
