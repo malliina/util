@@ -4,12 +4,11 @@ import java.io.Closeable
 import java.nio.charset.Charset
 import java.util.Base64
 
-import com.malliina.http.AsyncHttp.PromisingHandler
+import com.malliina.http.AsyncHttp.{ContentTypeHeaderName, PromisingHandler, RichRequestBuilder, WwwFormUrlEncoded}
 import org.apache.http.client.methods.{HttpGet, HttpUriRequest, RequestBuilder}
 import org.apache.http.concurrent.FutureCallback
 import org.apache.http.entity.{ContentType, StringEntity}
 import org.apache.http.impl.nio.client.HttpAsyncClients
-import org.apache.http.util.EntityUtils
 import org.apache.http.{HttpEntity, HttpResponse}
 import play.api.libs.json.{JsValue, Json}
 
@@ -17,24 +16,24 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.Try
 
 object AsyncHttp {
-  val Utf8 = "UTF-8"
-  val DefaultCharset = Try(Charset.forName(Utf8)) getOrElse Charset.defaultCharset()
   val Authorization = "Authorization"
   val Basic = "Basic"
-  val ContentType = "Content-Type"
+  val ContentTypeHeaderName = "Content-Type"
+  val Utf8 = "UTF-8"
+  val DefaultCharset = Try(Charset.forName(Utf8)) getOrElse Charset.defaultCharset()
   val MimeTypeJson = "application/json"
   val WwwFormUrlEncoded = "application/x-www-form-urlencoded"
 
-  def get(url: String)(implicit ec: ExecutionContext): Future[HttpResponse] =
+  def get(url: String)(implicit ec: ExecutionContext): Future[WebResponse] =
     withClient(_.get(url))
 
-  def postJson(url: String, body: JsValue, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[HttpResponse] =
+  def postJson(url: String, body: JsValue, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[WebResponse] =
     withClient(_.post(url, body, headers))
 
-  def post(url: String, body: String, contentType: ContentType, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[HttpResponse] =
+  def post(url: String, body: String, contentType: ContentType, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[WebResponse] =
     withClient(_.postAny(url, body, contentType, headers))
 
-  def withClient(run: AsyncHttp => Future[HttpResponse])(implicit ec: ExecutionContext) = {
+  def withClient(run: AsyncHttp => Future[WebResponse])(implicit ec: ExecutionContext) = {
     val client = new AsyncHttp
     val response = run(client)
     response.onComplete(_ => client.close())
@@ -54,7 +53,19 @@ object AsyncHttp {
       promise.failure(new Exception(s"HTTP request to '$url' cancelled."))
   }
 
-  implicit class RichRequestBuilder(req: HttpUriRequest) {
+  implicit class RichRequestBuilder(builder: RequestBuilder) {
+    def withParameters(ps: Map[String, String]): RequestBuilder = {
+      ps foreach { case (k, v) => builder.addParameter(k, v) }
+      builder
+    }
+
+    def withHeaders(headers: Map[String, String]): RequestBuilder = {
+      headers foreach { case (k, v) => builder.addHeader(k, v) }
+      builder
+    }
+  }
+
+  implicit class RichRequest(req: HttpUriRequest) {
     def setBasicAuth(username: String, password: String): Unit =
       req.setHeader(Authorization, basicAuthHeaderValue(username, password))
 
@@ -70,40 +81,47 @@ class AsyncHttp()(implicit ec: ExecutionContext) extends Closeable {
   val client = HttpAsyncClients.createDefault()
   client.start()
 
-  def get(url: String): Future[HttpResponse] =
+  def get(url: String): Future[WebResponse] =
     execute(new HttpGet(url))
 
-  def post(url: String, body: JsValue, headers: Map[String, String] = Map.empty): Future[HttpResponse] = {
+  def post(url: String, body: JsValue, headers: Map[String, String] = Map.empty): Future[WebResponse] = {
     val entity = new StringEntity(Json.stringify(body), ContentType.APPLICATION_JSON)
     postEntity(url, entity, headers)
   }
 
-  def postAny(url: String, body: String, contentType: ContentType, headers: Map[String, String] = Map.empty): Future[HttpResponse] = {
-    val entity = new StringEntity(body, contentType)
-    postEntity(url, entity, headers)
-  }
+  def postAny(url: String,
+              body: String,
+              contentType: ContentType,
+              headers: Map[String, String] = Map.empty): Future[WebResponse] =
+    postEntity(url, new StringEntity(body, contentType), headers)
 
-  def postEntity(url: String,
-                 entity: HttpEntity,
-                 headers: Map[String, String] = Map.empty,
-                 params: Map[String, String] = Map.empty): Future[HttpResponse] = {
-    val builder = RequestBuilder.post(url)
+  def postEntity(url: String, entity: HttpEntity, headers: Map[String, String]) = {
+    val builder = postRequest(url, headers)
     builder setEntity entity
-    headers foreach { case (key, value) => builder.addHeader(key, value) }
-    params foreach { case (key, value) => builder.addParameter(key, value) }
     execute(builder.build())
   }
 
-  def execute(req: HttpUriRequest): Future[HttpResponse] =
-    startExecute(req).map { r =>
-      Option(r.getEntity).foreach(EntityUtils.consume)
-      r
-    }
+  def postForm(url: String, params: Map[String, String]): Future[WebResponse] =
+    postEmpty(url, Map(ContentTypeHeaderName -> WwwFormUrlEncoded), params)
 
-  def startExecute(req: HttpUriRequest): Future[HttpResponse] = {
+  def postEmpty(url: String,
+                headers: Map[String, String] = Map.empty,
+                params: Map[String, String] = Map.empty): Future[WebResponse] = {
+    val builder = postRequest(url, headers, params)
+    execute(builder.build())
+  }
+
+  def postRequest(url: String,
+                  headers: Map[String, String] = Map.empty,
+                  params: Map[String, String] = Map.empty): RequestBuilder = {
+    val builder = RequestBuilder.post(url)
+    builder.withHeaders(headers).withParameters(params)
+  }
+
+  def execute(req: HttpUriRequest): Future[WebResponse] = {
     val handler = new PromisingHandler(req.getURI.toString)
     client.execute(req, handler)
-    handler.promise.future
+    handler.promise.future.map(WebResponse.apply)
   }
 
   def close(): Unit = client.close()
