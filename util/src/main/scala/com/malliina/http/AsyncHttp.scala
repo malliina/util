@@ -24,13 +24,13 @@ object AsyncHttp {
   val MimeTypeJson = "application/json"
   val WwwFormUrlEncoded = "application/x-www-form-urlencoded"
 
-  def get(url: String)(implicit ec: ExecutionContext): Future[WebResponse] =
+  def get(url: FullUrl)(implicit ec: ExecutionContext): Future[WebResponse] =
     withClient(_.get(url))
 
-  def postJson(url: String, body: JsValue, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[WebResponse] =
+  def postJson(url: FullUrl, body: JsValue, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[WebResponse] =
     withClient(_.post(url, body, headers))
 
-  def post(url: String, body: String, contentType: ContentType, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[WebResponse] =
+  def post(url: FullUrl, body: String, contentType: ContentType, headers: Map[String, String] = Map.empty)(implicit ec: ExecutionContext): Future[WebResponse] =
     withClient(_.postAny(url, body, contentType, headers))
 
   def withClient(run: AsyncHttp => Future[WebResponse])(implicit ec: ExecutionContext) = {
@@ -40,7 +40,7 @@ object AsyncHttp {
     response
   }
 
-  private class PromisingHandler(url: String) extends FutureCallback[HttpResponse] {
+  private class PromisingHandler(url: FullUrl) extends FutureCallback[HttpResponse] {
     val promise = Promise[HttpResponse]()
 
     override def failed(ex: Exception): Unit =
@@ -81,47 +81,52 @@ class AsyncHttp()(implicit ec: ExecutionContext) extends Closeable {
   val client = HttpAsyncClients.createDefault()
   client.start()
 
-  def get(url: String): Future[WebResponse] =
-    execute(new HttpGet(url))
+  def get(url: FullUrl): Future[WebResponse] =
+    execute(new HttpGet(url.url))
 
-  def post(url: String, body: JsValue, headers: Map[String, String] = Map.empty): Future[WebResponse] = {
+  def post(url: FullUrl, body: JsValue, headers: Map[String, String] = Map.empty): Future[WebResponse] = {
     val entity = new StringEntity(Json.stringify(body), ContentType.APPLICATION_JSON)
     postEntity(url, entity, headers)
   }
 
-  def postAny(url: String,
+  def postAny(url: FullUrl,
               body: String,
               contentType: ContentType,
               headers: Map[String, String] = Map.empty): Future[WebResponse] =
     postEntity(url, new StringEntity(body, contentType), headers)
 
-  def postEntity(url: String, entity: HttpEntity, headers: Map[String, String]) = {
+  def postEntity(url: FullUrl, entity: HttpEntity, headers: Map[String, String]) = {
     val builder = postRequest(url, headers)
     builder setEntity entity
     execute(builder.build())
   }
 
-  def postForm(url: String, params: Map[String, String]): Future[WebResponse] =
+  def postForm(url: FullUrl, params: Map[String, String]): Future[WebResponse] =
     postEmpty(url, Map(ContentTypeHeaderName -> WwwFormUrlEncoded), params)
 
-  def postEmpty(url: String,
+  def postEmpty(url: FullUrl,
                 headers: Map[String, String] = Map.empty,
                 params: Map[String, String] = Map.empty): Future[WebResponse] = {
     val builder = postRequest(url, headers, params)
     execute(builder.build())
   }
 
-  def postRequest(url: String,
+  def postRequest(url: FullUrl,
                   headers: Map[String, String] = Map.empty,
                   params: Map[String, String] = Map.empty): RequestBuilder = {
-    val builder = RequestBuilder.post(url)
+    val builder = RequestBuilder.post(url.url)
     builder.withHeaders(headers).withParameters(params)
   }
 
   def execute(req: HttpUriRequest): Future[WebResponse] = {
-    val handler = new PromisingHandler(req.getURI.toString)
-    client.execute(req, handler)
-    handler.promise.future.map(WebResponse.apply)
+    val uri = req.getURI.toString
+    FullUrl.build(req.getURI.toString).map { url =>
+      val handler = new PromisingHandler(url)
+      client.execute(req, handler)
+      handler.promise.future.map(WebResponse.apply)
+    }.getOrElse {
+      Future.failed(new Exception(s"Invalid URL: '$uri'."))
+    }
   }
 
   def close(): Unit = client.close()

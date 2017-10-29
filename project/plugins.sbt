@@ -1,4 +1,4 @@
-scalaVersion := "2.10.6"
+scalaVersion := "2.12.3"
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 resolvers ++= Seq(
   "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
@@ -7,7 +7,7 @@ resolvers ++= Seq(
   ivyResolver("malliina bintray sbt", url("https://dl.bintray.com/malliina/sbt-plugins/"))
 )
 
-addSbtPlugin("com.malliina" % "sbt-utils" % "0.6.3")
+addSbtPlugin("com.malliina" % "sbt-utils" % "0.7.0")
 
 def ivyResolver(name: String, repoUrl: sbt.URL) =
   Resolver.url(name, repoUrl)(Resolver.ivyStylePatterns)
