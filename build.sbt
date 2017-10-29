@@ -29,8 +29,6 @@ def trivialSettings = Seq(
   gitUserName := "malliina",
   developerName := "Michael Skogberg",
   scalaVersion := "2.12.4",
-  crossScalaVersions := Seq("2.10.6", "2.11.11", scalaVersion.value),
-  releaseCrossBuild := true,
   resolvers ++= Seq(
     "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
     "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
@@ -47,10 +45,7 @@ def baseSettings = trivialSettings ++ Seq(
 
 def extraActorSettings = Seq(
   libraryDependencies ++= {
-    val actorVersion = CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, minor)) if minor >= 11 => "2.5.3"
-      case _ => "2.3.16"
-    }
+    val actorVersion = "2.5.6"
     Seq(
       "com.typesafe.akka" %% "akka-actor" % actorVersion,
       "com.typesafe.akka" %% "akka-testkit" % actorVersion % Test
