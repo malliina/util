@@ -1,18 +1,18 @@
 import com.malliina.sbtutils.SbtUtils
 import com.malliina.sbtutils.SbtUtils.{developerName, gitUserName}
 
-val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4" % Test
+val scalaTest = "org.scalatest" %% "scalatest" % "3.0.5" % Test
 val slf4j = "org.slf4j" % "slf4j-api" % "1.7.25"
 val logBackClassic = "ch.qos.logback" % "logback-classic" % "1.2.3"
 val logBackCore = "ch.qos.logback" % "logback-core" % "1.2.3"
 val loggingDeps = Seq(slf4j, logBackClassic, logBackCore)
-val commonsIO = "commons-io" % "commons-io" % "2.4"
-val commonsCodec = "commons-codec" % "commons-codec" % "1.10"
+val commonsIO = "commons-io" % "commons-io" % "2.6"
+val commonsCodec = "commons-codec" % "commons-codec" % "1.11"
 val azureStorage = "com.microsoft.azure" % "azure-storage" % "5.0.0"
-val utilBase = "com.malliina" %% "util-base" % "1.3.2"
+val utilBase = "com.malliina" %% "util-base" % "1.4.1"
 val httpClient = "org.apache.httpcomponents" % "httpasyncclient" % "4.1.3"
 
-lazy val parent = project.in(file("."))
+lazy val utilRoot = project.in(file("."))
   .settings(rootSettings: _*)
   .aggregate(util, actor, rmi)
 
@@ -45,7 +45,7 @@ def baseSettings = trivialSettings ++ Seq(
 
 def extraActorSettings = Seq(
   libraryDependencies ++= {
-    val actorVersion = "2.5.6"
+    val actorVersion = "2.5.11"
     Seq(
       "com.typesafe.akka" %% "akka-actor" % actorVersion,
       "com.typesafe.akka" %% "akka-testkit" % actorVersion % Test
