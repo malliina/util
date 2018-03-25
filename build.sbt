@@ -9,14 +9,13 @@ val loggingDeps = Seq(slf4j, logBackClassic, logBackCore)
 val commonsIO = "commons-io" % "commons-io" % "2.6"
 val commonsCodec = "commons-codec" % "commons-codec" % "1.11"
 val azureStorage = "com.microsoft.azure" % "azure-storage" % "5.0.0"
-val utilBase = "com.malliina" %% "util-base" % "1.4.1"
-val httpClient = "org.apache.httpcomponents" % "httpasyncclient" % "4.1.3"
+val utilBase = "com.malliina" %% "util-base" % "1.5.0"
 
 lazy val utilRoot = project.in(file("."))
   .settings(rootSettings: _*)
   .aggregate(util, actor, rmi)
 
-lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase, httpClient) ++ loggingDeps)
+lazy val util = testableProject("util", deps = Seq(commonsIO, commonsCodec, utilBase) ++ loggingDeps)
 lazy val actor = utilProject("util-actor")
   .settings(extraActorSettings)
 lazy val rmi = utilProject("util-rmi")
@@ -28,7 +27,7 @@ def trivialSettings = Seq(
   organization := s"com.${gitUserName.value}",
   gitUserName := "malliina",
   developerName := "Michael Skogberg",
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.5",
   resolvers ++= Seq(
     "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
     "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",

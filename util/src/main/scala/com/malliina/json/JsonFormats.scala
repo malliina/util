@@ -1,28 +1,9 @@
 package com.malliina.json
 
-import com.malliina.storage.{StorageLong, StorageSize}
 import play.api.libs.json.Json._
 import play.api.libs.json.{Format, JsResult, JsValue}
 
-import scala.concurrent.duration.{Duration, DurationLong}
-
 trait JsonFormats {
-
-  /** Serializes Duration to Long (seconds), deserializes Long to Duration.
-    */
-  implicit object durationFormat extends Format[Duration] {
-    def writes(o: Duration): JsValue = toJson(o.toSeconds)
-
-    def reads(json: JsValue): JsResult[Duration] =
-      json.validate[Long].map(_.seconds)
-  }
-
-  implicit object storageSizeFormat extends Format[StorageSize] {
-    override def writes(o: StorageSize): JsValue = toJson(o.toBytes)
-
-    override def reads(json: JsValue): JsResult[StorageSize] =
-      json.validate[Long].map(_.bytes)
-  }
 
   /** Json reader/writer. Writes toString and reads as specified by `f`.
     *
