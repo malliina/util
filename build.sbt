@@ -9,7 +9,7 @@ val loggingDeps = Seq(slf4j, logBackClassic, logBackCore)
 val commonsIO = "commons-io" % "commons-io" % "2.6"
 val commonsCodec = "commons-codec" % "commons-codec" % "1.11"
 val azureStorage = "com.microsoft.azure" % "azure-storage" % "5.0.0"
-val utilBase = "com.malliina" %% "util-base" % "1.5.0"
+val utilBase = "com.malliina" %% "util-base" % "1.5.2"
 
 lazy val utilRoot = project.in(file("."))
   .settings(rootSettings: _*)
