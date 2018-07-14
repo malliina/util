@@ -9,7 +9,7 @@ val loggingDeps = Seq(slf4j, logBackClassic, logBackCore)
 val commonsIO = "commons-io" % "commons-io" % "2.6"
 val commonsCodec = "commons-codec" % "commons-codec" % "1.11"
 val azureStorage = "com.microsoft.azure" % "azure-storage" % "5.0.0"
-val utilBase = "com.malliina" %% "util-base" % "1.5.2"
+val utilBase = "com.malliina" %% "util-base" % "1.6.0"
 
 lazy val utilRoot = project.in(file("."))
   .settings(rootSettings: _*)
@@ -27,7 +27,7 @@ def trivialSettings = Seq(
   organization := s"com.${gitUserName.value}",
   gitUserName := "malliina",
   developerName := "Michael Skogberg",
-  scalaVersion := "2.12.5",
+  scalaVersion := "2.12.6",
   resolvers ++= Seq(
     "Typesafe releases" at "http://repo.typesafe.com/typesafe/releases/",
     "Sonatype releases" at "https://oss.sonatype.org/content/repositories/releases/",
@@ -44,7 +44,7 @@ def baseSettings = trivialSettings ++ Seq(
 
 def extraActorSettings = Seq(
   libraryDependencies ++= {
-    val actorVersion = "2.5.11"
+    val actorVersion = "2.5.14"
     Seq(
       "com.typesafe.akka" %% "akka-actor" % actorVersion,
       "com.typesafe.akka" %% "akka-testkit" % actorVersion % Test
